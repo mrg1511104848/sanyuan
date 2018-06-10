@@ -22,6 +22,15 @@ public interface VerifyTypeEnums {
 	 * 无效的适应症
 	 */
 	public static final int INVALID_INDICATION = 4;
+	/**
+	 * 无效的用法
+	 */
+	public static final int INVALID_USAGE = 5;
+	
+	/**
+	 * 转换用量单位时出现错误
+	 */
+	public static final int ERROR_PARSE_DOSAGE_UNIT = 6;
 	
 	/**
 	 * 通过

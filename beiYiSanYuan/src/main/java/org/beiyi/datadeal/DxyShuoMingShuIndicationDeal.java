@@ -1,10 +1,7 @@
 package org.beiyi.datadeal;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,13 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.ansj.domain.Term;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.xmlbeans.impl.jam.mutable.MPackage;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.reource.Resources;
 import org.bson.Document;

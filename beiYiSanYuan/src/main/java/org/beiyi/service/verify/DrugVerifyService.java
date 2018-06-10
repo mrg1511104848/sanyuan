@@ -59,7 +59,6 @@ public class DrugVerifyService  implements IDrugVerifyObserverable{
 				verifyResult.setSuccess(false);
 				verifyResult.setResultMsg(allResultMsg);
 				
-				
 				if(lastStepVerifyResult.getSuccessDrugs().size() == 0){//全部失败，直接返回审核的结果，不进行下一流程的审核
 					return verifyResult;
 				}else{//部分失败，继续审核其他药的其他流程

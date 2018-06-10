@@ -7,6 +7,7 @@ import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.service.verify.impl.JiLiangVerifyService;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
+import org.beiyi.service.verify.impl.UsageVerifyService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.PrescriptionReadUtil;
 import org.skynet.frame.util.excel.ExcelBean;
@@ -20,9 +21,10 @@ public class DrugVerifyServiceTest {
 		
 		IDrugVeryfy shiYingZhengService = new ShiYingZhengVerifyService();
 		IDrugVeryfy jiLiangVerifyService = new JiLiangVerifyService();
+		IDrugVeryfy useageVerifyService = new UsageVerifyService();
 		drugVerifyService.registerDrugVerify(shiYingZhengService);
 		drugVerifyService.registerDrugVerify(jiLiangVerifyService);
-		
+		drugVerifyService.registerDrugVerify(useageVerifyService);
 		
 		List<ChuFang> chuFangList = PrescriptionReadUtil.chuFangList;
 		
@@ -46,7 +48,6 @@ public class DrugVerifyServiceTest {
 				}
 			}
 		}
-			
 		List<ExcelBean> excelBeans = new ArrayList<ExcelBean>();
 		ExcelBean excelBean = new ExcelBean(cells, successValues, "正确处方.xls");
 		excelBeans.add(excelBean);
@@ -54,7 +55,7 @@ public class DrugVerifyServiceTest {
 		excelBeans.add(excelBean);
 		
 		String exportTestResultPath = "D://logs/错误处方模拟_其他测试/";
-		exportTestResultPath = "C://公司/北医三院/错误处方模拟_其他测试/";
+//		exportTestResultPath = "C://公司/北医三院/错误处方模拟_其他测试/";
 		ExcelUtil.export(exportTestResultPath, excelBeans);
 	}
 }

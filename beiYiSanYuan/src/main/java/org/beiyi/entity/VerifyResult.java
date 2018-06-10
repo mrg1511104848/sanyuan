@@ -65,7 +65,13 @@ public class VerifyResult {
 		}
 		if(drug == null)
 			throw new RuntimeException("When the method drugContainsInErrorDrugs() is called, the passed argument drug is null");
-		return lastStepVerifyResult.getErrorDrugs().contains(drug);
+		List<DrugVerifyInfo> drugVerifyInfos = lastStepVerifyResult.getErrorDrugs();
+		for (DrugVerifyInfo drugVerifyInfo : drugVerifyInfos) {
+			if(drugVerifyInfo.getDrug().equals(drug)){
+				return true;
+			}
+		}
+		return false;
 	}
 	public String getResultMsg() {
 		return resultMsg;

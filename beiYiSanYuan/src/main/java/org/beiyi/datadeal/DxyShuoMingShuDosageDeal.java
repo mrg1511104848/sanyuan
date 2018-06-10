@@ -237,8 +237,8 @@ public class DxyShuoMingShuDosageDeal {
 						drugCombinationName));
 			}
 		}
-		ExcelUtil.export("D://temp_丁香园剂量导出V3.xls", cells, values);
-		ExcelUtil.export("D://temp_丁香园剂量导出V3(不确定的药品).xls", cells,
+		ExcelUtil.export("D://temp_丁香园剂量导出V5.xls", cells, values);
+		ExcelUtil.export("D://temp_丁香园剂量导出V5(不确定的药品).xls", cells,
 				probablyMedicineValues);
 	}
 
