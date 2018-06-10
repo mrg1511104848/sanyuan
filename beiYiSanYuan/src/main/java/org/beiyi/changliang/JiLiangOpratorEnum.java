@@ -8,4 +8,5 @@ public class JiLiangOpratorEnum {
 	public static final String GEQ = ">=";
 	public static final String BETWEEN = "<>";
 	public static final String MULTIPLY = "*";
+	public static final String DEVIDED = "/";
 }

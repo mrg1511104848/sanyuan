@@ -858,60 +858,34 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 		if (StringUtils.isBlank(dosage) || StringUtils.isBlank(dosageUnit)) {
 			return null;
 		}
-
-		if (dosageUnit.equals("mg") || dosageUnit.equals("ml")) {
-			return new String[] { dosage, dosageUnit };
-		}
-		String parsedDosageUnit = null;
-		// 单位统一转为double
-		double dosageDouble = DoubleUtil.parseStr2Double(dosage, 3);
-		if (dosageUnit.equalsIgnoreCase("g")
-				|| dosageUnit.equalsIgnoreCase("克")) {
-			dosageDouble = dosageDouble * 1000;
-			parsedDosageUnit = "mg";
-		} else
-
-		if (dosageUnit.equalsIgnoreCase("μg")
-				|| dosageUnit.equalsIgnoreCase("微克")) {
-			dosageDouble = dosageDouble / 10000000;
-			parsedDosageUnit = "mg";
-		} else
-
-		if (dosageUnit.equalsIgnoreCase("L")
-				|| dosageUnit.equalsIgnoreCase("升")) {
-			dosageDouble = dosageDouble * 1000;
-			parsedDosageUnit = "ml";
-		} else
-
-		if (dosageUnit.equalsIgnoreCase("μl")
-				|| dosageUnit.equalsIgnoreCase("微升")) {
-			dosageDouble = dosageDouble / 1000000;
-			parsedDosageUnit = "ml";
-		}
-		
+		String parsedDosage = null;
 		if(Resources.dosageUnitConversionMap.containsKey(dosageUnit)){
 			String[] convertInfo = Resources.dosageUnitConversionMap.get(dosageUnit);
-			String toEleDosageUnit = convertInfo[0];
+			String parsedDosageUnit = convertInfo[0];
 			String opNum = convertInfo[1];
 			String op = convertInfo[2];
 			Oprator oprator = getSpecialParseToStandardOp(opNum);
-			/*if(toEleDosageUnit.equals(chuFangDrug.getDosageUnit())){
-				if(oprator.getType().equals(JiLiangOpratorEnum.BETWEEN)){
-					List<Double> ranges = oprator.getToCompareNums();
-					if(op.equals(JiLiangOpratorEnum.MULTIPLY)){
-						double start = DoubleUtil.parseStr2Double(instructionUse.getDosage(), 3)*ranges.get(0);
-						double end = DoubleUtil.parseStr2Double(instructionUse.getDosage(), 3)*ranges.get(1);
-						String instructionDosage = start+"~"+end;
-						return new String[] {chuFangDrug.getDosage() , instructionDosage
-								};
-					}
+			if(oprator.getType().equals(JiLiangOpratorEnum.BETWEEN)){
+				List<Double> ranges = oprator.getToCompareNums();
+				if(op.equals(JiLiangOpratorEnum.MULTIPLY)){
+					double start = DoubleUtil.parseStr2Double(dosage, 3)*ranges.get(0);
+					double end = DoubleUtil.parseStr2Double(dosage, 3)*ranges.get(1);
+					parsedDosage = start+"~"+end;
+				}else{
+					throw new RuntimeException(" The other oprators not support!");
 				}
-			}*/
-			
+			}else if(oprator.getType().equals(JiLiangOpratorEnum.EQ)){
+				if(op.equals(JiLiangOpratorEnum.MULTIPLY)){
+					double parsedDosageDouble = DoubleUtil.parseStr2Double(dosage, 3)*DoubleUtil.parseStr2Double(opNum, 3);
+					parsedDosage = parsedDosageDouble + "";
+				}else if(op.equals(JiLiangOpratorEnum.DEVIDED)){
+					double parsedDosageDouble = DoubleUtil.parseStr2Double(dosage, 3)/DoubleUtil.parseStr2Double(opNum, 3);
+					parsedDosage = parsedDosageDouble + "";
+				}
+			}
+			return new String[] { parsedDosage, parsedDosageUnit };
 		}
-		
-		
-		return new String[] { dosageDouble + "", parsedDosageUnit };
+		return null;
 	}
 
 	/**
