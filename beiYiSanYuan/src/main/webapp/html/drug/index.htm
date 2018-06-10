@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>北医三院 - 药品录入</title>
+<link rel="stylesheet" type="text/css"
+	href="resource/H-ui/static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="resource/H-ui/lib/Hui-iconfont/1.0.8/iconfont.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="resource/css/common.css" />
+</head>
+<body>
+	<h3>北医三院 - 药品录入</h3>
+	<form action="save.htm" method="post" class="form form-horizontal"
+		id="demoform-2" novalidate="novalidate">
+		<input type="hidden" id="id" name="id" value="${id}"/>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">通用名【药品名称】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text valid" name="tongYongName">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">商品名【药品名称】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text valid" name="shangPinName"
+					id="shangPinName">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">英文名【药品名称】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off"
+					name="enName" id="enName">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">剂型：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off"
+					name="preparation" id="preparation">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">主成份【成份】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off"
+					name="mainComponent" id="mainComponent">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">辅料【成份】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off"
+					name="accessories" id="accessories">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">性状：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off"
+					name="character" id="character">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">规格：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off"
+					name="specification" id="specification">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">药物分类：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off"
+					name="classification" id="classification">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">是否OTC：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" autocomplete="off" name="otc"
+					id="otc">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">医保类型：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="medicareType"
+					id="medicareType">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">执行标准：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="standard" id="standard">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">批准文号：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="approveCode"
+					id="approveCode">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">生产企业：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="companyName"
+					id="companyName">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">修改日期：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="modifyDate"
+					id="modifyDate">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">适应症：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<div id="tab_demo" class="HuiTab" role="tablist">
+					<div class="tabBar clearfix"></div>
+				</div>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">疾病【禁用】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="disableDisease"
+					id="disableDisease">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">特殊人群【禁用】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="disableSpecialCrowd"
+					id="disableSpecialCrowd">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">过敏【禁用】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="disableIrritability"
+					id="disableIrritability">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">合并药物【禁用】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="disableCombinedDrug"
+					id="disableCombinedDrug">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">疾病【慎用】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="cautionDisease"
+					id="cautionDisease">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">医生指导下使用：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="cautionGuidance"
+					id="cautionGuidance">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">孕妇禁用标记【孕妇及哺乳期用药】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text"
+					name="contraindicatedInPregnancy" id="contraindicatedInPregnancy">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">FDA妊娠药物分级【孕妇及哺乳期用药】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text"
+					name="fdaPregnancyDrugClassification"
+					id="fdaPregnancyDrugClassification">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">哺乳期禁用标记【孕妇及哺乳期用药】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="disableLactation"
+					id="disableLactation">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">哺乳期药物分级【孕妇及哺乳期用药】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="lactationDrugLevel"
+					id="lactationDrugLevel">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">contraindicated【药物相互作用】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="contraindicated"
+					id="contraindicated">
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">major【药物相互作用】：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" name="major" id="major">
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<input class="btn btn-primary" type="button" onclick="subForm()"
+					value="&nbsp;&nbsp;保存&nbsp;&nbsp;">
+				<input class="btn btn-primary" type="button" onclick="window.location.href='toList.htm'"
+					value="&nbsp;&nbsp;返回药品列表&nbsp;&nbsp;">
+			</div>
+		</div>
+	</form>
+
+
+	<div class="shi-ying-zheng-common" style="display: none;">
+		<div class="tabCon bk-gray pd-10" role="tabpanel"
+			style="display: block;">
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-3">适应症：</label>
+				<div class="formControls col-xs-8 col-sm-9">
+					<input type="text" class="input-text" />
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-3">常规用法用量【成人】：</label>
+				<div class="formControls col-xs-8 col-sm-9">
+					<input type="text" class="input-text" />
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-3">肝功能不全剂量调整【成人】：</label>
+				<div class="formControls col-xs-8 col-sm-9">
+					<input type="text" class="input-text" />
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-3">肾功能不全剂量调整【成人】：</label>
+				<div class="formControls col-xs-8 col-sm-9">
+					<input type="text" class="input-text" />
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-3">血液透析剂量调整【成人】：</label>
+				<div class="formControls col-xs-8 col-sm-9">
+					<input type="text" class="input-text" />
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-3">其他疾病状态剂量调整【成人】：</label>
+				<div class="formControls col-xs-8 col-sm-9">
+					<input type="text" class="input-text" />
+				</div>
+			</div>
+			<div class="row cl">
+				<label class="form-label col-xs-4 col-sm-3">常规用法用量【儿童】：</label>
+				<div class="formControls col-xs-8 col-sm-9">
+					<input type="text" class="input-text" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript"
+		src="resource/H-ui/lib/jquery/1.9.1/jquery.min.js"></script>
+	<script type="text/javascript"
+		src="resource/H-ui/lib/jquery-ui/1.9.1/jquery-ui.min.js"></script>
+	<script type="text/javascript"
+		src="resource/H-ui/static/h-ui/js/H-ui.js"></script>
+	<script type="text/javascript"
+		src="resource/H-ui/lib/jquery.SuperSlide/2.1.1/jquery.SuperSlide.min.js"></script>
+	<script type="text/javascript"
+		src="resource/H-ui/lib/jquery.validation/1.14.0/jquery.validate.min.js"></script>
+	<script type="text/javascript"
+		src="resource/H-ui/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+	<script type="text/javascript"
+		src="resource/H-ui/lib/jquery.validation/1.14.0/messages_zh.min.js"></script>
+	<script type="text/javascript" src="resource/js/index.js"></script>
+</body>
+</html>
