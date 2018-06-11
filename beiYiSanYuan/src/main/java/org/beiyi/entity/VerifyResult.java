@@ -29,7 +29,18 @@ public class VerifyResult {
 	 */
 	private List<DrugVerifyInfo> successDrugs = new ArrayList<DrugVerifyInfo>();
 	
+	/**
+	 * 是否将错误药品传递到下一个审核流程中去，为false的话表示不传递错误药品，下一流程仍然审核该药品
+	 */
+	private boolean transmitErrorDrugs;
 	
+	public VerifyResult() {
+		super();
+	}
+	public VerifyResult(boolean transmitErrorDrugs) {
+		super();
+		this.transmitErrorDrugs = transmitErrorDrugs;
+	}
 	public static VerifyResult success(){
 		VerifyResult result = new VerifyResult();
 		result.success = true;
@@ -56,8 +67,19 @@ public class VerifyResult {
 		result.successDrugs = successDrugs;
 		return result;
 	}
+	
+	public static VerifyResult fail(String resultMsg, List<DrugVerifyInfo> errorDrugs,
+			List<DrugVerifyInfo> successDrugs, boolean transmitErrorDrugs) {
+		VerifyResult result = new VerifyResult();
+		result.resultMsg = resultMsg;
+		result.errorDrugs = errorDrugs;
+		result.successDrugs = successDrugs;
+		result.transmitErrorDrugs = transmitErrorDrugs;
+		return result;
+	}
 	/**
 	 * 查看上一步审核过程中（适应症）是否包含这个错误的drug
+	 * 如果上一审核流程的transmitErrorDrugs(错误药品可传递标识)为false，则在判断是否包含这个drug时，默认返回false；
 	 */
 	public static boolean drugContainsInErrorDrugs(VerifyResult lastStepVerifyResult,Drug drug){
 		if(lastStepVerifyResult == null){
@@ -65,9 +87,11 @@ public class VerifyResult {
 		}
 		if(drug == null)
 			throw new RuntimeException("When the method drugContainsInErrorDrugs() is called, the passed argument drug is null");
-		List<DrugVerifyInfo> drugVerifyInfos = lastStepVerifyResult.getErrorDrugs();
-		for (DrugVerifyInfo drugVerifyInfo : drugVerifyInfos) {
-			if(drugVerifyInfo.getDrug().equals(drug)){
+		List<DrugVerifyInfo> errDrugVerifyInfos = lastStepVerifyResult.getErrorDrugs();
+		//drugContainsInErrorDrugs执行的时候，判断是否包含这个错误药品，如果包含，则不审核这个药品，而
+		//transmitErrorDrugs(错误药品可传递标识)如果为true，代表将上一流程的错误药品传递下去，该错误药品不需要下一流程审核，
+		for (DrugVerifyInfo errDrugVerifyInfo : errDrugVerifyInfos) {
+			if(errDrugVerifyInfo.getDrug().equals(drug) ){
 				return true;
 			}
 		}
@@ -99,5 +123,11 @@ public class VerifyResult {
 	}
 	public void setSuccessDrugs(List<DrugVerifyInfo> successDrugs) {
 		this.successDrugs = successDrugs;
+	}
+	public boolean isTransmitErrorDrugs() {
+		return transmitErrorDrugs;
+	}
+	public void setTransmitErrorDrugs(boolean transmitErrorDrugs) {
+		this.transmitErrorDrugs = transmitErrorDrugs;
 	}
 }

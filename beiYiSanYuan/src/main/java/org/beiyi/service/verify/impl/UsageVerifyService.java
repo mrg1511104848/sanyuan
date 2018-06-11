@@ -33,9 +33,6 @@ public class UsageVerifyService implements IDrugVeryfy {
 		
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
 			boolean chuFangDrugRouteOfMedicationIsValid = false;
-			if(VerifyResult.drugContainsInErrorDrugs(lastStepVerifyResult, chuFangDrug)){
-				continue;
-			}
 			
 			String chuFangRouteOfMedication = chuFangDrug.getRouteOfMedication();
 			if(StringUtils.isBlank(chuFangRouteOfMedication)){
@@ -91,6 +88,7 @@ public class UsageVerifyService implements IDrugVeryfy {
 		}
 		
 		if(verifyResult.getErrorDrugs().size() > 0){
+			verifyResult.setSuccess(false);
 			verifyResult.setResultMsg(errMsgBuffer.toString());
 		}else{
 			verifyResult.setSuccess(true);

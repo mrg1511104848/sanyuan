@@ -69,7 +69,7 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 		List<String> shiYingZhengs = chuFang.getDiagnosises();
 		int chuFangDrugInBaseDBCount = 0;
 		boolean chuFangIsValid = true;
-		VerifyResult verifyResult = new VerifyResult();
+		VerifyResult verifyResult = new VerifyResult(true);
 		StringBuilder errorSb = new StringBuilder();
 		for (Drug drug : drugs) {
 			String drugCombinationName = drug.getDrugCombinationName();
@@ -102,14 +102,14 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 			}
 		}
 		if(chuFangDrugInBaseDBCount == 0){
-			return VerifyResult.fail("无此药 , 原因 :"+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs());
+			return VerifyResult.fail("无此药 , 原因 :"+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs(),verifyResult.isTransmitErrorDrugs());
 		}
 		if(chuFangDrugInBaseDBCount!=drugs.size()){
-			return VerifyResult.fail("未审核 , 原因 :"+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs());
+			return VerifyResult.fail("未审核 , 原因 :"+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs(),verifyResult.isTransmitErrorDrugs());
 		}else if(chuFangIsValid){
 			return VerifyResult.success("适应证用药");
 		}else{
-			return VerifyResult.fail("无适应证用药 , 原因 : "+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs());
+			return VerifyResult.fail("无适应证用药 , 原因 : "+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs(),verifyResult.isTransmitErrorDrugs());
 		}
 	}
 }

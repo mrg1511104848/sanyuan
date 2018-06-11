@@ -87,12 +87,8 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		int chuFangDrugValidCount = 0;
 		StringBuffer chuFangErrBuffer = new StringBuffer();
-		chuFangDrugLoopOutter: for (Drug chuFangDrug : chuFangDrugVerifingList) {
-
-			if (VerifyResult.drugContainsInErrorDrugs(lastStepVerifyResult,
-					chuFangDrug)) {
-				continue;
-			}
+		chuFangDrugLoopOutter: 
+		for (Drug chuFangDrug : chuFangDrugVerifingList) {
 			String chuFangDrugDosage = chuFangDrug.getDosage();
 			String chuFangDrugDosageUnit = chuFangDrug.getDosageUnit();
 			String chuFangDrugDosingFrequency = chuFangDrug
@@ -150,6 +146,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 				String instructionDosageUnit = instructionUse.getDosageUnit(); // 粒
 																				// 片
 																				// 次/日
+				instructionDoseSelection = parseDoseSelection(instructionDoseSelection);
 				String instructionDosingFrequency = instructionUse
 						.getDosingFrequency(); // BID Q6H 次
 				String[] instructionBlankElement = getBlankElement(
@@ -275,8 +272,6 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 			outter: for (JiLiangCheckRecord jiLiangCheckRecord : jiLiangCheckRecords) {
 				String doseSelection = jiLiangCheckRecord.getTargetJiLiang()
 						.getDoseSelection();
-				// TODO : doseSelection为空时如何处理
-
 				// 从resouce中初始化的分组中，根据剂量选择判断属于哪个分组
 				for (int i = 0; i < jiLiangSelectionGroupList.size(); i++) {
 					List<JiLiang> jiLiangSelectionGroup = jiLiangSelectionGroupList
@@ -339,11 +334,21 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 				chuFangErrBuffer.append(errorMsg);
 			}
 		}
-		return chuFangDrugValidCount == chuFangDrugVerifingList.size() ? VerifyResult
-				.success() : VerifyResult.fail("审核失败，剂量存在问题（"
-				+ chuFangErrBuffer.toString() + "）");
+		if(chuFangDrugValidCount == chuFangDrugVerifingList.size()){
+			return VerifyResult
+					.success();
+		}else{
+			verifyResult.setResultMsg("审核失败，剂量存在问题（"
+					+ chuFangErrBuffer.toString() + "）");
+			return verifyResult;
+		}
 	}
-
+	private String parseDoseSelection(String doseSelection){
+		if(StringUtils.isBlank(doseSelection)){
+			return "常规剂量";
+		}
+		return doseSelection;
+	}
 	private StringBuffer removeEnd(StringBuffer sb, String remove) {
 		StringBuffer resultBuffer = new StringBuffer(StringUtils.removeEnd(
 				sb.toString(), remove));

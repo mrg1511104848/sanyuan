@@ -1,6 +1,7 @@
 package org.beiyi.service.verify;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +40,7 @@ public class DrugVerifyService  implements IDrugVerifyObserverable{
 			allResultMsg = "";
 		}
 		VerifyResult lastStepVerifyResult = null;
+		
 		for (IDrugVeryfy iDrugVeryfy : drugVerifies) {
 			lastStepVerifyResult = iDrugVeryfy.verify(cf,lastStepVerifyResult);
 			if(!lastStepVerifyResult.isSuccess()){
@@ -48,22 +50,35 @@ public class DrugVerifyService  implements IDrugVerifyObserverable{
 				
 				allResultMsg += lastStepVerifyResult.getResultMsg() + " \n ";//只要是失败的，就将错误的返回信息拼装记录一下。
 				
-				//只要是审核不适宜的药品，就将不适宜的药品拼装到总的verifyResult的不适宜药品中。
+				//只要是审核不适宜的药品， 就将不适宜的药品拼装到总的verifyResult的不适宜药品中。
 				List<DrugVerifyInfo> allErrorDrugs = verifyResult.getErrorDrugs();
 				List<DrugVerifyInfo> lastStepVerifyErrorDrugs = lastStepVerifyResult.getErrorDrugs();
-				for (DrugVerifyInfo lastStepVerifyErrorDrug : lastStepVerifyErrorDrugs) {
+				boolean isTransmitErrorDrug = lastStepVerifyResult.isTransmitErrorDrugs();//如果为true表示需要传递错误的药品，删除该错误药品，不让错误药品进入下一流程审核。
+				Iterator<DrugVerifyInfo> lastStepVerifyErrDrugItr = lastStepVerifyErrorDrugs.iterator();
+				while (lastStepVerifyErrDrugItr.hasNext()) {
+					DrugVerifyInfo lastStepVerifyErrorDrug = lastStepVerifyErrDrugItr.next();
 					if(!allErrorDrugs.contains(lastStepVerifyErrorDrug)){
 						allErrorDrugs.add(lastStepVerifyErrorDrug);
+					}
+					
+					if(isTransmitErrorDrug){
+						List<Drug> drugs = cf.getDrugs();
+						Iterator<Drug> cfDrugItr = drugs.iterator();
+						while (cfDrugItr.hasNext()) {
+							if(lastStepVerifyErrorDrug.getDrug().equals(cfDrugItr.next())){
+								cfDrugItr.remove();
+							}
+						}
 					}
 				}
 				verifyResult.setSuccess(false);
 				verifyResult.setResultMsg(allResultMsg);
 				
-				if(lastStepVerifyResult.getSuccessDrugs().size() == 0){//全部失败，直接返回审核的结果，不进行下一流程的审核
+				/*if(lastStepVerifyResult.getSuccessDrugs().size() == 0){//全部失败，直接返回审核的结果，不进行下一流程的审核
 					return verifyResult;
 				}else{//部分失败，继续审核其他药的其他流程
 					
-				}
+				}*/
 			}
 		}
 		if(verifyResult.getErrorDrugs().size() == 0){
