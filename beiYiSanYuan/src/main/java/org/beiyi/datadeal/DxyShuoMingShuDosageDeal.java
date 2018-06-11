@@ -118,10 +118,12 @@ public class DxyShuoMingShuDosageDeal {
 	public static void loadTestDrugNameList() throws InvalidFormatException,
 			IOException {
 		List<List<String>> testDrugList = null;
+		String path = "D://爱客服/数据_ALL/北医三院/三院提供/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx";
+		path = "C://BaiduYunDownload/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx";
 		testDrugList = ExcelUtils
 				.getInstance()
-				.readExcel2List(
-						"D://爱客服/数据_ALL/北医三院/三院提供/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx");
+				.readExcel2List(path
+						);
 		for (int i = 1; i < testDrugList.size(); i++) {
 			List<String> drugList = testDrugList.get(i);
 			String combinationName = drugList.get(1);

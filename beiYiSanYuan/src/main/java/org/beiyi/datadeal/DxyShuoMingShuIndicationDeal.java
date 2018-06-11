@@ -1,5 +1,6 @@
 package org.beiyi.datadeal;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.ansj.domain.Term;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -35,7 +38,8 @@ public class DxyShuoMingShuIndicationDeal {
 	private static final Map<String, String> DISEASE_ICD10CODE = new HashMap<String, String>();
 	private static final Map<String, String> ICD_VERSION_MAP = new HashMap<String, String>();
 	public static void main(String[] args) {
-		dealByICD10();
+//		dealByICD10();
+		loadKeyWordFromDrugIndication();
 		log.info("over!");
 	}
 	static{
@@ -52,7 +56,9 @@ public class DxyShuoMingShuIndicationDeal {
 					log.info("load icd10 from sheet "+fI);
 					List<List<String>> icd10DiseaseList = null;
 					try {
-						icd10DiseaseList = ExcelUtils.getInstance().readExcel2List("D://爱客服/数据_ALL/北医三院/数据/数据处理/微信ICD10part"+fI+".xls");
+						String path = "D://爱客服/数据_ALL/北医三院/数据/数据处理/微信ICD10part"+fI+".xls";
+						path = "C://BaiduYunDownload/微信ICD10part"+fI+".xls";
+						icd10DiseaseList = ExcelUtils.getInstance().readExcel2List(path);
 					} catch (InvalidFormatException | IOException e) {
 						e.printStackTrace();
 					}
@@ -77,6 +83,33 @@ public class DxyShuoMingShuIndicationDeal {
 		}*/
 		System.out.println("over");
 		return allIcd10DiseaseList;
+	}
+	public static void loadKeyWordFromDrugIndication(){
+		MongoCursor<Document> dxy_app_drug_detail_simple_cursor = MongoUtil.iterator("dxy_app_drug_detail_simple");
+		List<String> writeList = new ArrayList<String>();
+		while (dxy_app_drug_detail_simple_cursor.hasNext()) {
+			Document doc = dxy_app_drug_detail_simple_cursor.next();
+			String commonName = doc.getString("commonName");
+			String cnName = doc.getString("cnName");
+			String indication = doc.getString("indication");
+			DrugCombinationName drugCombinationName = new DrugCombinationName(cnName+"("+commonName+")");
+			
+			
+			List<Term> termList = AnalysisUtil.getTermList(indication);
+			StringBuffer sb = new StringBuffer();
+			writeList.add(drugCombinationName.getCombinationName());
+			writeList.add(indication);
+			for (Term term : termList) {
+				sb.append(term.getName()+"("+term.getNatureStr()+")");
+			}
+			writeList.add(sb.toString());
+			writeList.add("");
+		}
+		try {
+			FileUtils.writeLines(new File("C://temp_loadKeyWordFromDrugIndication.txt"), writeList);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public static void loadICD10Dict(){
 		List<String> dictList = new ArrayList<String>();
