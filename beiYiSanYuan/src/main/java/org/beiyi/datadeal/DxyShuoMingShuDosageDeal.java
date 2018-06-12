@@ -118,10 +118,12 @@ public class DxyShuoMingShuDosageDeal {
 	public static void loadTestDrugNameList() throws InvalidFormatException,
 			IOException {
 		List<List<String>> testDrugList = null;
+		String path = "D://爱客服/数据_ALL/北医三院/三院提供/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx";
+		path = "C://BaiduYunDownload/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx";
 		testDrugList = ExcelUtils
 				.getInstance()
-				.readExcel2List(
-						"D://爱客服/数据_ALL/北医三院/三院提供/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx");
+				.readExcel2List(path
+						);
 		for (int i = 1; i < testDrugList.size(); i++) {
 			List<String> drugList = testDrugList.get(i);
 			String combinationName = drugList.get(1);
@@ -270,7 +272,7 @@ public class DxyShuoMingShuDosageDeal {
 
 				values.add(subValues);
 			} else {
-				// values.add(subValues);
+//				 values.add(subValues);
 			}
 		}
 		if (values.size() == 0) {
@@ -344,14 +346,22 @@ public class DxyShuoMingShuDosageDeal {
 		for (int index = 0; index < dosageSetenceArr.length; index++) {
 			String sentence = dosageSetenceArr[index];
 			if (sentence.matches(dosageRegex)) {
+				if(sentence.contains("大多数病人最佳用量为每日 2 粒(0.5 μg)至 4 粒(1.0 μg)之间")){
+					System.out.println();
+				}
+				
 				Set<String> dosageFilterResultSet = new HashSet<String>();
 				String[] dosageFilterRegexGroupList = dosageFilterRegex.split("@@");
 				for (String dosageFilterRegexGroupEach : dosageFilterRegexGroupList) {
-					String dosageFilterResult = RegexUtils.getByRegex(dosageFilterRegexGroupEach, sentence);
-					if(StringUtils.isNotBlank(dosageFilterResult)){
-						dosageFilterResultSet.add(dosageFilterResult.trim());
+					List<String> dosageFilterResults = RegexUtils.getAllMatchByRegex(dosageFilterRegexGroupEach, sentence);
+					if(dosageFilterResults== null) continue;
+					for (String dosageFilterResult : dosageFilterResults) {
+						if(StringUtils.isNotBlank(dosageFilterResult)){
+							dosageFilterResultSet.add(dosageFilterResult.trim());
+						}
 					}
 				}
+				
 				sentence = sentence + "  转换后 : ";
 				for (String dosageFilterResult : dosageFilterResultSet) {
 					sentence = sentence + dosageFilterResult+" | ";

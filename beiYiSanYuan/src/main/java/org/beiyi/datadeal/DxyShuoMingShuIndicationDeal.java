@@ -1,5 +1,6 @@
 package org.beiyi.datadeal;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.ansj.domain.Term;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -35,8 +38,16 @@ public class DxyShuoMingShuIndicationDeal {
 	private static final Map<String, String> DISEASE_ICD10CODE = new HashMap<String, String>();
 	private static final Map<String, String> ICD_VERSION_MAP = new HashMap<String, String>();
 	public static void main(String[] args) {
-		dealByICD10();
+//		dealByICD10();
+		loadKeyWordFromDrugIndication();
 		log.info("over!");
+	}
+	private static void test() {
+		String testStr = "希刻劳适用于治疗下列敏感菌株引起的感染： 中耳炎：由肺炎双球菌、流感嗜血杆菌、葡萄球菌、化脓性链球菌 (A 组 B 溶血性链球菌) 和卡他莫拉氏菌引起。 下呼吸道感染 (包括肺炎)：由肺炎双球菌、流感嗜血杆菌、化脓性链球菌 (A 组 B 溶血性链球菌) 和卡他莫拉氏菌引起。 上呼吸道感染 (包括咽炎和扁桃体炎)：由化脓性链球菌 (A 组β溶血性链球菌) 和卡他莫拉氏菌引起。 注：青霉素是治疗和预防链球菌感染 (包括预防风湿热) 的常用药，美国心脏协会推荐羧氨苄青霉素 (Amoxicillin) 作为预防牙科、口腔和上呼吸道感染引起的细菌性心内膜炎的药物， 在此方面，对于预防α溶血性链球菌感染，青霉素 V 是合理的选择。一般说来头孢克洛对于消灭鼻咽部的链球菌有效，然而，对于预防继发性风湿热或细菌性心内膜炎，目前尚无证实头孢克洛疗效的重要数据。治疗β溶血性链球菌感染时、至少应给予 10 天的头孢克洛治疗量。 尿道感染 (包括肾盂肾炎和膀胱炎)：由大肠杆菌、奇异变形杆菌、克雷白氏杆菌属和凝固酶阴性的葡萄球菌引起。 注：头孢克洛对急性和慢性尿道感染都有效。 皮肤和皮肤组织感染：由金葡球菌和化脓性链球菌 (A 组 B 溶血性链球菌) 引起。 鼻窦炎 淋球菌性尿道炎 应进行适当的组织培养和敏感性研究，以测定致病菌对头孢克洛的敏感性。";
+		List<Term> terms = AnalysisUtil.getTermList(testStr);
+		for (Term term : terms) {
+			System.out.println(term.getName()+"\t"+term.getNatureStr());
+		}
 	}
 	static{
 		
@@ -52,7 +63,9 @@ public class DxyShuoMingShuIndicationDeal {
 					log.info("load icd10 from sheet "+fI);
 					List<List<String>> icd10DiseaseList = null;
 					try {
-						icd10DiseaseList = ExcelUtils.getInstance().readExcel2List("D://爱客服/数据_ALL/北医三院/数据/数据处理/微信ICD10part"+fI+".xls");
+						String path = "D://爱客服/数据_ALL/北医三院/数据/数据处理/微信ICD10part"+fI+".xls";
+						path = "C://BaiduYunDownload/微信ICD10part"+fI+".xls";
+						icd10DiseaseList = ExcelUtils.getInstance().readExcel2List(path);
 					} catch (InvalidFormatException | IOException e) {
 						e.printStackTrace();
 					}
@@ -77,6 +90,33 @@ public class DxyShuoMingShuIndicationDeal {
 		}*/
 		System.out.println("over");
 		return allIcd10DiseaseList;
+	}
+	public static void loadKeyWordFromDrugIndication(){
+		MongoCursor<Document> dxy_app_drug_detail_simple_cursor = MongoUtil.iterator("dxy_app_drug_detail_simple");
+		List<String> writeList = new ArrayList<String>();
+		while (dxy_app_drug_detail_simple_cursor.hasNext()) {
+			Document doc = dxy_app_drug_detail_simple_cursor.next();
+			String commonName = doc.getString("commonName");
+			String cnName = doc.getString("cnName");
+			String indication = doc.getString("indication");
+			DrugCombinationName drugCombinationName = new DrugCombinationName(cnName+"("+commonName+")");
+			
+			
+			List<Term> termList = AnalysisUtil.getTermList(indication);
+			StringBuffer sb = new StringBuffer();
+			writeList.add(drugCombinationName.getCombinationName());
+			writeList.add(indication);
+			for (Term term : termList) {
+				sb.append(term.getName()+"("+term.getNatureStr()+")");
+			}
+			writeList.add(sb.toString());
+			writeList.add("");
+		}
+		try {
+			FileUtils.writeLines(new File("C://temp_loadKeyWordFromDrugIndication.txt"), writeList);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	public static void loadICD10Dict(){
 		List<String> dictList = new ArrayList<String>();
@@ -135,6 +175,9 @@ public class DxyShuoMingShuIndicationDeal {
 			}
 			if(drugCombinationExistsInExport.contains(drugCombinationName.getCombinationStandardName())){
 				continue;
+			}
+			if(drugCombinationName.getCombinationName().equals("三辰(佐匹克隆片)")){
+				System.out.println();
 			}
 			List<List<String>> indicationParseResult = parse(indication,drugCombinationName);
 			if(indicationParseResult!=null && indicationParseResult.size()>0){

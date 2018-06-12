@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 
 public class WechatSentencePatternUtil {
-	private static final String IMGURL_REG = "(?i)<img\\s*src=\\\\\"(.*?)\\\\\"[^<]>";
+	private static final String IMGURL_REG = "(?i)<img\\s*src=\"(.*?)\"[^<]>";
 	private static final String SENTENCE_INOUT_TAG_REG = "<[^>]+>";
 	public static void main(String[] args) {
 		try {
@@ -20,6 +20,9 @@ public class WechatSentencePatternUtil {
 			List<String> filterImgs = getImg(testSentence);
 			for (String matchSenctence : filterImgs) {
 				System.out.println(matchSenctence);
+			}
+			for (String matchSenctence : filterImgs) {
+				testSentence = testSentence.replaceFirst(IMGURL_REG, matchSenctence);
 			}
 			String filterSentences = getSentenceInOrOutTheTag(testSentence);
 			System.out.println(filterSentences);
@@ -34,7 +37,7 @@ public class WechatSentencePatternUtil {
 	 * @return
 	 */
 	public static String getSentenceInOrOutTheTag(String html)  {
-		 Pattern ptn = Pattern.compile(SENTENCE_INOUT_TAG_REG,Pattern.CASE_INSENSITIVE);
+		 Pattern ptn = Pattern.compile(SENTENCE_INOUT_TAG_REG);
 		 Matcher m_html = ptn.matcher(html);
 		 String resultHtml = m_html.replaceAll("");
 		 return resultHtml;
