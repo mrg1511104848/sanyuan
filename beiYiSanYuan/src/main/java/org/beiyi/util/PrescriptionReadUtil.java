@@ -25,8 +25,8 @@ public class PrescriptionReadUtil {
 	private static List<List<String>> records;// 处方记录
 	public static List<String> cellsList;
 	public static List<ChuFang> chuFangList = new ArrayList<ChuFang>();
-	// public static String chuFangPath =
-	// "D://爱客服/北医三院/三院提供/三院提供的数据/处方/门急诊处方明细表-2017.3.6-2017.3.10（重新整理20180420）(1).xlsx";
+//	 public static String chuFangPath =
+//	 "D://爱客服/数据_ALL/北医三院/三院提供/三院提供的数据/处方/门急诊处方明细表-2017.3.6-2017.3.10（重新整理20180420）(1).xlsx";
 //	public static String chuFangPath = "D://爱客服/北医三院/三院提供/三院提供的数据/处方/模拟处方/错误处方模拟_多个药一种病.xlsx";
 //	public static String chuFangPath = "D://爱客服/数据_ALL/北医三院/三院提供/三院提供的数据/处方/模拟处方/cs.xlsx";
 //	public static String chuFangPath = "D://用法用量错误处方模拟20180601.xlsx";

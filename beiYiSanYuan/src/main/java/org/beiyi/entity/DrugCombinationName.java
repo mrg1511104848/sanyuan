@@ -40,6 +40,9 @@ public class DrugCombinationName {
 	public String getStandardShangPinName(){
 		return DrugInfoParseToStandard.shangPinNameParseToStandard(this.shangPinName);
 	}
+	public String getStandardTongYongName(){
+		return DrugInfoParseToStandard.tongYongNameParseToStandard(this.tongYongName);
+	}
 	public String getCombinationStandardName(){
 		return DrugInfoParseToStandard.shangPinNameParseToStandard(this.shangPinName)+"("+this.tongYongName+")";
 	}

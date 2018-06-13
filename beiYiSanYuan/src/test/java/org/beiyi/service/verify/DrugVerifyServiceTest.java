@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.service.verify.impl.DrugEffectVerifyService;
 import org.beiyi.service.verify.impl.JiLiangVerifyService;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
 import org.beiyi.service.verify.impl.UsageVerifyService;
@@ -22,10 +23,11 @@ public class DrugVerifyServiceTest {
 		IDrugVeryfy shiYingZhengService = new ShiYingZhengVerifyService();
 		IDrugVeryfy jiLiangVerifyService = new JiLiangVerifyService();
 		IDrugVeryfy useageVerifyService = new UsageVerifyService();
-		drugVerifyService.registerDrugVerify(shiYingZhengService);
-		drugVerifyService.registerDrugVerify(jiLiangVerifyService);
-		drugVerifyService.registerDrugVerify(useageVerifyService);
-		
+		IDrugVeryfy drugEffectVerifyService = new DrugEffectVerifyService();
+//		drugVerifyService.registerDrugVerify(shiYingZhengService);
+//		drugVerifyService.registerDrugVerify(jiLiangVerifyService);
+//		drugVerifyService.registerDrugVerify(useageVerifyService);
+		drugVerifyService.registerDrugVerify(drugEffectVerifyService);
 		List<ChuFang> chuFangList = PrescriptionReadUtil.chuFangList;
 		
 		List<String> cells = new ArrayList<String>();

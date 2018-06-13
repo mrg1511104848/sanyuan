@@ -28,6 +28,7 @@ import org.beiyi.util.InstructionsReadUtil;
 import org.junit.Assert;
 import org.skynet.frame.util.DoubleUtil;
 import org.skynet.frame.util.RegexUtils;
+import org.skynet.frame.util.StringBufferUtil;
 import org.skynet.frame.util.date.DateUtil;
 import org.skynet.frame.util.excel.ExcelUtil;
 
@@ -349,11 +350,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 		}
 		return doseSelection;
 	}
-	private StringBuffer removeEnd(StringBuffer sb, String remove) {
-		StringBuffer resultBuffer = new StringBuffer(StringUtils.removeEnd(
-				sb.toString(), remove));
-		return resultBuffer;
-	}
+	
 
 	/**
 	 * 封装剂量审核的错误信息
@@ -434,7 +431,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 				resultTxtDosing.append(instructionDos);
 				resultTxtDosing.append("，");
 			}
-			resultTxtDosing = removeEnd(resultTxtDosing, "，").append("）范围内");
+			resultTxtDosing = StringBufferUtil.removeEnd(resultTxtDosing, "，").append("）范围内");
 		}
 
 		StringBuffer resultTxtDosingFrequency = new StringBuffer();
@@ -455,7 +452,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 				resultTxtDosingFrequency.append(instructionDosFrequency);
 				resultTxtDosingFrequency.append("，");
 			}
-			resultTxtDosingFrequency = removeEnd(resultTxtDosingFrequency, "，");
+			resultTxtDosingFrequency = StringBufferUtil.removeEnd(resultTxtDosingFrequency, "，");
 			resultTxtDosingFrequency.append("）范围内");
 		}
 		// return errorMsgSb.toString() + " 转换后:"+parseAfterErrorMsg.toString();

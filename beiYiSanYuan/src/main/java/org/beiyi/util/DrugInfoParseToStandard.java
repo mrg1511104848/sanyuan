@@ -18,6 +18,19 @@ public class DrugInfoParseToStandard {
 		return standardShangPinName;
 	}
 	/**
+	 * 通用名统一格式化
+	 */
+	public static String tongYongNameParseToStandard(String tongYongMing){
+		List<String> tongYongNameRegexList = RegexUtils.getByGroup("(左旋|小儿|复方|右旋|注射用){0,1}(.+?)(口服|片|分散片|混悬液|缓释胶囊|胶囊|缓释片|乳膏|凝胶|软胶囊|糖浆|搽剂|缓释混悬液|混悬液|颗粒|注射液|滴眼液|泡腾片|眼膏|肠溶片|栓){1,3}", tongYongMing, 2);
+    	if(tongYongNameRegexList.size() == 0){
+    		tongYongNameRegexList = RegexUtils.getByGroup("(左旋|小儿|复方|右旋|注射用){0,1}(.+)", tongYongMing, 2);
+    	}
+    	if(tongYongNameRegexList.size() > 0){
+    		tongYongMing = tongYongNameRegexList.get(0);
+    	}
+    	return tongYongMing;
+	}
+	/**
 	 * 获取药品名称(1 商品  、 2 通用)
 	 * @param combinationName
 	 * @param type
