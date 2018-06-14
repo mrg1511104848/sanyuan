@@ -1,2 +1,4 @@
 /bin/
 /target/
+/Program Files (x86)/
+*.log
