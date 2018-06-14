@@ -27,7 +27,7 @@ public class CFDADealFinal {
 	 * 将sfda_each_page_html_no_rep遍历，并取出商品名、本位码、生产公司、药品批准文号， 去drugfutureAndSupplementAll中查找。如果找到，则将结果封装到 cfda_final中
 	 */
 	public static void dealFinal(){
-		List<Document> docs = MongoUtil.findDocList("sfda_each_page_html_no_rep");
+		List<Document> docs = MongoUtil.findDocList("sfda_each_page_html_no_rep",100);
 		for (Document doc : docs) {
 			String html = doc.getString("html");
 			
@@ -51,34 +51,44 @@ public class CFDADealFinal {
 					log.error("[href] > "+ doc.getInteger("href")+" spm blank err >"+drugEach);
 					continue;
 				}
+				Map<String, Object> queryMap = new HashMap<String, Object>();
 				String productName = spm.substring(0,spm.length()-1);
 				if(StringUtils.isNotBlank(productName)){
 					productName = productName.trim();
+					queryMap.put("productName", productName);
 				}
-				String piZhunWenHao= RegexUtils.getByRegex("(国药.+)", moreInfo).trim();
-				if(StringUtils.isNotBlank(piZhunWenHao)){
-					piZhunWenHao = piZhunWenHao.trim();
+				List<String> piZhunWenHaoRegexResult= RegexUtils.getByGroup("[\\s　]+(^国药.+)", moreInfo,1);
+				String piZhunWenHao=null;
+				if(piZhunWenHaoRegexResult.size()>0){
+					piZhunWenHao= piZhunWenHaoRegexResult.get(0).trim();
+					queryMap.put("piZhunWenHao", piZhunWenHao);
 				}
-				List<String> manufactureFactoryRegexResult = RegexUtils.getByGroup("([\\s　]*[\u4e00-\u9fa5\\(（\\)））·〇\\- \\+].+?)国药", moreInfo,1);
+				List<String> manufactureFactoryRegexResult = RegexUtils.getByGroup("([\\s　]*[\u4e00-\u9fa5\\(（\\)））·〇\\- \\+].+?)[\\s　]+国药", moreInfo,1);
 				String manufactureFactory=null;
-				if(manufactureFactoryRegexResult.size()>0)
+				if(manufactureFactoryRegexResult.size()>0){
 					manufactureFactory= manufactureFactoryRegexResult.get(0).trim();
+//					queryMap.put("manufactureFactory", manufactureFactory);
+				}
 				String benWeiMa= RegexUtils.getByRegex("([\\d；;]*)", moreInfo);
+				if(StringUtils.isNotBlank(benWeiMa)){
+					benWeiMa = benWeiMa.trim();
+					queryMap.put("benWeiMa", benWeiMa);
+				}
+				if(queryMap.size() == 0 ){
+					log.error("[href] > "+ doc.getInteger("href")+" queryMap.size() == 0  err >"+drugEach);
+					continue;
+				}
+				if(MongoUtil.has("cfda_final", queryMap)){
+					continue;
+				}
 				
-				Map<String, Object> queryMap = new HashMap<String, Object>();
-				queryMap.put("productName", productName);
-				queryMap.put("piZhunWenHao", piZhunWenHao);
-				queryMap.put("manufactureFactory", manufactureFactory);
-				queryMap.put("benWeiMa", benWeiMa);
+				
 				Document drugfutureFindResult = MongoUtil.findOne("drugfutureAndSupplementAll", queryMap);
 				if(drugfutureFindResult==null){
 					log.error("[href] > "+ doc.getInteger("href")+" drugfutureAndSupplementAll find not result err >"+drugEach);
 					continue;
 				}
 				
-				if(MongoUtil.has("cfda_final", queryMap)){
-					continue;
-				}
 				
 				MongoUtil.saveDoc("cfda_final", drugfutureFindResult);
 				
