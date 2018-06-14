@@ -2,3 +2,4 @@
 /target/
 /Program Files (x86)/
 *.log
+/src/main/resource/

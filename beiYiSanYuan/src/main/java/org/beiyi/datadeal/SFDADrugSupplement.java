@@ -199,8 +199,9 @@ public class SFDADrugSupplement {
 		driver.quit();
 	}
 	private static void deal2DrugfutureAndSupplementAll(){
-		MongoUtil.cpCollection("drugfutureDeal", "drugfutureAndSupplementAll");
-		MongoUtil.cpCollection("drugfutureSupplementDeal", "drugfutureAndSupplementAll");
+//		MongoUtil.cpCollection("drugfutureDeal", "drugfutureAndSupplementAll");
+//		MongoUtil.cpCollection("drugfutureSupplementDeal", "drugfutureAndSupplementAll");
+		MongoUtil.cpCollection("drugfutureSupplementBySFDADeal", "drugfutureAndSupplementAll");
 	}
 	private static boolean htmlReourceIsBlank(String pageSource){
 		if(pageSource!=null){
