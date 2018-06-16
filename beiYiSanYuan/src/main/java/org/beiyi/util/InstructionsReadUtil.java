@@ -11,9 +11,15 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.beiyi.datadeal.YiMaiTongDataDeal;
 import org.beiyi.entity.DrugCombinationName;
+import org.beiyi.entity.verify.ATCCode;
+import org.beiyi.entity.verify.Drug;
+import org.beiyi.entity.verify.DrugCategory;
 import org.beiyi.entity.verify.Instruction;
 import org.beiyi.entity.verify.InstructionUse;
+import org.bson.Document;
+import org.skynet.frame.util.mongo.MongoUtil;
 
 import com.github.crab2died.ExcelUtils;
 
@@ -23,6 +29,7 @@ import com.github.crab2died.ExcelUtils;
  *
  */
 public class InstructionsReadUtil {
+	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(InstructionsReadUtil.class);
 	private static List<List<String>> records;//说明书记录
 	private static List<Instruction> instructions = new ArrayList<Instruction>();
 	public static Map<String, Set<String>> drugShiYingZhengMap = new HashMap<String, Set<String>>(); //药品适应症对应MAP
@@ -43,6 +50,8 @@ public class InstructionsReadUtil {
 			e.printStackTrace();
 		}
 		shiYingZhengRead();
+		loadTests();
+		loadInstructionCategorys();
 	}
 	public static Instruction get(String drugCombinationName){
 		for (Instruction instruction : instructions) {
@@ -52,24 +61,43 @@ public class InstructionsReadUtil {
 		}
 		return null;
 	}
+	private static void loadTests() {
+		String[] tests = {"自维(L-谷氨酰胺胶囊)","新麦林(谷氨酰胺颗粒)"};
+		for (int i = 0; i < tests.length; i++) {
+			Instruction instruction = new Instruction();
+			instruction.setDrugCombinationName(tests[i]);
+			ATCCode atcCode = new ATCCode();
+//			atcCode.setAtcNo("A0"+i+"CC1"+i);
+			instruction.setAtcCode(atcCode);
+			instructions.add(instruction);
+		}
+	}
 	public static List<Instruction> shiYingZhengRead(){
 		for (int i = 3; i < records.size(); i++) {
 			List<String> r = records.get(i);
 			if(r.size()<20) continue;
 			String tongYongName = r.get(0);
+			String shangPinName = r.get(1);
+			String form = r.get(4);
+			String standard = r.get(10);
+			String atcCode = r.get(11);
+			String shiyingzheng = r.get(20);
+			String shiyingzhengKuoZhan = r.get(21);
 			if(StringUtils.isBlank(tongYongName) || tongYongName.equals("直接提取")){
 				continue;
 			}
-			String shangPinName = r.get(1);
 			tongYongName = tongYongName.trim();
 			DrugCombinationName drugCombinationName = new DrugCombinationName(shangPinName, tongYongName);
 			String combinationName = drugCombinationName.getCombinationStandardName();
-			String shiyingzheng = r.get(20);
-			String shiyingzhengKuoZhan = r.get(21);
 			Set<String> syzAll = getOneDrugShiYingZhengAll(shiyingzheng,shiyingzhengKuoZhan);//单个药品所有的适应症
+			
 			
 			Instruction instruction = new Instruction();
 			instruction.setDrugCombinationName(combinationName);
+			
+			ATCCode atcCd = new ATCCode();
+			atcCd.setAtcNo(atcCode);
+			instruction.setAtcCode(atcCd);
 			if(instructions.contains(instruction)){
 				for (Instruction inst : instructions) {
 					if(inst.equals(instruction)){
@@ -90,15 +118,14 @@ public class InstructionsReadUtil {
 				}
 			}
 			instruction.setDiagnosises(diagnosisesList);
-			instruction.setForm(r.get(4));
-			instruction.setStandard(r.get(10));
+			instruction.setForm(form);
+			instruction.setStandard(standard);
 			
 			List<InstructionUse> instructionUses = instruction.getInstructionUses();
 			if(instructionUses == null){
 				instructionUses = new ArrayList<InstructionUse>();
 			}
 			InstructionUse instructionUse = new InstructionUse();
-			
 			instructionUse.setDoseSelection(r.get(22));
 			instructionUse.setPatientStatus(r.get(23));
 			instructionUse.setDosage(r.get(25));
@@ -107,6 +134,7 @@ public class InstructionsReadUtil {
 			instructionUse.setRouteOfMedication(r.get(28));
 			instructionUse.setCourseControl(r.get(29));
 			instructionUses.add(instructionUse);
+			
 			instruction.setInstructionUses(instructionUses);
 			if(!instructions.contains(instruction)){
 				instructions.add(instruction);
@@ -114,6 +142,36 @@ public class InstructionsReadUtil {
 			System.out.println(combinationName+"\t"+shiyingzheng);
 		}
 		return instructions;
+	}
+	/**
+	 * 加载说明书中药品的分类
+	 */
+	private static void loadInstructionCategorys(){
+		logger.info(" -- start load instruction categorys");
+		for (Instruction instruction : instructions) {
+			DrugCombinationName drugCombinationName = new DrugCombinationName(instruction.getDrugCombinationName());
+			String combinationStandardName = drugCombinationName.getCombinationStandardName();
+			
+			Document yiMaiTongFinalStandardDoc = MongoUtil.findOne("yiMaiTongFinalStandard", "combinationStandardName", combinationStandardName);
+			if(yiMaiTongFinalStandardDoc!=null){
+				String category = yiMaiTongFinalStandardDoc.getString("category");
+				DrugCategory drugCategory = new DrugCategory();
+				drugCategory.setCategoryName(category);
+				drugCategory.setSource("医脉通");
+				instruction.setCategory(drugCategory);
+			}
+		}
+		logger.info(" -- end load instruction categorys");
+	}
+	/**
+	 * 加载说明书中药品的分类
+	 */
+	private static void loadInstructionATCLevels(){
+		logger.info(" -- start load instruction ATC levels");
+		/*for (Instruction instruction : instructions) {
+			ATCCode atcCode = instruction.getAtcCode();
+		}*/
+		logger.info(" -- end load instruction ATC levels");
 	}
 	private static Set<String> getOneDrugShiYingZhengAll(String... shiyingzheng){
 		Set<String> shiYingZhengFilterAfter = new HashSet<String>();

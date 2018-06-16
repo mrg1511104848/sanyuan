@@ -9,10 +9,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import net.sf.json.JSONArray;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.cookie.Cookie;
@@ -30,6 +32,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.skynet.frame.persistent.MongoIndex;
 import org.skynet.frame.persistent.MongoPersistent;
+import org.skynet.frame.util.ListUtil;
 import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.excel.ExcelUtil;
 import org.skynet.frame.util.http.HttpUtil;
@@ -66,7 +69,8 @@ public class MicroEffectDeal {
 //		 getDrugEffectMaterial();
 //		step1();
 //		step2();
-		drugAtcInfoDDIExport();
+//		MongoUtil.cpCollection("drugAtcInfoDDIWithDXYV2", "drugAtcInfoDDIWithDXYV3");
+//		drugAtcInfoDDIExport();
 		drugAtcInfoDDIWithDXYExport();
 	}
 	static List<List<String>> atcInfos = null;
@@ -214,6 +218,25 @@ public class MicroEffectDeal {
 			}
 		}
 	}
+	static Map<org.bson.Document, List<String>> drugIdAndEnNameList = null;
+	static{
+		drugIdAndEnNameList = loadDrugList();
+	}
+	private static Map<org.bson.Document, List<String>> loadDrugList(){
+		Map<org.bson.Document, List<String>> drugIdAndEnNameList = new HashMap<org.bson.Document, List<String>>();
+		List<org.bson.Document> documents = MongoUtil.findDocList("dxy_app_drug_detail_deal_final");
+		for (org.bson.Document document : documents) {
+			String englishName = document.getString("englishName");
+			String[] englishNameArr = englishName.split(" ");
+			List<String> enNameList = new ArrayList<String>();
+			for (String enName : englishNameArr) {
+				if(StringUtils.isNotBlank(enName))
+					enNameList.add(enName.trim());
+			}
+			drugIdAndEnNameList.put(document, enNameList);
+		}
+		return drugIdAndEnNameList;
+	}
 	/**
 	 * 遍历drugAtcInfoDDI通过drugAAtcChName和drugBAtcChName去丁香园dxy_app_drug_detail_deal中匹配药品
 	 * ，并存储药品间的的相互作用至drugAtcInfoDDIWithDXY集合中
@@ -228,26 +251,65 @@ public class MicroEffectDeal {
 			org.bson.Document doc = cursor.next();
 			String level = doc.getString("level");
 			String type = doc.getString("type");
+			String drugAAtcEnName = doc.getString("drugAAtcEnName");
+			String drugBAtcEnName = doc.getString("drugBAtcEnName");
+			
 			String drugAAtcChName = doc.getString("drugAAtcChName");
 			String drugBAtcChName = doc.getString("drugBAtcChName");
-			List<Drug> dxyADrugs =  getDrugList(drugAAtcChName);
+		    /*if(drugAAtcEnName.equalsIgnoreCase("Irbesartan") || drugBAtcEnName.equalsIgnoreCase("Irbesartan") ){
+		    	System.out.println();
+		    }else{
+		    	continue;
+		    }*/
+			List<Drug> dxyADrugs =  getDrugList(drugAAtcEnName);
 			if(StringUtils.isNotBlank(type)&&type.equals("与乙醇相关的禁忌")){
 				//去药品中辅料找辅料中含有乙醇或者酒精的。
 				//TODO 去药品中辅料找辅料中含有乙醇或者酒精的。
 				continue;
 			}else{
-				List<Drug> dxyBDrugs = getDrugList(drugBAtcChName);
+				List<Drug> dxyBDrugs = getDrugList(drugBAtcEnName);
 				for (Drug drugA : dxyADrugs) {
 					for (Drug drugB : dxyBDrugs) {
-						Map<String, Object> drugAtcInfoDDIWithDXY = new HashMap<String, Object>();
+						Map<String, Object> drugAtcInfoDDIWithDXY = new LinkedHashMap<String, Object>();
 						MapUtil.cpAndRemoveNullValue(doc, drugAtcInfoDDIWithDXY);
+						
+						Map<String, Object> queryMap = new HashMap<String, Object>();
+						List<Map<String, Object>> list = new ArrayList<Map<String,Object>>();
+						
+						Map<String, Object> or1 = new HashMap<String, Object>();
+						or1.put("dxyDrugAId", drugA.getId());
+						or1.put("dxyDrugBId", drugB.getId());
+						or1.put("drugAAtcEnName", drugAAtcEnName);
+						or1.put("drugBAtcEnName", drugBAtcEnName);
+						or1.put("level", level);
+						list.add(or1);
+						
+						Map<String, Object> or2 = new HashMap<String, Object>();
+						or2.put("dxyDrugAId", drugB.getId());
+						or2.put("dxyDrugBId", drugA.getId());
+						or2.put("drugAAtcEnName", drugBAtcEnName);
+						or2.put("drugBAtcEnName", drugAAtcEnName);
+						or2.put("level", level);
+						list.add(or2);
+						
+						queryMap.put("$or", list);
+						
+						if(MongoUtil.has("drugAtcInfoDDIWithDXYV5", queryMap)) continue;
+						drugAtcInfoDDIWithDXY.remove("_id");
 						drugAtcInfoDDIWithDXY.put("dxyDrugAId", drugA.getId());
 						drugAtcInfoDDIWithDXY.put("dxyDrugAShangPinMing", drugA.getShangPinName());
 						drugAtcInfoDDIWithDXY.put("dxyDrugATongYongMing", drugA.getTongYongName());
+						drugAtcInfoDDIWithDXY.put("dxyDrugAEnName", drugA.getEnName());
+						
+						/*if(drugB.getShangPinName().contains("安博诺") ||drugB.getTongYongName().contains("安博诺") ){
+							System.out.println();
+						}*/
 						drugAtcInfoDDIWithDXY.put("dxyDrugBId", drugB.getId());
 						drugAtcInfoDDIWithDXY.put("dxyDrugBShangPinMing", drugB.getShangPinName());
 						drugAtcInfoDDIWithDXY.put("dxyDrugBTongYongMing", drugB.getTongYongName());
-						MongoUtil.saveDoc("drugAtcInfoDDIWithDXY", drugAtcInfoDDIWithDXY);
+						drugAtcInfoDDIWithDXY.put("dxyDrugBEnName", drugB.getEnName());
+						
+						MongoUtil.saveDoc("drugAtcInfoDDIWithDXYV5", drugAtcInfoDDIWithDXY);
 					}
 				}
 			}
@@ -271,8 +333,33 @@ public class MicroEffectDeal {
 			MongoUtil.saveDoc("dxy_app_drug_detail_deal_final", dxy_app_drug_detail_deal_final);
 		}
 	}
-	private static List<org.beiyi.entity.Drug> getDrugList(String icd10DiseaseTongYongName){
-		List<String> tongYongNameList = ICD10ParseUtil.getDiseaseNames(icd10DiseaseTongYongName);
+	/**
+	 * 根据说明书通用名匹配
+	 * @param icd10DiseaseTongYongName
+	 * @return
+	 */
+	private static List<org.beiyi.entity.Drug> getDrugList(String icd10DiseaseEnName){
+		List<org.beiyi.entity.Drug> drugList = new ArrayList<Drug>();
+		Iterator<Entry<org.bson.Document, List<String>>> itr = drugIdAndEnNameList.entrySet().iterator();
+		while (itr.hasNext()) {
+			Entry<org.bson.Document, List<String>> entry = itr.next();
+			List<String> enNameList = entry.getValue();
+			org.bson.Document doc = entry.getKey();
+			if(enNameList!=null){
+				for (String enName : enNameList) {
+					if(icd10DiseaseEnName.trim().equalsIgnoreCase(enName.trim())){
+						Drug d = new Drug();
+						d.setId(doc.getString("drugId"));
+						d.setShangPinName(doc.getString("shangPinMing"));
+						d.setTongYongName(doc.getString("tongYongMing"));
+						d.setEnName(doc.getString("englishName"));
+						d.getEffectCFList().add(enName);
+						drugList.add(d);
+					}
+				}
+			}
+		}
+		/*List<String> tongYongNameList = ICD10ParseUtil.getDiseaseNames(icd10DiseaseEnName);
 		List<org.beiyi.entity.Drug> drugList = new ArrayList<org.beiyi.entity.Drug>();
 		List<String> temp_tongYongNameRegexList_toFile = new ArrayList<String>();
 		for (String tongYongName : tongYongNameList) {
@@ -302,9 +389,11 @@ public class MicroEffectDeal {
 			FileUtils.writeLines(new File("C://temp_tongYongNameRegex.txt"), temp_tongYongNameRegexList_toFile,true);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		return drugList;
 	}
+	
+	
 	private static void saveDrugAtcInfoDDI(List<String> subValues){
 		Map<String, Object> query = new HashMap<String, Object>();
 		Map<String, Object> or1 = new HashMap<String, Object>();
@@ -860,6 +949,7 @@ public class MicroEffectDeal {
 		cells.add("A药品匹配到的ATC英文名");
 		cells.add("A药品匹配到的丁香园药品(商品名)");
 		cells.add("A药品匹配到的丁香园药品(通用名)");
+		cells.add("A药品匹配到的丁香园药品(英文名)");
 		
 		cells.add("B药品英文名(Micro)");
 		cells.add("B药品英文名转换后(Micro)");
@@ -868,11 +958,16 @@ public class MicroEffectDeal {
 		cells.add("B药品匹配到的ATC英文名");
 		cells.add("B药品匹配到的丁香园药品(商品名)");
 		cells.add("B药品匹配到的丁香园药品(通用名)");
+		cells.add("B药品匹配到的丁香园药品(英文名)");
 		cells.add("级别");
 		
-		MongoCursor<org.bson.Document> cursor = MongoUtil.iterator("drugAtcInfoDDIWithDXY");
+		int currCount = 0;
+		MongoCursor<org.bson.Document> cursor = MongoUtil.iterator("drugAtcInfoDDIWithDXYV5",true);
+		int totalCount = MongoUtil.getCount("drugAtcInfoDDIWithDXYV5");
+		int part = 0;
 		while (cursor.hasNext()) {
 			org.bson.Document doc = cursor.next();
+			String drugAId = doc.getString("drugId");
 			String drugAName = doc.getString("drugAName");
 			String drugAParseName = doc.getString("drugAParseName");
 			String drugAAtcNo = doc.getString("drugAAtcNo");
@@ -880,7 +975,9 @@ public class MicroEffectDeal {
 			String drugAAtcEnName = doc.getString("drugAAtcEnName");
 			String dxyDrugAShangPinMing = doc.getString("dxyDrugAShangPinMing");
 			String dxyDrugATongYongMing = doc.getString("dxyDrugATongYongMing");
+			String dxyDrugAEnName = doc.getString("dxyDrugAEnName");
 			
+			String drugBId = doc.getString("drugId");
 			String drugBName = doc.getString("drugBName");
 			String drugBParseName = doc.getString("drugBParseName");
 			String drugBAtcNo = doc.getString("drugBAtcNo");
@@ -888,6 +985,7 @@ public class MicroEffectDeal {
 			String drugBAtcEnName = doc.getString("drugBAtcEnName");
 			String dxyDrugBShangPinMing = doc.getString("dxyDrugBShangPinMing");
 			String dxyDrugBTongYongMing = doc.getString("dxyDrugBTongYongMing");
+			String dxyDrugBEnName = doc.getString("dxyDrugBEnName");
 			
 			String level = doc.getString("level");
 			
@@ -899,6 +997,8 @@ public class MicroEffectDeal {
 			subValues.add(drugAAtcEnName);
 			subValues.add(dxyDrugAShangPinMing);
 			subValues.add(dxyDrugATongYongMing);
+			subValues.add(dxyDrugAEnName);
+			
 			subValues.add(drugBName);
 			subValues.add(drugBParseName);
 			subValues.add(drugBAtcNo);
@@ -906,10 +1006,14 @@ public class MicroEffectDeal {
 			subValues.add(drugBAtcEnName);
 			subValues.add(dxyDrugBShangPinMing);
 			subValues.add(dxyDrugBTongYongMing);
+			subValues.add(dxyDrugBEnName);
 			subValues.add(level);
 			values.add(subValues);
+			System.out.println(++currCount+"/"+totalCount);
 		}
-		
-		ExcelUtil.export("D://爱客服/数据_ALL/北医三院/数据/数据处理/DDI(与丁香园药品关联).xls", cells, values);
+		List<List<List<String>>> splitValueList = ListUtil.createList(values, 60000);
+		for (int i = 0; i < splitValueList.size(); i++) {
+			ExcelUtil.export("D://爱客服/数据_ALL/北医三院/数据/数据处理/DDI(与丁香园药品关联)V5/PART_"+i+".xls", cells, splitValueList.get(i));
+		}
 	}
 }

@@ -33,6 +33,11 @@ public interface VerifyTypeEnums {
 	public static final int ERROR_PARSE_DOSAGE_UNIT = 6;
 	
 	/**
+	 * 重复给药
+	 */
+	public static final int REPEATED_PRESCRIPTIONS = 7;
+	
+	/**
 	 * 通过
 	 */
 	public static final int SUCCESS = 100;

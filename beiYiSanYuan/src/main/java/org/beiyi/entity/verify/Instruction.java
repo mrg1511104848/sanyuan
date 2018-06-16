@@ -22,6 +22,14 @@ public class Instruction {
 	 */
 	private String standard;
 	/**
+	 * ATC编码
+	 */
+	private ATCCode atcCode;
+	/**
+	 * 药品分类
+	 */
+	private DrugCategory category;
+	/**
 	 * 药品使用
 	 */
 	private List<InstructionUse> instructionUses;
@@ -49,6 +57,12 @@ public class Instruction {
 	public void setStandard(String standard) {
 		this.standard = standard;
 	}
+	public ATCCode getAtcCode() {
+		return atcCode;
+	}
+	public void setAtcCode(ATCCode atcCode) {
+		this.atcCode = atcCode;
+	}
 	public List<InstructionUse> getInstructionUses() {
 		return instructionUses;
 	}
@@ -60,6 +74,12 @@ public class Instruction {
 	}
 	public void setDiagnosises(List<String> diagnosises) {
 		this.diagnosises = diagnosises;
+	}
+	public DrugCategory getCategory() {
+		return category;
+	}
+	public void setCategory(DrugCategory category) {
+		this.category = category;
 	}
 	@Override
 	public boolean equals(Object obj) {

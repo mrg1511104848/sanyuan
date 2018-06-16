@@ -7,6 +7,7 @@ import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.service.verify.impl.DrugEffectVerifyService;
 import org.beiyi.service.verify.impl.JiLiangVerifyService;
+import org.beiyi.service.verify.impl.RepeatedPrescriptions;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
 import org.beiyi.service.verify.impl.UsageVerifyService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
@@ -20,14 +21,18 @@ public class DrugVerifyServiceTest {
 	public static void main(String[] args) {
 		DrugVerifyService drugVerifyService = new DrugVerifyService();
 		
-		IDrugVeryfy shiYingZhengService = new ShiYingZhengVerifyService();
-		IDrugVeryfy jiLiangVerifyService = new JiLiangVerifyService();
-		IDrugVeryfy useageVerifyService = new UsageVerifyService();
-		IDrugVeryfy drugEffectVerifyService = new DrugEffectVerifyService();
+		IDrugVeryfy repeatedPrescription = new RepeatedPrescriptions();
+		
+//		IDrugVeryfy drugEffectVerifyService = new DrugEffectVerifyService();
+//		IDrugVeryfy shiYingZhengService = new ShiYingZhengVerifyService();
+//		IDrugVeryfy jiLiangVerifyService = new JiLiangVerifyService();
+//		IDrugVeryfy useageVerifyService = new UsageVerifyService();
+		
+		drugVerifyService.registerDrugVerify(repeatedPrescription);
+//		drugVerifyService.registerDrugVerify(drugEffectVerifyService);
 //		drugVerifyService.registerDrugVerify(shiYingZhengService);
 //		drugVerifyService.registerDrugVerify(jiLiangVerifyService);
 //		drugVerifyService.registerDrugVerify(useageVerifyService);
-		drugVerifyService.registerDrugVerify(drugEffectVerifyService);
 		List<ChuFang> chuFangList = PrescriptionReadUtil.chuFangList;
 		
 		List<String> cells = new ArrayList<String>();

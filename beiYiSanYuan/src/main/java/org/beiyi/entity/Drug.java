@@ -1,5 +1,6 @@
 package org.beiyi.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ public class Drug {
 	private String contraindicated;// 【contraindicated】
 	private String major;// 【major】
 
-	
+	private List<String> effectCFList = new ArrayList<String>();
 
 
 	
@@ -285,5 +286,13 @@ public class Drug {
 
 	public void setMajor(String major) {
 		this.major = major;
+	}
+
+	public List<String> getEffectCFList() {
+		return effectCFList;
+	}
+
+	public void setEffectCFList(List<String> effectCFList) {
+		this.effectCFList = effectCFList;
 	}
 }
