@@ -18,6 +18,7 @@ import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.ATCUtil;
 import org.beiyi.util.InstructionsReadUtil;
+import org.beiyi.util.VerifyUtil;
 
 /**
  * 重复给药审核
@@ -35,17 +36,17 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
 		Set<Drug> notExistsDrugs = new HashSet<Drug>();
-		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行用法审核
+		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行审核
 		for (int i = 0; i < chuFangDrugVerifingList.size(); i++) {
 			Drug chuFangDrugI = chuFangDrugVerifingList.get(i);
-			Instruction instructionI = getInstructionOfChuFangDrug(chuFangDrugI);
+			Instruction instructionI = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugI);
 			if (instructionI == null) {
 				notExistsDrugs.add(chuFangDrugI);
 				continue;
 			}
 			for (int j = i + 1; j < chuFangDrugVerifingList.size(); j++) {
 				Drug chuFangDrugJ = chuFangDrugVerifingList.get(j);
-				Instruction instructionJ = getInstructionOfChuFangDrug(chuFangDrugJ);
+				Instruction instructionJ = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugJ);
 				if (instructionJ == null) {
 					notExistsDrugs.add(chuFangDrugJ);
 					continue;
@@ -148,10 +149,4 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 		return null;
 	}
 
-	private Instruction getInstructionOfChuFangDrug(Drug chuFangDrug) {
-		// 获取整理好的说明书的药品
-		Instruction instruction = InstructionsReadUtil.get(chuFangDrug
-				.getDrugCombinationName());
-		return instruction;
-	}
 }

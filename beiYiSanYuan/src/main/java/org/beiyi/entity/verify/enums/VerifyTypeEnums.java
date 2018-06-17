@@ -36,6 +36,10 @@ public interface VerifyTypeEnums {
 	 * 重复给药
 	 */
 	public static final int REPEATED_PRESCRIPTIONS = 7;
+	/**
+	 * 禁忌症/禁用人群
+	 */
+	public static final int CONTRAINDICATIONS = 8;
 	
 	/**
 	 * 通过

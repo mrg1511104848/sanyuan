@@ -39,6 +39,11 @@ public class Instruction {
 	 */
 	private List<String> diagnosises;
 	
+	/**
+	 * 禁用-疾病状态/特殊人群
+	 */
+	private List<String> contraindications;
+	
 	public String getDrugCombinationName() {
 		return drugCombinationName;
 	}
@@ -80,6 +85,13 @@ public class Instruction {
 	}
 	public void setCategory(DrugCategory category) {
 		this.category = category;
+	}
+	
+	public List<String> getContraindications() {
+		return contraindications;
+	}
+	public void setContraindications(List<String> contraindications) {
+		this.contraindications = contraindications;
 	}
 	@Override
 	public boolean equals(Object obj) {

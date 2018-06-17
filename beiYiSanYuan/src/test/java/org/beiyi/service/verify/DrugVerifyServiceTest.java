@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.service.verify.impl.ContraindicationVerifyService;
 import org.beiyi.service.verify.impl.DrugEffectVerifyService;
 import org.beiyi.service.verify.impl.JiLiangVerifyService;
 import org.beiyi.service.verify.impl.RepeatedPrescriptions;
@@ -21,14 +22,17 @@ public class DrugVerifyServiceTest {
 	public static void main(String[] args) {
 		DrugVerifyService drugVerifyService = new DrugVerifyService();
 		
-		IDrugVeryfy repeatedPrescription = new RepeatedPrescriptions();
+//		IDrugVeryfy repeatedPrescription = new RepeatedPrescriptions();
+		
+		IDrugVeryfy contraindicationVerifyService = new ContraindicationVerifyService();
 		
 //		IDrugVeryfy drugEffectVerifyService = new DrugEffectVerifyService();
 //		IDrugVeryfy shiYingZhengService = new ShiYingZhengVerifyService();
 //		IDrugVeryfy jiLiangVerifyService = new JiLiangVerifyService();
 //		IDrugVeryfy useageVerifyService = new UsageVerifyService();
 		
-		drugVerifyService.registerDrugVerify(repeatedPrescription);
+//		drugVerifyService.registerDrugVerify(repeatedPrescription);
+		drugVerifyService.registerDrugVerify(contraindicationVerifyService);
 //		drugVerifyService.registerDrugVerify(drugEffectVerifyService);
 //		drugVerifyService.registerDrugVerify(shiYingZhengService);
 //		drugVerifyService.registerDrugVerify(jiLiangVerifyService);

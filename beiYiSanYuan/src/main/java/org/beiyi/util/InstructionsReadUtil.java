@@ -43,13 +43,13 @@ public class InstructionsReadUtil {
 		
 		try {
 			String instrunctionPath = "D://爱客服/数据_ALL/北医三院/三院提供/20180418说明书提取框架&demo新.xlsx";
-//			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
+			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
 			
 			records = ExcelUtils.getInstance().readExcel2List(instrunctionPath);
 		} catch (InvalidFormatException | IOException e) {
 			e.printStackTrace();
 		}
-		shiYingZhengRead();
+		instructionRead();
 		loadTests();
 		loadInstructionCategorys();
 	}
@@ -72,7 +72,7 @@ public class InstructionsReadUtil {
 			instructions.add(instruction);
 		}
 	}
-	public static List<Instruction> shiYingZhengRead(){
+	public static List<Instruction> instructionRead(){
 		for (int i = 3; i < records.size(); i++) {
 			List<String> r = records.get(i);
 			if(r.size()<20) continue;
@@ -83,6 +83,7 @@ public class InstructionsReadUtil {
 			String atcCode = r.get(11);
 			String shiyingzheng = r.get(20);
 			String shiyingzhengKuoZhan = r.get(21);
+			String containdications = r.get(35);
 			if(StringUtils.isBlank(tongYongName) || tongYongName.equals("直接提取")){
 				continue;
 			}
@@ -90,7 +91,7 @@ public class InstructionsReadUtil {
 			DrugCombinationName drugCombinationName = new DrugCombinationName(shangPinName, tongYongName);
 			String combinationName = drugCombinationName.getCombinationStandardName();
 			Set<String> syzAll = getOneDrugShiYingZhengAll(shiyingzheng,shiyingzhengKuoZhan);//单个药品所有的适应症
-			
+			Set<String> containdicationAll = getOneDrugContaindicationAll(containdications);//单个药品所有的 禁用-疾病状态/特殊人群
 			
 			Instruction instruction = new Instruction();
 			instruction.setDrugCombinationName(combinationName);
@@ -106,6 +107,7 @@ public class InstructionsReadUtil {
 					}
 				}
 			}
+			//重新将适应症封装到已有的说明书的药品的适应症中
 			List<String> diagnosisesList = instruction.getDiagnosises();
 			if(diagnosisesList == null){
 				diagnosisesList = new ArrayList<String>();
@@ -118,6 +120,23 @@ public class InstructionsReadUtil {
 				}
 			}
 			instruction.setDiagnosises(diagnosisesList);
+			
+			//重新将 禁用-疾病状态/特殊人群 封装到已有的说明书的药品的 禁用-疾病状态/特殊人群 中
+			List<String> contraindicationsList = instruction.getContraindications();
+			if(contraindicationsList == null){
+				contraindicationsList = new ArrayList<String>();
+			}
+			Iterator<String> contraindicationsItr = containdicationAll.iterator();
+			while (contraindicationsItr.hasNext()) {
+				String contraindication = contraindicationsItr.next();
+				if(!contraindicationsList.contains(contraindication)){
+					contraindicationsList.add(contraindication);
+				}
+			}
+			instruction.setContraindications(contraindicationsList);
+			
+			
+			
 			instruction.setForm(form);
 			instruction.setStandard(standard);
 			
@@ -142,6 +161,18 @@ public class InstructionsReadUtil {
 			System.out.println(combinationName+"\t"+shiyingzheng);
 		}
 		return instructions;
+	}
+	private static Set<String> getOneDrugContaindicationAll(
+			String containdications) {
+		Set<String> containdicationAll = new HashSet<String>();
+		String[] containdicationList = containdications.split("；|;");
+		for (String containdication : containdicationList) {
+			if(StringUtils.isNotBlank(containdication)){
+				containdication = containdication.trim();
+				containdicationAll.add(containdication);
+			}
+		}
+		return containdicationAll;
 	}
 	/**
 	 * 加载说明书中药品的分类
@@ -211,7 +242,6 @@ public class InstructionsReadUtil {
 		InstructionsReadUtil.records = records;
 	}
 	public static void main(String[] args) {
-		shiYingZhengRead();
 	}
 	public static boolean contains(String combinationName) {
 		for (Instruction instruction : instructions) {
