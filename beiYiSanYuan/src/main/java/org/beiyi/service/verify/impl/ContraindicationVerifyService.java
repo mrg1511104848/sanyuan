@@ -48,7 +48,7 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 			Set<String> contraindicationEntirelyEqResult = compareContraindicationEntirelyEq(
 					instructionContraindications, chuFangAlldiagnosises);
 
-			if (VerifyUtil.chuFangDrugContainsInVerifyResult(verifyResult,
+			if (VerifyUtil.chuFangDrugContainsInVerifyResultErrorDrugs(verifyResult,
 					chuFangDrug)) {
 				continue;
 			}

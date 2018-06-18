@@ -12,7 +12,7 @@ public class DrugInfoEnum {
 	public static final Integer TONGYONG_NAME = 2;
 	public static final String shangPinNameRegex = "(.+?)(片|颗|粒|缓释|缓释片|复合包装|干混悬剂|胶囊|®(.+®))+";
 	public static final String shangPinTongYongRegex = "(.+?)[\\(（]{1}(.*)[\\)）]{1}";
-	public static final String standardRegex = "(.+?)(g|mg) x([0-9]+)(.+?)/(.*)";//
+	public static final String standardRegex = "(.+?)(g|mg)\\s*x([0-9]+)(.+?)/(.*)";//
 	public static final String dosageUnitRegex = "(.+?)(g|mg|克|毫克|ml)";//
 	public static final String dosageRegex = "；|;";//每次用量的分隔
 	

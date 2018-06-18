@@ -37,7 +37,8 @@ public class PrescriptionReadUtil {
 //	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/测试_错误处方.xlsx";
 //	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/测试2_错误处方.xlsx";
 //	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/测试3_错误处方模拟.xlsx";
-	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/用法用量+test.xlsx";
+//	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/用法用量+test.xlsx";
+	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/模拟处方06182306.xlsx";
 	static {
 		try {
 			// records =
@@ -83,6 +84,7 @@ public class PrescriptionReadUtil {
 		List<String> firstRow = chuFangRows.get(0);
 		chuFang.setChuFangNo(firstRow.get(1));
 		HuanZhe huanZhe = new HuanZhe();
+		huanZhe.setSex(firstRow.get(5).trim());
 		huanZhe.setBornDate(firstRow.get(6));
 		huanZhe.setJiuZhenDate(firstRow.get(9));
 		chuFang.setHuanZhe(huanZhe);

@@ -40,6 +40,10 @@ public interface VerifyTypeEnums {
 	 * 禁忌症/禁用人群
 	 */
 	public static final int CONTRAINDICATIONS = 8;
+	/**
+	 * 性别审核不通过
+	 */
+	public static final int SEX_INVALID = 9;
 	
 	/**
 	 * 通过

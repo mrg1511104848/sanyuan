@@ -130,4 +130,11 @@ public class VerifyResult {
 	public void setTransmitErrorDrugs(boolean transmitErrorDrugs) {
 		this.transmitErrorDrugs = transmitErrorDrugs;
 	}
+	@Override
+	public String toString() {
+		return "VerifyResult [resultMsg=" + resultMsg + ", success=" + success
+				+ ", errorDrugs=" + errorDrugs + ", successDrugs="
+				+ successDrugs + ", transmitErrorDrugs=" + transmitErrorDrugs
+				+ "]";
+	}
 }

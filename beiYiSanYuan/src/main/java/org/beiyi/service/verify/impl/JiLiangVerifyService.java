@@ -96,7 +96,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 					.getDosingFrequency();
 			String chuFangDrugCombinationName = chuFangDrug
 					.getDrugCombinationName();
-
+			
 			System.out.println("------------------------------------------");
 			log.info(String.format("[chuFangDrugCombinationName] %s",
 					chuFangDrugCombinationName));
@@ -147,9 +147,11 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 				String instructionDosageUnit = instructionUse.getDosageUnit(); // 粒
 																				// 片
 																				// 次/日
-				instructionDoseSelection = parseDoseSelection(instructionDoseSelection);
+				instructionDoseSelection = parseDoseSelection(instructionDoseSelection); //转换一下说明书中的剂量选择
+				
 				String instructionDosingFrequency = instructionUse
 						.getDosingFrequency(); // BID Q6H 次
+				
 				String[] instructionBlankElement = getBlankElement(
 						new String[] {
 								instructionDosageUnit,
@@ -258,6 +260,16 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 					dosageInfoVerifyBean.getValidInstructionDosFrequencys()
 							.add(instructionDosingFrequency.trim());
 				}
+				
+				/*//计算发药数量，疗程是否符合说明书的标准
+				if(checkRecord.isValid()){
+					String calculate = Resources.dddsCalculateMap.get(chuFangDrugDosingFrequency);
+					String hour = calculate.split("_")[0];
+					String time = calculate.split("_")[1];
+					
+					
+					RegexUtils.getByGroup(DrugInfoEnum.standardRegex, "0.3g x20粒/盒", 1);
+				}*/
 			}
 
 			// 遍历所有的关于这个处方的审核结果。按照doseSelection(剂量选择)进行分组，

@@ -6,6 +6,7 @@ import java.util.List;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.service.verify.impl.ContraindicationVerifyService;
+import org.beiyi.service.verify.impl.JiLiangVerifyService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.PrescriptionReadUtil;
 import org.skynet.frame.util.excel.ExcelBean;
@@ -23,14 +24,14 @@ public class DrugVerifyServiceTest {
 		
 //		IDrugVeryfy drugEffectVerifyService = new DrugEffectVerifyService();
 //		IDrugVeryfy shiYingZhengService = new ShiYingZhengVerifyService();
-//		IDrugVeryfy jiLiangVerifyService = new JiLiangVerifyService();
+		IDrugVeryfy jiLiangVerifyService = new JiLiangVerifyService();
 //		IDrugVeryfy useageVerifyService = new UsageVerifyService();
 		
 //		drugVerifyService.registerDrugVerify(repeatedPrescription);
-		drugVerifyService.registerDrugVerify(contraindicationVerifyService);
+//		drugVerifyService.registerDrugVerify(contraindicationVerifyService);
 //		drugVerifyService.registerDrugVerify(drugEffectVerifyService);
 //		drugVerifyService.registerDrugVerify(shiYingZhengService);
-//		drugVerifyService.registerDrugVerify(jiLiangVerifyService);
+		drugVerifyService.registerDrugVerify(jiLiangVerifyService);
 //		drugVerifyService.registerDrugVerify(useageVerifyService);
 		List<ChuFang> chuFangList = PrescriptionReadUtil.chuFangList;
 		

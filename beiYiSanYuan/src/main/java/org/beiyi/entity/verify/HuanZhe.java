@@ -13,6 +13,10 @@ public class HuanZhe {
 	 * 就诊日期
 	 */
 	private String jiuZhenDate;
+	/**
+	 * 性别
+	 */
+	private String sex;
 	
 	public String getBornDate() {
 		return bornDate;
@@ -28,5 +32,13 @@ public class HuanZhe {
 
 	public void setJiuZhenDate(String jiuZhenDate) {
 		this.jiuZhenDate = jiuZhenDate;
+	}
+
+	public String getSex() {
+		return sex;
+	}
+
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 }

@@ -25,6 +25,7 @@ public class Resources {
 	 * 用药频率
 	 */
 	public static Map<String, List<String>> dddsMap = new HashMap<String, List<String>>();
+	public static Map<String, String> dddsCalculateMap = new HashMap<String, String>();
 	public static List<List<JiLiang>> jiLiangSelectionGroupList = new ArrayList<List<JiLiang>>();
 	public static Map<String, String> patientStatusMap = new HashMap<String, String>();
 	public static List<String> routeOfMedicineList = new ArrayList<String>();
@@ -32,6 +33,7 @@ public class Resources {
 	public static List<String> useForDosageSplitDicts = new ArrayList<String>();
 	static{
 		loadDDDS();
+		loadDDDSCalculate();
 		loadJiLiangSelectionGroupLists();
 		loadPatientStatus();
 		loadRouteOfMedicineList();
@@ -43,6 +45,7 @@ public class Resources {
 		List<String> lines = FileUtils.readLines(file,Charset.forName("utf-8"));
 		return lines;
 	}
+	
 	private static void loadUseForDosageSplitDicts(){
 		try {
 			useForDosageSplitDicts = readFile2Lines("classpath:useForDosageSplit.txt");
@@ -119,6 +122,17 @@ public class Resources {
 			e.printStackTrace();
 		}
 		return dddsMap;
+	}
+	private static void loadDDDSCalculate() {
+		try {
+			List<String> dddsCalculateLines = readFile2Lines("classpath:ddds_calculate.txt");
+			for (String dddsCalculate : dddsCalculateLines) {
+				String[] dddsCalculateArr  = dddsCalculate.split(":");
+				dddsCalculateMap.put(dddsCalculateArr[0], dddsCalculateArr[1]);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * 剂量选择 分组，用于将剂量选择分组,判断某个处方是否等于、小于、大于这个剂量分组

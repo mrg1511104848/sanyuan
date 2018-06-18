@@ -20,11 +20,11 @@ public class ContraindicationVerifyServiceTest {
 			declaredMethod.setAccessible(true);  
 			
 			List<String> instructionContraindications = new ArrayList<String>();
-//			instructionContraindications.add("心脏肿物");
-//			instructionContraindications.add("心脏病的并发症和不明确表述");
+			instructionContraindications.add("心脏肿物");
+			instructionContraindications.add("心脏病的并发症和不明确表述");
 			instructionContraindications.add("后天性心间隔缺损");
 			List<String> chuFangAlldiagnosises = new ArrayList<String>();
-//			chuFangAlldiagnosises.add("心脏肿物");
+			chuFangAlldiagnosises.add("心脏肿物");
 			chuFangAlldiagnosises.add("后天性心间隔缺损");
 //			chuFangAlldiagnosises.add("心脏病");
 			invokeResult = declaredMethod.invoke(test, instructionContraindications,chuFangAlldiagnosises);

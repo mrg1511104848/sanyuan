@@ -16,7 +16,7 @@ public class VerifyUtil {
 				.getDrugCombinationName());
 		return instruction;
 	}
-	public static boolean chuFangDrugContainsInVerifyResult(VerifyResult verifyResult,Drug chuFangDrug){
+	public static boolean chuFangDrugContainsInVerifyResultErrorDrugs(VerifyResult verifyResult,Drug chuFangDrug){
 		List<DrugVerifyInfo> errorDrugs = verifyResult.getErrorDrugs();
 		for (DrugVerifyInfo drugVerifyInfo : errorDrugs) {
 			if(drugVerifyInfo.getDrug().equals(chuFangDrug)){

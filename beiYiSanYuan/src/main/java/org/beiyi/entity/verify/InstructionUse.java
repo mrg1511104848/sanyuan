@@ -47,6 +47,15 @@ public class InstructionUse {
 		this.doseSelection = doseSelection;
 	}
 	
+	public InstructionUse(String dosage,
+			String dosingFrequency,String doseSelection,String courseControl) {
+		super();
+		this.dosage = dosage;
+		this.dosingFrequency = dosingFrequency;
+		this.doseSelection = doseSelection;
+		this.courseControl = courseControl;
+	}
+	
 	public InstructionUse(String dosage, String dosingFrequency) {
 		super();
 		this.dosage = dosage;
