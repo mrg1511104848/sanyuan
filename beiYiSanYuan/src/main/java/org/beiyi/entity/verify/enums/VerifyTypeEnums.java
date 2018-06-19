@@ -6,6 +6,10 @@ package org.beiyi.entity.verify.enums;
  */
 public interface VerifyTypeEnums {
 	/**
+	 * 通过
+	 */
+	public static final int SUCCESS = 100;
+	/**
 	 * 不合适的用量
 	 */
 	public static final int INVALID_DOSAGE = 1;
@@ -44,10 +48,12 @@ public interface VerifyTypeEnums {
 	 * 性别审核不通过
 	 */
 	public static final int SEX_INVALID = 9;
-	
 	/**
-	 * 通过
+	 * 统一单位失败
 	 */
-	public static final int SUCCESS = 100;
-	
+	public static final int INVALID_UNIT = 10;
+	/**
+	 * 用量超出日剂量上限
+	 */
+	public static final int INVALID_DOSAGE_GT_DAY_LIMIT = 11;
 }

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.bcel.generic.NEW;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.beiyi.changliang.DrugInfoEnum;
@@ -21,11 +20,11 @@ import org.beiyi.entity.verify.Instruction;
 import org.beiyi.entity.verify.InstructionUse;
 import org.beiyi.entity.verify.JiLiang;
 import org.beiyi.entity.verify.JiLiangCheckRecord;
+import org.beiyi.entity.verify.Oprator;
 import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.reource.Resources;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.InstructionsReadUtil;
-import org.junit.Assert;
 import org.skynet.frame.util.DoubleUtil;
 import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.StringBufferUtil;
@@ -631,7 +630,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 				Oprator insOprator = getSpecialParseToStandardOp(insDosage);
 				// 如果处方中剂量直接是个范围，并且是剂量分组中第一组中的内容(常规剂量,起始剂量,负荷剂量,维持剂量,剂量调整) or
 				// 剂量选择是空 ，则直接从这里判断
-				if (insOprator.type.equals(JiLiangOpratorEnum.BETWEEN)
+				if (insOprator.getType().equals(JiLiangOpratorEnum.BETWEEN)
 						&& (getJiLiang(insDoseSelection, 0) != null || StringUtils
 								.isBlank(insDoseSelection))) {
 					List<Double> insJiLiangRanges = insOprator
@@ -676,26 +675,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 		return false;
 	}
 
-	static class Oprator {
-		private List<Double> toCompareNums;// 数值，可能是个范围
-		private String type;// 比较的类型
-
-		public List<Double> getToCompareNums() {
-			return toCompareNums;
-		}
-
-		public void setToCompareNums(List<Double> toCompareNums) {
-			this.toCompareNums = toCompareNums;
-		}
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-	}
+	
 
 	private Oprator getSpecialParseToStandardOp(String insDosage) {
 		Oprator oprator = new Oprator();
