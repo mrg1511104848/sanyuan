@@ -267,6 +267,56 @@ public class VerifyUtil {
 	 * @param dosageUnit
 	 * @return
 	 */
+	public static String[] parseDosagePackUnit(String chuFangDrugStandard,String dosage,
+			String dosageUnit) {
+		if (StringUtils.isBlank(dosage)) {
+			throw new RuntimeException("The dosage is blank!");
+		}
+		if (StringUtils.isBlank(dosageUnit)) {
+			throw new RuntimeException("The DosageUnit is blank!");
+		}
+		if (!dosageUnit.matches("粒|拴|揿|瓶|片|喷|枚")) {
+			return new String[] { dosage, dosageUnit };
+		}
+		if (chuFangDrugStandard == null) {
+			return null;
+		}
+		String chuFangDosagePackUnitFromDrugStandard = getDosagePackUnit(chuFangDrugStandard); // 处方中的包装单位
+
+		if (StringUtils.isBlank(chuFangDosagePackUnitFromDrugStandard)) {
+			return null;
+		}
+		// 计量单位/包装单位dosageUnit 是否等于处方中的包装单位，相等的话在转换剂量及单位
+		if (dosageUnit.trim().equalsIgnoreCase(chuFangDosagePackUnitFromDrugStandard.trim())) {
+			// 0.3g * 20粒 /盒  
+			//得到 0.3(dosageFromDrugStandard) 和 g(dosageUnitFromDrugStandard)
+			String dosageFromDrugStandard = getDosage(chuFangDrugStandard);// 从规格中获取处方中的剂量
+			String dosageUnitFromDrugStandard = getDosageUnit(chuFangDrugStandard);// 从规格中获取处方中的剂量单位
+			
+			if(StringUtils.isBlank(dosageFromDrugStandard)){
+				return null;
+			}
+			if(StringUtils.isBlank(dosageFromDrugStandard)){
+				return null;
+			}
+			//0.3(dosageFromDrugStandard) 和 1(dosage) 相乘得到每次用量
+			double dosageDouble = DoubleUtil.parseStr2Double(dosageFromDrugStandard, 3);
+			double dosageFromDrugStandardDouble = DoubleUtil.parseStr2Double(dosage, 3);
+			double dosageShouldBeUseEachTime = dosageDouble * dosageFromDrugStandardDouble; //相乘得到每次应该用的量
+			
+			//将g(dosageUnitFromDrugStandard)和相乘得到每次应该用的量dosageShouldBeUseEachTime相组合，返回。
+			return new String[] { dosageShouldBeUseEachTime+"", dosageUnitFromDrugStandard };
+		}
+		return null;
+	}
+	/**
+	 * 针对包装单位的转换
+	 * 
+	 * @param chuFangDrug
+	 * @param dosage
+	 * @param dosageUnit
+	 * @return
+	 */
 	private static String[] parseDosagePackUnit(Drug chuFangDrug, String dosage,
 			String dosageUnit) {
 		if (StringUtils.isBlank(dosage)) {
@@ -326,7 +376,7 @@ public class VerifyUtil {
 	 * @param dosageUnit
 	 * @return
 	 */
-	private static String[] parseDosageUnitToStandard(String dosage, String dosageUnit) {
+	public static String[] parseDosageUnitToStandard(String dosage, String dosageUnit) {
 		if (StringUtils.isBlank(dosage) || StringUtils.isBlank(dosageUnit)) {
 			return null;
 		}

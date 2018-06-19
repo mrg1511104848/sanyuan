@@ -17,12 +17,27 @@ public class DosingFrequencyUtil {
 	 * @return
 	 */
 	public static Integer parseDosingFrequency(String dosingFrequency){
-		String oneDayTime = Resources.dddsCalculateMap.get(dosingFrequency);//一天几次
-		if(StringUtils.isBlank(oneDayTime)){
+		String dayTimeInfo = Resources.dddsCalculateMap.get(dosingFrequency);//一天几次
+		if(StringUtils.isBlank(dayTimeInfo)){
 			log.warn("Can't parse The dosingFrequency of "+dosingFrequency);
 			return null;
 		}
-		oneDayTime = oneDayTime.trim();
-		return Integer.parseInt(oneDayTime);
+		
+		dayTimeInfo = dayTimeInfo.trim();
+		String time = dayTimeInfo.split("_")[1];//index0 时间(1天为单位) index1 次数
+		return Integer.parseInt(time);
+	}
+	/**
+	 * 根据提供的dosingFrequency转换成单日n次
+	 * @param dosingFrequency
+	 * @return
+	 */
+	public static String[] getDosingFrequency(String dosingFrequency){
+		String dayTimeInfo = Resources.dddsCalculateMap.get(dosingFrequency);//一天几次
+		if(StringUtils.isBlank(dayTimeInfo)){
+			log.warn("Can't parse The dosingFrequency of "+dosingFrequency);
+			return null;
+		}
+		return dayTimeInfo.split("_");
 	}
 }

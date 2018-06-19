@@ -1,7 +1,8 @@
 package org.beiyi.service.verify.itr;
 
-import org.beiyi.entity.verify.ChuFang;
+import org.apache.log4j.Logger;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.verify.ChuFang;
 
 /***
  * 抽象观察者
@@ -9,6 +10,7 @@ import org.beiyi.entity.VerifyResult;
  * @author 
  */
 public interface IDrugVeryfy {
+	public Logger logger = Logger.getLogger(IDrugVeryfy.class);
 	/**
 	 * 审核
 	 * @param chuFang 处方
