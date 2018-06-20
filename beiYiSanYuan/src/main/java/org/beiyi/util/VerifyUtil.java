@@ -32,7 +32,7 @@ public class VerifyUtil {
 	private static Logger log = Logger.getLogger(VerifyUtil.class);
 	private static final String AGE_KEYWORD_REGEX = ".*成人.*|.*年龄.*|.*岁.*|.*儿童.*|.*老年.*";
 	public static void main(String[] args) {
-		System.out.println("10.0，300".matches("(\\d+|\\d+.\\d+)[;；](\\d+|\\d+.\\d+)"));
+		System.out.println("150mg/ 12.5mgx7".matches(DrugInfoEnum.standardRegexForCompoundDrug));
 	}
 	public static Instruction getInstructionOfChuFangDrug(Drug chuFangDrug) {
 		// 获取整理好的说明书的药品
@@ -235,6 +235,7 @@ public class VerifyUtil {
 		String[] chuFangDosageStandard = null;
 		List<String[]> instructionDosageStandards = null;
 
+		
 		// 进行包装单位转换
 		String[] chuFangDosageAndDosageUnit = parseDosagePackUnit(chuFangDrug, chuFangDosage, chuFangDosageUnit);
 		String[] instructionDosageAndDosageUnit = parseDosagePackUnit(chuFangDrug, instructionDosage, instructionDosageUnit);
@@ -267,6 +268,9 @@ public class VerifyUtil {
 			}
 		}
 		return null;
+	}
+	public static boolean isCompoundDrug(Drug chuFangDrug) {
+		return chuFangDrug.getStandard().matches(DrugInfoEnum.standardRegexForCompoundDrug);
 	}
 	/**
 	 * 针对包装单位的转换
@@ -328,6 +332,9 @@ public class VerifyUtil {
 	 */
 	private static String[] parseDosagePackUnit(Drug chuFangDrug, String dosage,
 			String dosageUnit) {
+		if(chuFangDrug.getDrugCombinationName().contains("厄贝沙坦氢氯噻嗪")){
+			System.out.println();
+		}
 		if (StringUtils.isBlank(dosage)) {
 			throw new RuntimeException("The dosage is blank!");
 		}
@@ -343,8 +350,20 @@ public class VerifyUtil {
 					chuFangDrug.getDrugCombinationName()));
 			return null;
 		}
+		/*//判断是否是复方制剂，如果是，转换时需要另处理
+		boolean compoundFlag = isCompoundDrug(chuFangDrug);
+		if(compoundFlag){
+			String componentFirstDosage = RegexUtils.getByGroup(DrugInfoEnum.standardRegexForCompoundDrug, chuFangDrug.getStandard(), 1).get(0);
+			String componentFirstDosageUnit = RegexUtils.getByGroup(DrugInfoEnum.standardRegexForCompoundDrug, chuFangDrug.getStandard(), 2).get(0);
+			String componentSecondDosage = RegexUtils.getByGroup(DrugInfoEnum.standardRegexForCompoundDrug, chuFangDrug.getStandard(), 3).get(0);
+			String componentSecondDosageUnit = RegexUtils.getByGroup(DrugInfoEnum.standardRegexForCompoundDrug, chuFangDrug.getStandard(), 4).get(0);
+			System.out.println();
+		}*/
+		
+		
 		String chuFangDosagePackUnitFromDrugStandard = getDosagePackUnit(chuFangDrugStandard); // 处方中的包装单位
-
+		
+		
 		if (StringUtils.isBlank(chuFangDosagePackUnitFromDrugStandard)) {
 			log.error(String.format("[处方-药品] %s 处方中规格 “%s” 获取的包装单位为空",
 					chuFangDrug.getDrugCombinationName(),chuFangDrugStandard));
