@@ -12,6 +12,7 @@ import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.changliang.JiLiangOpratorEnum;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.DrugDosageInfoVerifyBean;
 import org.beiyi.entity.verify.DrugVerifyInfo;
@@ -376,7 +377,6 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 			List<List<JiLiangCheckRecord>> checkResultsGroupList,
 			List<Boolean> groupValidRecords) {
 		StringBuffer errorMsgSb = new StringBuffer();
-		StringBuffer parseAfterErrorMsg = new StringBuffer();
 		for (int i = 0; i < groupValidRecords.size(); i++) {
 			Boolean checkResult = groupValidRecords.get(i);
 			if (checkResult == null) {
@@ -908,6 +908,12 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 				}
 			}
 		}
+		return null;
+	}
+
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

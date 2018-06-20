@@ -31,7 +31,7 @@ public class ICD10ParseUtil {
 		if(diseaseByRegex.size()>0){
 			oldDisease = diseaseByRegex.get(0);
 		}else{
-			System.err.println(icd10DiseaseName);
+//			System.err.println(icd10DiseaseName);
 		}
 		oldDisease = diseaseByRegex.get(0);
 		List<String> similarDiseaseByRegex = RegexUtils.getByGroup(
@@ -65,7 +65,7 @@ public class ICD10ParseUtil {
 		}
 		Document icd10Doc = MongoUtil.findOne("wechat_icd", filter);
 		if(icd10Doc==null){
-			log.warn(String.format("未找到关于[icd10Code]%s [version]%s 的ICD10", icd10Code,version));
+//			log.warn(String.format("未找到关于[icd10Code]%s [version]%s 的ICD10", icd10Code,version));
 			return null;
 		}
 		String name = icd10Doc.getString("name");

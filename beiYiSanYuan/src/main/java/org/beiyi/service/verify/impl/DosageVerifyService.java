@@ -34,7 +34,7 @@ public class DosageVerifyService implements IDrugVeryfy {
 			VerifyResult lastStepVerifyResult) {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
-		Set<Drug> notExistsDrugs = new HashSet<Drug>();
+//		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
 			/*String chuFangDrugCombinationName = chuFangDrug
@@ -48,10 +48,10 @@ public class DosageVerifyService implements IDrugVeryfy {
 			}
 			// 获取整理好的说明书的药品
 			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
-			if (instructionDrug == null) {
-				notExistsDrugs.add(chuFangDrug);
-				continue;
-			}
+//			if (instructionDrug == null) {
+//				notExistsDrugs.add(chuFangDrug);
+//				continue;
+//			}
 			boolean containsInVerifyResultErrorDrugs = VerifyUtil.chuFangDrugContainsInVerifyResultErrorDrugs(verifyResult, chuFangDrug);
 			if(containsInVerifyResultErrorDrugs){ continue;}
 			// 用来存放剂量审核的记录，最后进行最终剂量评判的标准
@@ -111,10 +111,18 @@ public class DosageVerifyService implements IDrugVeryfy {
 		StringBuffer resultMsg = new StringBuffer(String.format("药品 “%s” 用量 “%s%s” 应在",
 				chuFangDrug.getDrugCombinationName(),chuFangDrug.getDosage(),chuFangDrug.getDosageUnit()));
 		resultMsg.append("（");
+		Set<String> dosageAndUnitSets = new HashSet<String>();
 		for (ChuFangCheckRecord chuFangErrRecord : dosageErrors) {
 			String cfDosage = chuFangErrRecord.getInstructionUse().getDosage();
-			String cfDosageUnit = chuFangErrRecord.getInstructionUse().getDosageUnit();
-			resultMsg.append(String.format("%s%s,", cfDosage,cfDosageUnit));
+			String[] cfDosageArr = cfDosage.split(";|；");
+			for (String cfDsg : cfDosageArr) {
+				String cfDosageUnit = chuFangErrRecord.getInstructionUse().getDosageUnit();
+//				resultMsg.append(String.format("%s%s,", cfDsg,cfDosageUnit));
+				dosageAndUnitSets.add(String.format("%s%s", cfDsg,cfDosageUnit));
+			}
+		}
+		for (String dosageAndUnit : dosageAndUnitSets) {
+			resultMsg.append(String.format("%s,", dosageAndUnit));
 		}
 		resultMsg = StringBufferUtil.removeEnd(resultMsg, ",");
 		resultMsg.append("）范围内");
@@ -262,6 +270,11 @@ public class DosageVerifyService implements IDrugVeryfy {
 				return check;
 			}
 		}
+		return null;
+	}
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

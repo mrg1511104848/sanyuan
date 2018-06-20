@@ -9,4 +9,5 @@ public class JiLiangOpratorEnum {
 	public static final String BETWEEN = "<>";
 	public static final String MULTIPLY = "*";
 	public static final String DEVIDED = "/";
+	public static final String OR = "|";
 }

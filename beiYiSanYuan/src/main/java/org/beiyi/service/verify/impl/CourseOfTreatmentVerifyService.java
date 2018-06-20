@@ -1,10 +1,9 @@
 package org.beiyi.service.verify.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
@@ -12,12 +11,14 @@ import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.Instruction;
 import org.beiyi.entity.verify.InstructionUse;
+import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.DosingFrequencyUtil;
 import org.beiyi.util.InstructionsReadUtil;
 import org.beiyi.util.VerifyUtil;
 import org.skynet.frame.util.DoubleUtil;
 import org.skynet.frame.util.RegexUtils;
+import org.skynet.frame.util.StringBufferUtil;
 
 /**
  * 疗程审核
@@ -26,22 +27,27 @@ import org.skynet.frame.util.RegexUtils;
  *
  */
 public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
-
+	private static final String COURSE_OF_TREATMENT_REGEX = "(\\d+([-~]\\d+)?)";
+	public static void main(String[] args) {
+	}
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
-		Set<Drug> notExistsDrugs = new HashSet<Drug>();
+//		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
+			if(chuFangDrug.getDrugCombinationName().contains("布洛芬")){
+				System.out.println();
+			}
 			// 获取整理好的说明书的药品
 			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug
 					.getDrugCombinationName());
-			if (instructionDrug == null) {
-				notExistsDrugs.add(chuFangDrug);
-				continue;
-			}
+//			if (instructionDrug == null) {
+//				notExistsDrugs.add(chuFangDrug);
+//				continue;
+//			}
 			boolean containsInVerifyResultErrorDrugs = VerifyUtil
 					.chuFangDrugContainsInVerifyResultErrorDrugs(verifyResult,
 							chuFangDrug);
@@ -49,7 +55,7 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 				continue;
 			}
 			// 用来存放剂量审核的记录，最后进行最终剂量评判的标准
-			List<ChuFangCheckRecord> dosageCheckRecords = new ArrayList<ChuFangCheckRecord>();
+			List<ChuFangCheckRecord> checkRecords = new ArrayList<ChuFangCheckRecord>();
 			List<InstructionUse> instructionUses = instructionDrug
 					.getInstructionUses();
 			// 遍历 整理好的说明书 - 药品使用相关信息
@@ -66,17 +72,100 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 				if (!crowdValid) {// 不属于该人群的话，continue;
 					continue;
 				}
+				//1.获取可使用的天数
 				Integer canUseDay = getCanUseDays(chuFangDrug);
 				if(canUseDay == null){
 					logger.warn(String.format("The canUseDay of [drugName] %s is blank!", chuFangDrug.getDrugCombinationName()));
 					continue;
 				}
-				
+				//2.校验是否符合疗程天数
+				ChuFangCheckRecord checkResult = checkDaysIsMatchCourseOfTreatment(canUseDay,chuFangDrug,instructionUse);
+				checkRecords.add(checkResult);
+			}
+			if(checkRecords.size()!=0){
+				VerifyUtil.appendDrugAndErrorMsg(checkRecords,chuFangDrug,this,errMsgBuffer,verifyResult,VerifyTypeEnums.INVALID_COURSE_OF_TREATMENT);
 			}
 		}
+		VerifyUtil.packVerifyResultFinal(verifyResult, errMsgBuffer);
 		return verifyResult;
 	}
+	public String appendErrors(Drug chuFangDrug,
+			List<ChuFangCheckRecord> errors) {
+		StringBuffer resultMsg = new StringBuffer(String.format("药品 “%s” 疗程应在",
+				chuFangDrug.getDrugCombinationName()));
+		resultMsg.append("（");
+		for (ChuFangCheckRecord chuFangErrRecord : errors) {
+			String rangeEach = chuFangErrRecord.getInstructionUse().getCourseControl();
+			resultMsg.append(rangeEach+",");
+		}
+		resultMsg = StringBufferUtil.removeEnd(resultMsg, ",");
+		resultMsg.append("）范围内");
+		return resultMsg.toString();
+	}
+	
+	/**
+	 * 校验可使用天数是否符合疗程天数
+	 * @param canUseDay
+	 * @param instructionUse 
+	 * @param chuFangDrug 
+	 * @return 
+	 */
+	private ChuFangCheckRecord checkDaysIsMatchCourseOfTreatment(Integer canUseDay, Drug chuFangDrug, InstructionUse instructionUse) {
+		ChuFangCheckRecord checkRecord = new ChuFangCheckRecord();
+		checkRecord.setValid(true);
+		
+		
+		ChuFangCheckRecord medicalInsuranceValid = checkMedicalInsuranceIsValid(canUseDay);//医保
+		medicalInsuranceValid.setChuFangDrug(chuFangDrug);
+		medicalInsuranceValid.setInstructionUse(instructionUse);
+		if(!medicalInsuranceValid.getValid()){
+			return medicalInsuranceValid;
+		}
+		ChuFangCheckRecord courseOfTreatmentValid = courseOfTreatmentIsValid(canUseDay,chuFangDrug,instructionUse);//普通疗程
+		courseOfTreatmentValid.setChuFangDrug(chuFangDrug);
+		courseOfTreatmentValid.setInstructionUse(instructionUse);
+		if(!courseOfTreatmentValid.getValid()){
+			return courseOfTreatmentValid;
+		}
+		return checkRecord;
+	}
 
+	private ChuFangCheckRecord courseOfTreatmentIsValid(Integer canUseDay, Drug chuFangDrug, InstructionUse instructionUse) {
+		ChuFangCheckRecord chuFangCheckRecord = new ChuFangCheckRecord();
+		chuFangCheckRecord.setValid(true);
+		if(StringUtils.isBlank(instructionUse.getCourseControl())){
+//			logger.warn(String.format("The courseControl of drug “%s” is blank!", chuFangDrug.getDrugCombinationName()));
+			return chuFangCheckRecord;
+		}
+		String dayOrDayRange = RegexUtils.getByRegex(COURSE_OF_TREATMENT_REGEX, instructionUse.getCourseControl());
+		if(StringUtils.isBlank(dayOrDayRange)){
+			logger.warn(String.format("The courseControl of drug “%s” is not match COURSE_OF_TREATMENT_REGEX", chuFangDrug.getDrugCombinationName()));
+			return chuFangCheckRecord;
+		}
+		if(dayOrDayRange.contains("-") || dayOrDayRange.contains("~")){
+			String[] rangeArr = dayOrDayRange.split("-|~");
+			String dayStart = rangeArr[0];
+			String dayEnd = rangeArr[1];
+			if(StringUtils.isNotBlank(dayStart) || StringUtils.isNotBlank(dayEnd)){
+				logger.warn(String.format("The dayStart or dayEnd of drug “%s” is blank!", chuFangDrug.getDrugCombinationName()));
+				return chuFangCheckRecord;
+			}
+			if(!(canUseDay>=Integer.parseInt(dayStart)
+					&&canUseDay<=Integer.parseInt(dayEnd))){
+				chuFangCheckRecord.setValid(false);
+			}
+		}else{//非范围直接匹配
+			if(canUseDay>Integer.parseInt(dayOrDayRange)){
+				chuFangCheckRecord.setValid(false);
+			}
+		}
+		return chuFangCheckRecord;
+	}
+	private ChuFangCheckRecord checkMedicalInsuranceIsValid(Integer canUseDay) {
+		ChuFangCheckRecord chuFangCheckRecord = new ChuFangCheckRecord();
+		chuFangCheckRecord.setValid(true);
+		return chuFangCheckRecord;
+	}
 	private Integer getCanUseDays(Drug chuFangDrug) {
 		String chuFangStandard = chuFangDrug.getStandard();
 		List<String> mqRegex = RegexUtils.getByGroup(DrugInfoEnum.standardRegex, chuFangStandard, 1);
@@ -98,7 +187,7 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 		String cfEachTimeUse = chuFangDrug.getDosage();
 		String cfEachTimeUseUnit = chuFangDrug.getDosageUnit();
 		int totalPack = Integer.parseInt(chuFangDrug.getDrugQuantity());
-		String dosingFrequency = chuFangDrug.getDosingFrequency();
+		String dosingFrequency = chuFangDrug.getDosingFrequency().trim();
 		// 进行包装单位转换
 		String[] standardDosageParse = VerifyUtil.parseDosagePackUnit(chuFangStandard, containsCfEach+"", mu);
 		String[] eachTimeUseDosageParse = VerifyUtil.parseDosagePackUnit(chuFangStandard, cfEachTimeUse, cfEachTimeUseUnit);
@@ -122,7 +211,9 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 		//包装总剂量/每次剂量 = 一盒可以吃几次 
 		int allCanUseTimeAllPack = allCanUseTimeEachPack*totalPack;
 		String[] dayTimeArr = DosingFrequencyUtil.getDosingFrequency(dosingFrequency);
-		
+		if(dayTimeArr == null){
+			return null;
+		}
 		int day = Integer.parseInt(dayTimeArr[0]);
 		int time = Integer.parseInt(dayTimeArr[1]);
 		

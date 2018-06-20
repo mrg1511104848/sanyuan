@@ -1,9 +1,7 @@
 package org.beiyi.service.verify.impl;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
@@ -30,15 +28,15 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 			VerifyResult lastStepVerifyResult) {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
-		Set<Drug> notExistsDrugs = new HashSet<Drug>();
+//		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
 			// 获取整理好的说明书的药品
 			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
-			if (instructionDrug == null) {
-				notExistsDrugs.add(chuFangDrug);
-				continue;
-			}
+//			if (instructionDrug == null) {
+//				notExistsDrugs.add(chuFangDrug);
+//				continue;
+//			}
 			List<ChuFangCheckRecord> dosageCheckRecords = new ArrayList<ChuFangCheckRecord>();
 			List<InstructionUse> instructionUses = instructionDrug.getInstructionUses();
 			// 遍历 整理好的说明书 - 药品使用相关信息
@@ -113,5 +111,10 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 			}
 		}
 		return dosageCheckResult;
+	}
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

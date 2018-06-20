@@ -1,8 +1,12 @@
 package org.beiyi.service.verify.itr;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
+import org.beiyi.entity.verify.Drug;
 
 /***
  * 抽象观察者
@@ -18,4 +22,7 @@ public interface IDrugVeryfy {
 	 * @return
 	 */
 	VerifyResult verify(ChuFang chuFang,VerifyResult lastStepVerifyResult);
+	
+	String appendErrors(Drug chuFangDrug,
+			List<ChuFangCheckRecord> errors);
 }

@@ -48,6 +48,7 @@ public class CommonResourceForVerify {
 		drug33.setDosageUnit("mg");
 		drug33.setDosingFrequency("BID");
 		drug33.setStandard("5mgx7片/盒");
+		drug33.setDrugQuantity("3");
 		drugs.add(drug33);
 		
 		Drug drug44 = new Drug();
@@ -56,8 +57,17 @@ public class CommonResourceForVerify {
 		drug44.setDosageUnit("mg");
 		drug44.setDosingFrequency("每日一次，早4点");
 		drug44.setStandard("5mgx7片/盒");
+		drug44.setDrugQuantity("3");
 		drugs.add(drug44);
 		
+		Drug drug55 = new Drug();
+		drug55.setDrugCombinationName("芬必得(布洛芬缓释胶囊)");
+		drug55.setDosage("5");
+		drug55.setDosageUnit("粒");
+		drug55.setDosingFrequency("BID");
+		drug55.setStandard("0.3g x20粒/盒");
+		drug55.setDrugQuantity("20");
+		drugs.add(drug55);
 		
 		for (int i = 0; i < 10; i++) {
 			Drug drug = new Drug();

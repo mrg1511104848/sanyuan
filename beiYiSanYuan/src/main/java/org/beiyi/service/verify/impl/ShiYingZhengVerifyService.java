@@ -7,6 +7,7 @@ import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.DrugVerifyInfo;
 import org.beiyi.entity.verify.Instruction;
@@ -73,12 +74,12 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 		StringBuilder errorSb = new StringBuilder();
 		for (Drug drug : drugs) {
 			String drugCombinationName = drug.getDrugCombinationName();
-			if(!InstructionsReadUtil.contains(drugCombinationName)){
-				errorSb.append("说明书不包含此药品> "+drugCombinationName+"，");
-				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(drug,VerifyTypeEnums.NO_DRUG);
-				verifyResult.getErrorDrugs().add(drugVerifyInfo);
-				continue;
-			}
+//			if(!InstructionsReadUtil.contains(drugCombinationName)){
+//				errorSb.append("说明书不包含此药品> "+drugCombinationName+"，");
+//				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(drug,VerifyTypeEnums.NO_DRUG);
+//				verifyResult.getErrorDrugs().add(drugVerifyInfo);
+//				continue;
+//			}
 			chuFangDrugInBaseDBCount++;
 			//判断这个药在所有的适应症中是否有能治疗的适应症(是否能够匹配)
 			boolean drugMatchShiYingZheng = false;
@@ -101,9 +102,9 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 				verifyResult.getSuccessDrugs().add(drugVerifyInfo);
 			}
 		}
-		if(chuFangDrugInBaseDBCount == 0){
+		/*if(chuFangDrugInBaseDBCount == 0){
 			return VerifyResult.fail("无此药 , 原因 :"+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs(),verifyResult.isTransmitErrorDrugs());
-		}
+		}*/
 		if(chuFangDrugInBaseDBCount!=drugs.size()){
 			return VerifyResult.fail("未审核 , 原因 :"+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs(),verifyResult.isTransmitErrorDrugs());
 		}else if(chuFangIsValid){
@@ -111,5 +112,11 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 		}else{
 			return VerifyResult.fail("无适应证用药 , 原因 : "+errorSb.toString(),verifyResult.getErrorDrugs(),verifyResult.getSuccessDrugs(),verifyResult.isTransmitErrorDrugs());
 		}
+	}
+
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

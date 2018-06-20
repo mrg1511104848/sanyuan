@@ -64,7 +64,7 @@ public class DxyShuoMingShuIndicationDeal {
 					List<List<String>> icd10DiseaseList = null;
 					try {
 						String path = "D://爱客服/数据_ALL/北医三院/数据/数据处理/微信ICD10part"+fI+".xls";
-						path = "C://BaiduYunDownload/微信ICD10part"+fI+".xls";
+//						path = "C://BaiduYunDownload/微信ICD10part"+fI+".xls";
 						icd10DiseaseList = ExcelUtils.getInstance().readExcel2List(path);
 					} catch (InvalidFormatException | IOException e) {
 						e.printStackTrace();

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.ICD10;
 import org.beiyi.entity.verify.Instruction;
@@ -29,7 +30,7 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 			VerifyResult lastStepVerifyResult) {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
-		Set<Drug> notExistsDrugs = new HashSet<Drug>();
+//		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 
 		List<String> chuFangAlldiagnosises = chuFang.getDiagnosises();
 
@@ -38,10 +39,10 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 			Drug chuFangDrug = chuFangDrugVerifingList.get(i);
 			Instruction instruction = VerifyUtil
 					.getInstructionOfChuFangDrug(chuFangDrug);
-			if (instruction == null) {// 药品不存在于说明书
-				notExistsDrugs.add(chuFangDrug);
-				continue;
-			}
+//			if (instruction == null) {// 药品不存在于说明书
+//				notExistsDrugs.add(chuFangDrug);
+//				continue;
+//			}
 
 			List<String> instructionContraindications = instruction
 					.getContraindications();
@@ -80,8 +81,8 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 				}
 			}
 		}
-		VerifyUtil.addNotExistsDrugToVerifyResult(verifyResult, notExistsDrugs,
-				errMsgBuffer);
+//		VerifyUtil.addNotExistsDrugToVerifyResult(verifyResult, notExistsDrugs,
+//				errMsgBuffer);
 		VerifyUtil.packVerifyResultFinal(verifyResult, errMsgBuffer);
 		return verifyResult;
 	}
@@ -276,5 +277,11 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 					+ instructionContraindication + "]";
 		}
 
+	}
+
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

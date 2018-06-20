@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.DrugVerifyInfo;
 import org.beiyi.entity.verify.Instruction;
@@ -14,6 +15,7 @@ import org.beiyi.entity.verify.InstructionUse;
 import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.InstructionsReadUtil;
+import org.beiyi.util.VerifyUtil;
 import org.skynet.frame.util.excel.ExcelUtil;
 
 /**
@@ -49,15 +51,15 @@ public class UsageVerifyService implements IDrugVeryfy {
 			}
 			// 获取整理好的说明书的药品
 			Instruction instruction = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
-			if(instruction == null){
-				String errorMsg = String.format(" %s 在说明书中不存在！", chuFangDrug.getDrugCombinationName());
-				errMsgBuffer.append(String.format("%s【药品】 %s 用法不适宜，具体原因为 ： %s",ExcelUtil.NEW_LINE, chuFangDrug.getDrugCombinationName(),errorMsg));
-				
-				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,VerifyTypeEnums.NO_DRUG);
-				verifyResult.getErrorDrugs().add(drugVerifyInfo);
-				
-				continue;
-			}
+//			if(instruction == null){
+//				String errorMsg = String.format(" %s 在说明书中不存在！", chuFangDrug.getDrugCombinationName());
+//				errMsgBuffer.append(String.format("%s【药品】 %s 用法不适宜，具体原因为 ： %s",ExcelUtil.NEW_LINE, chuFangDrug.getDrugCombinationName(),errorMsg));
+//				
+//				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,VerifyTypeEnums.NO_DRUG);
+//				verifyResult.getErrorDrugs().add(drugVerifyInfo);
+//				
+//				continue;
+//			}
 			
 			List<InstructionUse> instructionUses = instruction.getInstructionUses();
 			
@@ -74,6 +76,10 @@ public class UsageVerifyService implements IDrugVeryfy {
 					//加入到建议的药品用法。
 					suggestUseageSet.add(instructionRouteOfMedication);
 				}
+			}
+			boolean containsInVerifyResultErrorDrugs = VerifyUtil.chuFangDrugContainsInVerifyResultErrorDrugs(verifyResult, chuFangDrug);
+			if(containsInVerifyResultErrorDrugs){
+				continue;
 			}
 			if(!chuFangDrugRouteOfMedicationIsValid){
 				String errorMsg = String.format(" 用法不适宜 处方中用法 “%s” ，推荐用法“%s”！", chuFangRouteOfMedication,suggestUseageSet);
@@ -94,6 +100,12 @@ public class UsageVerifyService implements IDrugVeryfy {
 			verifyResult.setSuccess(true);
 		}
 		return verifyResult;
+	}
+
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

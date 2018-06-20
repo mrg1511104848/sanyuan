@@ -38,7 +38,8 @@ public class PrescriptionReadUtil {
 //	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/测试2_错误处方.xlsx";
 //	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/测试3_错误处方模拟.xlsx";
 //	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/用法用量+test.xlsx";
-	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/模拟处方06182306.xlsx";
+//	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/模拟处方06182306.xlsx";
+	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/整体流程测试_模拟处方.xlsx";
 	static {
 		try {
 			// records =

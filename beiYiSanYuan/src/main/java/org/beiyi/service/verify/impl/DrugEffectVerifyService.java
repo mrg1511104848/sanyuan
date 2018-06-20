@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.DrugVerifyInfo;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
@@ -131,5 +132,11 @@ public class DrugEffectVerifyService implements IDrugVeryfy {
 		public void setLevel(String level) {
 			this.level = level;
 		}
+	}
+
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

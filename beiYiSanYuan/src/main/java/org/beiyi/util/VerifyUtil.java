@@ -13,6 +13,7 @@ import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.changliang.JiLiangOpratorEnum;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.DrugVerifyInfo;
 import org.beiyi.entity.verify.HuanZhe;
@@ -21,6 +22,7 @@ import org.beiyi.entity.verify.InstructionUse;
 import org.beiyi.entity.verify.Oprator;
 import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.reource.Resources;
+import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.skynet.frame.util.DoubleUtil;
 import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.date.DateUtil;
@@ -29,6 +31,9 @@ import org.skynet.frame.util.excel.ExcelUtil;
 public class VerifyUtil {
 	private static Logger log = Logger.getLogger(VerifyUtil.class);
 	private static final String AGE_KEYWORD_REGEX = ".*成人.*|.*年龄.*|.*岁.*|.*儿童.*|.*老年.*";
+	public static void main(String[] args) {
+		System.out.println("10.0，300".matches("(\\d+|\\d+.\\d+)[;；](\\d+|\\d+.\\d+)"));
+	}
 	public static Instruction getInstructionOfChuFangDrug(Drug chuFangDrug) {
 		// 获取整理好的说明书的药品
 		Instruction instruction = InstructionsReadUtil.get(chuFangDrug
@@ -228,7 +233,7 @@ public class VerifyUtil {
 		String instructionDosageUnit = instructionUse.getDosageUnit();
 
 		String[] chuFangDosageStandard = null;
-		String[] instructionDosageStandard = null;
+		List<String[]> instructionDosageStandards = null;
 
 		// 进行包装单位转换
 		String[] chuFangDosageAndDosageUnit = parseDosagePackUnit(chuFangDrug, chuFangDosage, chuFangDosageUnit);
@@ -241,22 +246,26 @@ public class VerifyUtil {
 		chuFangDosageStandard = parseDosageUnitToStandard(chuFangDosageAndDosageUnit[0],
 				chuFangDosageAndDosageUnit[1]);
 		;
-		instructionDosageStandard = parseDosageUnitToStandard(
+		instructionDosageStandards = parseDosageUnitToStandardList(
 				instructionDosageAndDosageUnit[0], instructionDosageAndDosageUnit[1]);
 
-		if (chuFangDosageStandard != null && instructionDosageStandard != null
-				&& chuFangDosageStandard.length == 2
-				&& instructionDosageStandard.length == 2) {
-			if (StringUtils.isBlank(chuFangDosageStandard[1])
-					|| StringUtils.isBlank(instructionDosageStandard[1])) {
-				return null;
-			}
-			if (chuFangDosageStandard[1].equals(instructionDosageStandard[1])) {
-				return new String[] { chuFangDosageStandard[0],chuFangDosageStandard[1],
-						instructionDosageStandard[0],instructionDosageStandard[1] };
+		if(instructionDosageStandards == null) {
+			return null;
+		}
+		for (String[] instructionDosageStandard : instructionDosageStandards) {
+			if (chuFangDosageStandard != null && instructionDosageStandard != null
+					&& chuFangDosageStandard.length == 2
+					&& instructionDosageStandard.length == 2) {
+				if (StringUtils.isBlank(chuFangDosageStandard[1])
+						|| StringUtils.isBlank(instructionDosageStandard[1])) {
+					return null;
+				}
+				if (chuFangDosageStandard[1].equals(instructionDosageStandard[1])) {
+					return new String[] { chuFangDosageStandard[0],chuFangDosageStandard[1],
+							instructionDosageStandard[0],instructionDosageStandard[1] };
+				}
 			}
 		}
-
 		return null;
 	}
 	/**
@@ -376,6 +385,31 @@ public class VerifyUtil {
 	 * @param dosageUnit
 	 * @return
 	 */
+	public static List<String[]> parseDosageUnitToStandardList(String dosage, String dosageUnit) {
+		List<String[]> parseResults = new ArrayList<String[]>();
+		if(dosage.matches("(\\d+|\\d+.\\d+)[;；](\\d+|\\d+.\\d+)")){
+			String[] dosageArr = dosage.split("；|;");
+			for (String dsg : dosageArr) {
+				String[] parseResult = parseDosageUnitToStandard(dsg, dosageUnit);
+				if(parseResult== null || parseResult.length == 0){
+					continue;
+				}
+				parseResults.add(parseResult);
+			}
+		}else{
+			String[] parseResult = parseDosageUnitToStandard(dosage, dosageUnit);
+			parseResults.add(parseResult);
+		}
+		return parseResults;
+	}
+	/**
+	 * 转换成常规的剂量单位，不对包装单位转换 //常见质量单位：1克（g）=1000毫克（mg）=10000000微克（μg）；
+	 * //常见体积单位：1升（L）=1000毫升（ml）=1000000微升（μl）；
+	 * 
+	 * @param dosage
+	 * @param dosageUnit
+	 * @return
+	 */
 	public static String[] parseDosageUnitToStandard(String dosage, String dosageUnit) {
 		if (StringUtils.isBlank(dosage) || StringUtils.isBlank(dosageUnit)) {
 			return null;
@@ -411,9 +445,9 @@ public class VerifyUtil {
 	}
 	private static Oprator getSpecialParseToStandardOp(String insDosage) {
 		Oprator oprator = new Oprator();
-		String[] regex = { "(\\d+|\\d+.\\d+)~(\\d+|\\d+.\\d+)", "(\\d+)" };
+		String[] regex = { "(\\d+|\\d+.\\d+)~(\\d+|\\d+.\\d+)", "(\\d+)","(\\d+|\\d+.\\d+)[;；](\\d+|\\d+.\\d+)" };
 		String[] regexType = { JiLiangOpratorEnum.BETWEEN,
-				JiLiangOpratorEnum.EQ };
+				JiLiangOpratorEnum.EQ,JiLiangOpratorEnum.OR };
 		for (int i = 0; i < regex.length; i++) {
 			String r = regex[i];
 			List<String> tarNums = RegexUtils.getByGroup(r, insDosage);
@@ -470,5 +504,33 @@ public class VerifyUtil {
 			return "常规剂量";
 		}
 		return doseSelection;
+	}
+	public static void appendDrugAndErrorMsg(List<ChuFangCheckRecord> checkRecords,Drug chuFangDrug,IDrugVeryfy verify,StringBuffer errMsgBuffer,VerifyResult verifyResult,int errType){
+		List<ChuFangCheckRecord> errors = VerifyUtil.getErrorCheckRecords(checkRecords);
+		if(errors.size()>0){
+			String errorMsg = verify.appendErrors(chuFangDrug,errors);
+			errMsgBuffer.append(errorMsg);
+			VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, errType);
+		}else{
+			VerifyUtil.addSuccessDrugToVerifyResult(verifyResult, chuFangDrug);
+		}
+	}
+	public static List<ChuFangCheckRecord> getErrorCheckRecords(List<ChuFangCheckRecord> checkRecords) {
+		if(checkRecords== null || checkRecords.size() == 0){
+			throw new RuntimeException("The checkRecords is blank!");
+		}
+		List<ChuFangCheckRecord> errorResults = new ArrayList<ChuFangCheckRecord>();
+		for (ChuFangCheckRecord dosageCheckRecord : checkRecords) {
+			if(dosageCheckRecord.getValid()){
+				return new ArrayList<ChuFangCheckRecord>(0);
+			}
+		}
+		
+		for (ChuFangCheckRecord dosageCheckRecord : checkRecords) {
+			if(!dosageCheckRecord.getValid()){
+				errorResults.add(dosageCheckRecord);
+			}
+		}
+		return errorResults;
 	}
 }

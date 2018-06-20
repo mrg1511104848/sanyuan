@@ -56,4 +56,8 @@ public interface VerifyTypeEnums {
 	 * 用量超出日剂量上限
 	 */
 	public static final int INVALID_DOSAGE_GT_DAY_LIMIT = 11;
+	/**
+	 * 无效的疗程
+	 */
+	public static final int INVALID_COURSE_OF_TREATMENT = 12;
 }

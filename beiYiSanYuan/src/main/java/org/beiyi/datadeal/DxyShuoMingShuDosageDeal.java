@@ -119,7 +119,7 @@ public class DxyShuoMingShuDosageDeal {
 			IOException {
 		List<List<String>> testDrugList = null;
 		String path = "D://爱客服/数据_ALL/北医三院/三院提供/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx";
-		path = "C://BaiduYunDownload/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx";
+//		path = "C://BaiduYunDownload/test drug list共163（航慈1-60，张琪61-120，亚希121-163）.xlsx";
 		testDrugList = ExcelUtils
 				.getInstance()
 				.readExcel2List(path
@@ -185,13 +185,13 @@ public class DxyShuoMingShuDosageDeal {
 			DrugCombinationName drugCombinationName = new DrugCombinationName(
 					cnName + "(" + commonName + ")");
 			
-			if (!testDrugNameList.contains(drugCombinationName)) {
+			/*if (!testDrugNameList.contains(drugCombinationName)) {
 				continue;
-			}
-			if (drugCombinationExistsInExport.contains(drugCombinationName
+			}*/
+			/*if (drugCombinationExistsInExport.contains(drugCombinationName
 					.getCombinationStandardName())) {
 				continue;
-			}
+			}*/
 			if(drugCombinationName.getCombinationStandardName().contains("诺和灵30R")){
 				System.out.println();
 			}
@@ -239,8 +239,8 @@ public class DxyShuoMingShuDosageDeal {
 						drugCombinationName));
 			}
 		}
-		ExcelUtil.export("D://temp_丁香园剂量导出V5.xls", cells, values);
-		ExcelUtil.export("D://temp_丁香园剂量导出V5(不确定的药品).xls", cells,
+		ExcelUtil.export("D://temp_丁香园剂量导出V6.xls", cells, values);
+		ExcelUtil.export("D://temp_丁香园剂量导出V6(不确定的药品).xls", cells,
 				probablyMedicineValues);
 	}
 

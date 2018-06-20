@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
@@ -30,15 +31,18 @@ public class DDDSVerifyService implements IDrugVeryfy {
 			VerifyResult lastStepVerifyResult) {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
-		Set<Drug> notExistsDrugs = new HashSet<Drug>();
+//		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
+			if(chuFangDrug.getDrugCombinationName().contains("威凡")){
+				System.out.println();
+			}
 			// 获取整理好的说明书的药品
 			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
-			if (instructionDrug == null) {
-				notExistsDrugs.add(chuFangDrug);
-				continue;
-			}
+//			if (instructionDrug == null) {
+//				notExistsDrugs.add(chuFangDrug);
+//				continue;
+//			}
 			String chuFangDrugDosingFrequency = chuFangDrug.getDosingFrequency(); // 用药频率
 			List<InstructionUse> instructionUses = instructionDrug.getInstructionUses();
 			// 用来存放剂量审核的记录，最后进行最终剂量评判的标准
@@ -67,15 +71,14 @@ public class DDDSVerifyService implements IDrugVeryfy {
 					dosageCheckRecord.setInvalidDosageType(VerifyTypeEnums.INVALID_DOSING_FREQUENCY);
 					continue;
 				}
-				
-				List<ChuFangCheckRecord> dddsErrors = getErrorCheckRecords(dosageCheckRecords);
-				if(dddsErrors.size()>0){
-					String errorMsg = appendDDDSErrors(chuFangDrug,dddsErrors);
-					errMsgBuffer.append(errorMsg);
-					VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSING_FREQUENCY);
-				}else{
-					VerifyUtil.addSuccessDrugToVerifyResult(verifyResult, chuFangDrug);
-				}
+			}
+			List<ChuFangCheckRecord> dddsErrors = getErrorCheckRecords(dosageCheckRecords);
+			if(dddsErrors!=null&&dddsErrors.size()>0){
+				String errorMsg = appendDDDSErrors(chuFangDrug,dddsErrors);
+				errMsgBuffer.append(errorMsg);
+				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSING_FREQUENCY);
+			}else{
+				VerifyUtil.addSuccessDrugToVerifyResult(verifyResult, chuFangDrug);
 			}
 		}
 		VerifyUtil.packVerifyResultFinal(verifyResult, errMsgBuffer);
@@ -83,11 +86,17 @@ public class DDDSVerifyService implements IDrugVeryfy {
 	}
 	private String appendDDDSErrors(Drug chuFangDrug, List<ChuFangCheckRecord> dddsErrors) {
 		StringBuffer resultMsg = new StringBuffer(String.format("药品 “%s” 用药频率 “%s” 应在",
-				chuFangDrug.getDrugCombinationName(),chuFangDrug.getDosingFrequency()));
+				chuFangDrug.getDrugCombinationName(),chuFangDrug.getDosingFrequency().trim()));
 		resultMsg.append("（");
+		Set<String> dddsSets = new HashSet<String>();
 		for (ChuFangCheckRecord chuFangErrRecord : dddsErrors) {
 			String dosingFrequency = chuFangErrRecord.getInstructionUse().getDosingFrequency();
-			resultMsg.append(dosingFrequency+",");
+//			resultMsg.append(dosingFrequency+",");
+			if(StringUtils.isNotBlank(dosingFrequency))
+				dddsSets.add(dosingFrequency.trim());
+		}
+		for (String ddds : dddsSets) {
+			resultMsg.append(ddds+",");
 		}
 		resultMsg = StringBufferUtil.removeEnd(resultMsg, ",");
 		resultMsg.append("）范围内");
@@ -96,7 +105,8 @@ public class DDDSVerifyService implements IDrugVeryfy {
 	private List<ChuFangCheckRecord> getErrorCheckRecords(
 			List<ChuFangCheckRecord> dosageCheckRecords) {
 		if(dosageCheckRecords== null || dosageCheckRecords.size() == 0){
-			throw new RuntimeException("The dosageCheckRecords is blank!");
+//			throw new RuntimeException("The dosageCheckRecords is blank!");
+			return null;
 		}
 		List<ChuFangCheckRecord> errorResults = new ArrayList<ChuFangCheckRecord>();
 		for (ChuFangCheckRecord dosageCheckRecord : dosageCheckRecords) {
@@ -130,5 +140,10 @@ public class DDDSVerifyService implements IDrugVeryfy {
 			return false;
 		}
 		return equalsFrequencies.contains(instructionDosingFrequency);
+	}
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

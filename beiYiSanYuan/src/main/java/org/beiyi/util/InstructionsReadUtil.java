@@ -50,7 +50,7 @@ public class InstructionsReadUtil {
 			e.printStackTrace();
 		}
 		instructionRead();
-		loadTests();
+//		loadTests();
 		loadInstructionCategorys();
 	}
 	public static Instruction get(String drugCombinationName){

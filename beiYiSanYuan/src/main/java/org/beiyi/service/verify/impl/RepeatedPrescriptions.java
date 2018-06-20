@@ -1,15 +1,13 @@
 package org.beiyi.service.verify.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ATCCode;
 import org.beiyi.entity.verify.ChuFang;
+import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.DrugCategory;
 import org.beiyi.entity.verify.DrugVerifyInfo;
@@ -17,7 +15,6 @@ import org.beiyi.entity.verify.Instruction;
 import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.ATCUtil;
-import org.beiyi.util.InstructionsReadUtil;
 import org.beiyi.util.VerifyUtil;
 
 /**
@@ -35,23 +32,32 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 			VerifyResult lastStepVerifyResult) {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
-		Set<Drug> notExistsDrugs = new HashSet<Drug>();
+//		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行审核
 		for (int i = 0; i < chuFangDrugVerifingList.size(); i++) {
 			Drug chuFangDrugI = chuFangDrugVerifingList.get(i);
 			Instruction instructionI = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugI);
-			if (instructionI == null) {
-				notExistsDrugs.add(chuFangDrugI);
-				continue;
-			}
+//			if (instructionI == null) {
+//				notExistsDrugs.add(chuFangDrugI);
+//				continue;
+//			}
 			for (int j = i + 1; j < chuFangDrugVerifingList.size(); j++) {
 				Drug chuFangDrugJ = chuFangDrugVerifingList.get(j);
 				Instruction instructionJ = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugJ);
-				if (instructionJ == null) {
-					notExistsDrugs.add(chuFangDrugJ);
-					continue;
-				}
-				if (instructionI.getAtcCode() == null
+//				if (instructionJ == null) {
+//					notExistsDrugs.add(chuFangDrugJ);
+//					continue;
+//				}
+				if(instructionI.getDrugCombinationName().equals(instructionJ.getDrugCombinationName())){
+					VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugI, VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
+					VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugJ, VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
+					errMsgBuffer.append(String.format(
+							"药品“%s”与 药品 “%s” 存在重复用药，原因：药品相同",
+							instructionI
+									.getDrugCombinationName(),
+									instructionJ
+									.getDrugCombinationName()));
+				}else if (instructionI.getAtcCode() == null
 						|| (instructionI.getAtcCode() != null && StringUtils
 								.isBlank(instructionI.getAtcCode().getAtcNo()))
 						|| instructionJ.getAtcCode() == null
@@ -102,15 +108,15 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 				}
 			}
 		}
-		if (notExistsDrugs.size() > 0) {
-			for (Drug notExistsDrug : notExistsDrugs) {
-				DrugVerifyInfo notExistsDrugVerifyInfo = new DrugVerifyInfo(
-						notExistsDrug, VerifyTypeEnums.NO_DRUG);
-				verifyResult.getErrorDrugs().add(notExistsDrugVerifyInfo);
-				errMsgBuffer.append(String.format("药品“%s” 不存在。",
-						notExistsDrug.getDrugCombinationName()));
-			}
-		}
+//		if (notExistsDrugs.size() > 0) {
+//			for (Drug notExistsDrug : notExistsDrugs) {
+//				DrugVerifyInfo notExistsDrugVerifyInfo = new DrugVerifyInfo(
+//						notExistsDrug, VerifyTypeEnums.NO_DRUG);
+//				verifyResult.getErrorDrugs().add(notExistsDrugVerifyInfo);
+//				errMsgBuffer.append(String.format("药品“%s” 不存在。",
+//						notExistsDrug.getDrugCombinationName()));
+//			}
+//		}
 		if (verifyResult.getErrorDrugs().size() > 0) {
 			verifyResult.setSuccess(false);
 			verifyResult.setResultMsg(errMsgBuffer.toString());
@@ -146,6 +152,12 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 				return insIAtcLevelCodeMap.get(level);
 			}
 		}
+		return null;
+	}
+
+	@Override
+	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
