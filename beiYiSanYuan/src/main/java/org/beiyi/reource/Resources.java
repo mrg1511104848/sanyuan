@@ -24,7 +24,7 @@ public class Resources {
 	/**
 	 * 用药频率
 	 */
-	public static Map<String, List<String>> dddsMap = new HashMap<String, List<String>>();
+	public static List<List<String>> dddsList = new ArrayList<List<String>>();
 	public static Map<String, String> dddsCalculateMap = new HashMap<String, String>();
 	public static List<List<JiLiang>> jiLiangSelectionGroupList = new ArrayList<List<JiLiang>>();
 	public static Map<String, String> patientStatusMap = new HashMap<String, String>();
@@ -97,7 +97,7 @@ public class Resources {
 	 * 用药频率
 	 * @return 
 	 */
-	private static Map<String, List<String>> loadDDDS(){
+	private static List<List<String>> loadDDDS(){
 		try {
 			List<String> dddsLines = readFile2Lines("classpath:ddds.txt");
 			for (String dddsEach : dddsLines) {
@@ -106,22 +106,20 @@ public class Resources {
 				
 				String[] dddsEqualsArr = dddsEach.split(",");
 				
+				
+				List<String> dddsEqList = new ArrayList<String>();
 				for (int i = 0; i < dddsEqualsArr.length; i++) {
-					
 					if(StringUtils.isBlank(dddsEqualsArr[i])) continue;
-					
-					String dddsName = dddsEqualsArr[i].trim();
-					List<String> dddsEqualsAll = new ArrayList<>(Arrays.asList(dddsEqualsArr));  
-					dddsEqualsAll.remove(i);
-					dddsMap.put(dddsName, dddsEqualsAll);
+					dddsEqList.add(dddsEqualsArr[i]);
 				}
+				dddsList.add(dddsEqList);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return dddsMap;
+		return dddsList;
 	}
 	private static void loadDDDSCalculate() {
 		try {

@@ -34,7 +34,7 @@ public class DDDSVerifyService implements IDrugVeryfy {
 //		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
-			if(chuFangDrug.getDrugCombinationName().contains("威凡")){
+			if(chuFangDrug.getDrugCombinationName().contains("布洛芬缓释胶囊")){
 				System.out.println();
 			}
 			// 获取整理好的说明书的药品
@@ -70,6 +70,8 @@ public class DDDSVerifyService implements IDrugVeryfy {
 					dosageCheckRecord.setInValidText("用药频率不适宜");
 					dosageCheckRecord.setInvalidDosageType(VerifyTypeEnums.INVALID_DOSING_FREQUENCY);
 					continue;
+				}else{
+					dosageCheckRecord.setValid(true);
 				}
 			}
 			List<ChuFangCheckRecord> dddsErrors = getErrorCheckRecords(dosageCheckRecords);
@@ -135,11 +137,21 @@ public class DDDSVerifyService implements IDrugVeryfy {
 		if (chuFangDrugDosingFrequency.equalsIgnoreCase(instructionDosingFrequency)) {
 			return true;
 		}
-		List<String> equalsFrequencies = Resources.dddsMap.get(chuFangDrugDosingFrequency);
-		if (equalsFrequencies == null) {
-			return false;
+		return dddsEq(chuFangDrugDosingFrequency, instructionDosingFrequency);
+	}
+	/**
+	 * 比较ddds是否相等
+	 * @param sourceDosingFrequency
+	 * @param targetDosingFrequency
+	 * @return
+	 */
+	private boolean dddsEq(String sourceDosingFrequency,String targetDosingFrequency){
+		for (List<String> dddsList :  Resources.dddsList) {
+			if(dddsList.contains(sourceDosingFrequency) && dddsList.contains(targetDosingFrequency) ){
+				return true;
+			}
 		}
-		return equalsFrequencies.contains(instructionDosingFrequency);
+		return false;
 	}
 	@Override
 	public String appendErrors(Drug chuFangDrug, List<ChuFangCheckRecord> errors) {

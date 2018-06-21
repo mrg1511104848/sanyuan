@@ -25,6 +25,11 @@ public class ChuFang {
 	 */
 	private List<Drug> drugs;
 	
+	/**
+	 * 多个药品 - 副本
+	 */
+	private List<Drug> oldDrugs;
+	
 	private List<List<String>> chuFangOldRows;
 	public String getChuFangNo() {
 		return chuFangNo;
@@ -55,5 +60,11 @@ public class ChuFang {
 	}
 	public void setChuFangOldRows(List<List<String>> chuFangOldRows) {
 		this.chuFangOldRows = chuFangOldRows;
+	}
+	public List<Drug> getOldDrugs() {
+		return oldDrugs;
+	}
+	public void setOldDrugs(List<Drug> oldDrugs) {
+		this.oldDrugs = oldDrugs;
 	}
 }

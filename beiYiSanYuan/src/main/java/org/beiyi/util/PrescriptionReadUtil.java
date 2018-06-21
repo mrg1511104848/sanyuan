@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.beiyi.entity.DrugCombinationName;
@@ -39,7 +40,8 @@ public class PrescriptionReadUtil {
 //	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/测试3_错误处方模拟.xlsx";
 //	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/用法用量+test.xlsx";
 //	public static String chuFangPath = "C://公司/北医三院/错误处方模拟_其他测试/模拟处方06182306.xlsx";
-	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/整体流程测试_模拟处方.xlsx";
+//	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/整体流程测试_模拟处方.xlsx";
+	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/模拟处方180621 - 单SHEET.xlsx";
 	static {
 		try {
 			// records =
@@ -117,6 +119,9 @@ public class PrescriptionReadUtil {
 		}
 		chuFang.setDiagnosises(diagnosises);
 		chuFang.setDrugs(drugs);
+		List<Drug> oldDrugs = new ArrayList<Drug>();
+		oldDrugs.addAll(drugs);
+		chuFang.setOldDrugs(oldDrugs);
 		chuFang.setChuFangOldRows(chuFangRows);
 		return chuFang;
 	}

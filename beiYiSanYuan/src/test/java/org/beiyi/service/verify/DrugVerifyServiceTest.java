@@ -33,7 +33,7 @@ public class DrugVerifyServiceTest {
 		drugVerifyServices.add(new DrugEffectVerifyService());
 		drugVerifyServices.add(new SexVerifyService());
 		drugVerifyServices.add(new DDDSVerifyService());
-//		drugVerifyServices.add(new ShiYingZhengVerifyService());
+		drugVerifyServices.add(new ShiYingZhengVerifyService());
 		drugVerifyServices.add(new ContraindicationVerifyService());
 		drugVerifyServices.add(new DosageMaxLimitVerifyService());
 		drugVerifyServices.add(new DosageVerifyService());

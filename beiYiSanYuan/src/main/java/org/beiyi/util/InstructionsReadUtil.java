@@ -43,7 +43,7 @@ public class InstructionsReadUtil {
 		
 		try {
 			String instrunctionPath = "D://爱客服/数据_ALL/北医三院/三院提供/20180418说明书提取框架&demo新.xlsx";
-			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
+//			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
 			
 			records = ExcelUtils.getInstance().readExcel2List(instrunctionPath);
 		} catch (InvalidFormatException | IOException e) {
@@ -178,7 +178,7 @@ public class InstructionsReadUtil {
 	 * 加载说明书中药品的分类
 	 */
 	private static void loadInstructionCategorys(){
-		logger.info(" -- start load instruction categorys");
+		/*logger.info(" -- start load instruction categorys");
 		for (Instruction instruction : instructions) {
 			DrugCombinationName drugCombinationName = new DrugCombinationName(instruction.getDrugCombinationName());
 			String combinationStandardName = drugCombinationName.getCombinationStandardName();
@@ -192,7 +192,7 @@ public class InstructionsReadUtil {
 				instruction.setCategory(drugCategory);
 			}
 		}
-		logger.info(" -- end load instruction categorys");
+		logger.info(" -- end load instruction categorys");*/
 	}
 	/**
 	 * 加载说明书中药品的分类

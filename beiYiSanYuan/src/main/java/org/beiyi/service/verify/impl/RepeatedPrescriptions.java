@@ -3,6 +3,7 @@ package org.beiyi.service.verify.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils.Null;
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ATCCode;
@@ -33,14 +34,10 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
 //		Set<Drug> notExistsDrugs = new HashSet<Drug>();
-		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行审核
+		List<Drug> chuFangDrugVerifingList = chuFang.getOldDrugs();// 需要遍历处方中的药品，挨个进行审核
 		for (int i = 0; i < chuFangDrugVerifingList.size(); i++) {
 			Drug chuFangDrugI = chuFangDrugVerifingList.get(i);
 			Instruction instructionI = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugI);
-//			if (instructionI == null) {
-//				notExistsDrugs.add(chuFangDrugI);
-//				continue;
-//			}
 			for (int j = i + 1; j < chuFangDrugVerifingList.size(); j++) {
 				Drug chuFangDrugJ = chuFangDrugVerifingList.get(j);
 				Instruction instructionJ = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugJ);
@@ -48,24 +45,24 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 //					notExistsDrugs.add(chuFangDrugJ);
 //					continue;
 //				}
-				if(instructionI.getDrugCombinationName().equals(instructionJ.getDrugCombinationName())){
+				if(chuFangDrugI.getDrugCombinationName().equals(chuFangDrugJ.getDrugCombinationName())){
 					VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugI, VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
 					VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugJ, VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
 					errMsgBuffer.append(String.format(
 							"药品“%s”与 药品 “%s” 存在重复用药，原因：药品相同",
-							instructionI
+							chuFangDrugI
 									.getDrugCombinationName(),
-									instructionJ
+									chuFangDrugJ
 									.getDrugCombinationName()));
-				}else if (instructionI.getAtcCode() == null
+				}else if (instructionI==null || instructionJ == null || instructionI.getAtcCode() == null
 						|| (instructionI.getAtcCode() != null && StringUtils
 								.isBlank(instructionI.getAtcCode().getAtcNo()))
 						|| instructionJ.getAtcCode() == null
 						|| (instructionJ.getAtcCode() != null && StringUtils
 						.isBlank(instructionJ.getAtcCode().getAtcNo()))) {
 					// 当a与b药其中某个药的atcCode为空时，则直接去yiMaiTongFinalStandard数据库查找医脉通的分类，查看是否属于同一分类。
-					DrugCategory category = getSameCategory(instructionI,
-							instructionJ);
+					DrugCategory category = VerifyUtil.isSameCategory(chuFangDrugI,
+							chuFangDrugJ);
 					if (category != null) {
 						// 属于同一分类，
 						DrugVerifyInfo drugVerifyInfoI = new DrugVerifyInfo(
@@ -126,15 +123,7 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 		return verifyResult;
 	}
 
-	private DrugCategory getSameCategory(Instruction instructionI,
-			Instruction instructionJ) {
-		if (instructionI.getCategory() != null && instructionJ != null) {
-			if (instructionI.getCategory().equals(instructionJ.getCategory())) {
-				return instructionI.getCategory();
-			}
-		}
-		return null;
-	}
+	
 
 	private ATCCode getSameAtcCode(Instruction instructionI,
 			Instruction instructionJ) {

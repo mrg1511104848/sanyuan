@@ -29,7 +29,7 @@ public class YiMaiTongDataDeal {
 	 */
 	private static void dealData(){
 		String targetColName = "yiMaiTongFinalStandard";
-		List<Document> yiMaiTongFinal = MongoUtil.findDocList("yiMaiTongFinal");
+		List<Document> yiMaiTongFinal = MongoUtil.findDocList("yiMaiTongFinalAll_notFilter2");
 		for (Document document : yiMaiTongFinal) {
 			String url = document.getString("url");
 			String medicineName = document.getString("药品名称：");

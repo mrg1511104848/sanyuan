@@ -11,10 +11,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.changliang.JiLiangOpratorEnum;
+import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
+import org.beiyi.entity.verify.DrugCategory;
 import org.beiyi.entity.verify.DrugVerifyInfo;
 import org.beiyi.entity.verify.HuanZhe;
 import org.beiyi.entity.verify.Instruction;
@@ -23,10 +25,12 @@ import org.beiyi.entity.verify.Oprator;
 import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.reource.Resources;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
+import org.bson.Document;
 import org.skynet.frame.util.DoubleUtil;
 import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.date.DateUtil;
 import org.skynet.frame.util.excel.ExcelUtil;
+import org.skynet.frame.util.mongo.MongoUtil;
 
 public class VerifyUtil {
 	private static Logger log = Logger.getLogger(VerifyUtil.class);
@@ -421,6 +425,15 @@ public class VerifyUtil {
 		}
 		return parseResults;
 	}
+	
+	public static String[] getRange(String dosage){
+		String[] rangeArr = dosage.split("-|~");
+		return rangeArr;
+	}
+	public static boolean isRange(String dosage){
+		return  dosage.matches("(\\d+|\\d+.\\d+)[~-](\\d+|\\d+.\\d+)");
+	}
+	
 	/**
 	 * 转换成常规的剂量单位，不对包装单位转换 //常见质量单位：1克（g）=1000毫克（mg）=10000000微克（μg）；
 	 * //常见体积单位：1升（L）=1000毫升（ml）=1000000微升（μl）；
@@ -551,5 +564,31 @@ public class VerifyUtil {
 			}
 		}
 		return errorResults;
+	}
+	
+	public static DrugCategory getDrugCatagory(Drug chuFangDrug){
+		DrugCombinationName drugCombinationName = new DrugCombinationName(chuFangDrug.getDrugCombinationName());
+		String combinationStandardName = drugCombinationName.getCombinationStandardName();
+		
+		Document yiMaiTongFinalStandardDoc = MongoUtil.findOne("yiMaiTongFinalStandard", "combinationStandardName", combinationStandardName);
+		if(yiMaiTongFinalStandardDoc!=null){
+			String category = yiMaiTongFinalStandardDoc.getString("category");
+			DrugCategory drugCategory = new DrugCategory();
+			drugCategory.setCategoryName(category);
+			drugCategory.setSource("医脉通");
+			return drugCategory;
+		}
+		return null;
+	}
+	public static DrugCategory isSameCategory(Drug chuFangDrugA,
+			Drug chuFangDrugB) {
+		DrugCategory chuFangDrugACata = getDrugCatagory(chuFangDrugA);
+		DrugCategory chuFangDrugBCata = getDrugCatagory(chuFangDrugB);
+		if (chuFangDrugACata != null && chuFangDrugBCata != null) {
+			if (chuFangDrugACata.getCategoryName().equals(chuFangDrugBCata.getCategoryName())) {
+				return chuFangDrugACata;
+			}
+		}
+		return null;
 	}
 }

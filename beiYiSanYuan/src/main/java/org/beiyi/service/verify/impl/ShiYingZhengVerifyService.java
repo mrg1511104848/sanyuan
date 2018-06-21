@@ -70,7 +70,7 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 		List<String> shiYingZhengs = chuFang.getDiagnosises();
 		int chuFangDrugInBaseDBCount = 0;
 		boolean chuFangIsValid = true;
-		VerifyResult verifyResult = new VerifyResult(true);
+		VerifyResult verifyResult = new VerifyResult();
 		StringBuilder errorSb = new StringBuilder();
 		for (Drug drug : drugs) {
 			String drugCombinationName = drug.getDrugCombinationName();

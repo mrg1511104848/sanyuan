@@ -706,7 +706,7 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 	 * @return
 	 */
 	private boolean compareFrequency(JiLiangCheckRecord checkRecord) {
-		String dosingFrequency = checkRecord.getSourceJiLiang()
+		/*String dosingFrequency = checkRecord.getSourceJiLiang()
 				.getDosingFrequency().trim();
 		String instructionDosingFrequency = checkRecord.getTargetJiLiang()
 				.getDosingFrequency().trim();
@@ -717,7 +717,8 @@ public class JiLiangVerifyService implements IDrugVeryfy {
 		if (equalsFrequencies == null) {
 			return false;
 		}
-		return equalsFrequencies.contains(instructionDosingFrequency);
+		return equalsFrequencies.contains(instructionDosingFrequency);*/
+		return false;
 	}
 
 	/**

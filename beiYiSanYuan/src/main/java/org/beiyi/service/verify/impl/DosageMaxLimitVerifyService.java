@@ -37,10 +37,6 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 			// 获取整理好的说明书的药品
 			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug
 					.getDrugCombinationName());
-			// if (instructionDrug == null) {
-			// notExistsDrugs.add(chuFangDrug);
-			// continue;
-			// }
 			List<ChuFangCheckRecord> dosageCheckRecords = new ArrayList<ChuFangCheckRecord>();
 			List<InstructionUse> instructionUses = instructionDrug
 					.getInstructionUses();
@@ -68,45 +64,20 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 					ChuFangCheckRecord dosageCheckRecord = new ChuFangCheckRecord();
 					dosageCheckRecord.setChuFangDrug(chuFangDrug);
 					dosageCheckRecord.setInstructionUse(instructionUse);
+					ChuFangCheckRecord checkResult = null;
 					if (compoundFlag) {
-						// 比较单日剂量上限
-						DosageCheckResult dosageIsMatchDayLimit = dosageIsMatchDayLimitForCompoundDrug(
-								chuFangDrug, instructionUse,
-								instructionDoseSelection,
-								instructionDosingFrequency);
-						if (!dosageIsMatchDayLimit.isValid()) {
-							dosageCheckRecord.setInValidText("超出最大日剂量");
-							dosageCheckRecord
-									.setInvalidDosageType(VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT);
-							dosageCheckRecords.add(dosageCheckRecord);
-							break;
-						}
+						checkResult = compoundDrugOverstepMaxDayDosageLimit(chuFangDrug,instructionUse,instructionDoseSelection,instructionDosingFrequency,
+								dosageCheckRecord,dosageCheckRecords);
+						
 					} else {
-						// 统一单位
-						String[] standardDosageAndUnit = VerifyUtil
-								.parseUnitToStandard(chuFangDrug,
-										instructionDrug, instructionUse,
-										errMsgBuffer, verifyResult);
-						if (standardDosageAndUnit == null) {
-							dosageCheckRecord.setInValidText("统一单位失败");
-							dosageCheckRecord
-									.setInvalidDosageType(VerifyTypeEnums.INVALID_UNIT);
-							continue;
-						}
-						// 比较单日剂量上限
-						DosageCheckResult dosageIsMatchDayLimit = dosageIsMatchDayLimit(
-								standardDosageAndUnit,
-								instructionDoseSelection,
-								instructionDosingFrequency);
-						if (!dosageIsMatchDayLimit.isValid()) {
-							dosageCheckRecord.setInValidText("超出最大日剂量");
-							dosageCheckRecord
-									.setInvalidDosageType(VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT);
-							dosageCheckRecords.add(dosageCheckRecord);
-							break;
-						}
+						checkResult = nonCompoundDrugOverstepMaxDayDosageLimit(chuFangDrug, instructionDrug, instructionUse, 
+								verifyResult, errMsgBuffer, instructionDoseSelection, 
+								instructionDosingFrequency, dosageCheckRecord, dosageCheckRecords);
 					}
-
+					if(checkResult.getValid()==false && 
+							checkResult.getInvalidDosageType() == VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT){
+						break;
+					}
 				}
 
 			}
@@ -129,6 +100,7 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 						"药品 “%s” 剂量为 “%s%s” ，超出【%s】 “%s%s”",
 						cfDrugCombinationName, cfDosage, cfDosageUnit,
 						doseSelection, insDosage, insDosageUnit));
+				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT);
 			} else {
 				VerifyUtil.addSuccessDrugToVerifyResult(verifyResult,
 						chuFangDrug);
@@ -137,7 +109,56 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 		VerifyUtil.packVerifyResultFinal(verifyResult, errMsgBuffer);
 		return verifyResult;
 	}
-
+	private ChuFangCheckRecord compoundDrugOverstepMaxDayDosageLimit(Drug chuFangDrug, InstructionUse instructionUse, String instructionDoseSelection, 
+			String instructionDosingFrequency, ChuFangCheckRecord dosageCheckRecord, List<ChuFangCheckRecord> dosageCheckRecords){
+		// 比较单日剂量上限
+		DosageCheckResult dosageIsMatchDayLimit = dosageIsMatchDayLimitForCompoundDrug(
+				chuFangDrug, instructionUse,
+				instructionDoseSelection,
+				instructionDosingFrequency);
+		if (!dosageIsMatchDayLimit.isValid()) {
+			dosageCheckRecord.setValid(false);
+			dosageCheckRecord.setInValidText("超出最大日剂量");
+			dosageCheckRecord
+					.setInvalidDosageType(VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT);
+			dosageCheckRecords.add(dosageCheckRecord);
+			return dosageCheckRecord;
+		}
+		dosageCheckRecord.setValid(true);
+		return dosageCheckRecord;
+	}
+	private ChuFangCheckRecord nonCompoundDrugOverstepMaxDayDosageLimit(Drug chuFangDrug,Instruction instructionDrug, InstructionUse instructionUse,
+			VerifyResult verifyResult,StringBuffer errMsgBuffer,String instructionDoseSelection, 
+			String instructionDosingFrequency, ChuFangCheckRecord dosageCheckRecord, List<ChuFangCheckRecord> dosageCheckRecords){
+		// 统一单位
+		String[] standardDosageAndUnit = VerifyUtil
+				.parseUnitToStandard(chuFangDrug,
+						instructionDrug, instructionUse,
+						errMsgBuffer, verifyResult);
+		if (standardDosageAndUnit == null) {
+			dosageCheckRecord.setValid(false);
+			dosageCheckRecord.setInValidText("统一单位失败");
+			dosageCheckRecord
+					.setInvalidDosageType(VerifyTypeEnums.INVALID_UNIT);
+			return dosageCheckRecord;
+		}
+		// 比较单日剂量上限
+		DosageCheckResult dosageIsMatchDayLimit = dosageIsMatchDayLimit(
+				standardDosageAndUnit,
+				instructionDoseSelection,
+				instructionDosingFrequency);
+		if (!dosageIsMatchDayLimit.isValid()) {
+			dosageCheckRecord.setValid(false);
+			dosageCheckRecord.setInValidText("超出最大日剂量");
+			dosageCheckRecord
+					.setInvalidDosageType(VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT);
+			dosageCheckRecords.add(dosageCheckRecord);
+			return dosageCheckRecord;
+		}else{
+			dosageCheckRecord.setValid(true);
+			return dosageCheckRecord;
+		}
+	}
 	private DosageCheckResult dosageIsMatchDayLimitForCompoundDrug(
 			Drug chuFangDrug, InstructionUse instructionUse,
 			String instructionDoseSelection, String instructionDosingFrequency) {

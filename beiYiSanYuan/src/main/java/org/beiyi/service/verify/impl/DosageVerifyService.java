@@ -77,16 +77,26 @@ public class DosageVerifyService implements IDrugVeryfy {
 				dosageCheckRecord.setChuFangDrug(chuFangDrug);
 				dosageCheckRecord.setInstructionUse(instructionUse);
 				dosageCheckRecords.add(dosageCheckRecord);
-				// 2.比较每次用量
-				//统一单位
-				String[] standardDosageAndUnit = VerifyUtil.parseUnitToStandard(chuFangDrug,instructionDrug,instructionUse,errMsgBuffer,verifyResult);
-				if(standardDosageAndUnit == null){
-					dosageCheckRecord.setInValidText("统一单位失败");
-					dosageCheckRecord.setInvalidDosageType(VerifyTypeEnums.INVALID_UNIT);
-					continue;
-				}
+				
+				// 判断是否是复方制剂，如果是，转换时需要另处理
+				boolean compoundFlag = VerifyUtil
+						.isCompoundDrug(chuFangDrug);
 				//根据剂量选择比较剂量
-				DosageCheckResult dosageIsValid = dosageIsValid(standardDosageAndUnit,instructionDoseSelection);
+				DosageCheckResult dosageIsValid = null;
+				if(compoundFlag){//复方制剂，直接用包装单位
+					dosageIsValid = compoundDosageIsValid(chuFangDrug,instructionUse,instructionDoseSelection);
+				}else{
+					// 2.比较每次用量
+					//统一单位
+					String[] standardDosageAndUnit = VerifyUtil.parseUnitToStandard(chuFangDrug,instructionDrug,instructionUse,errMsgBuffer,verifyResult);
+					if(standardDosageAndUnit == null){
+						dosageCheckRecord.setInValidText("统一单位失败");
+						dosageCheckRecord.setInvalidDosageType(VerifyTypeEnums.INVALID_UNIT);
+						continue;
+					}
+					//根据剂量选择比较剂量
+					dosageIsValid = nonCompoundDosageIsValid(standardDosageAndUnit,instructionDoseSelection);
+				}
 				if(!dosageIsValid.isValid()){
 					dosageCheckRecord.setInValidText("剂量不适宜");
 					dosageCheckRecord.setInvalidDosageType(VerifyTypeEnums.INVALID_DOSAGE);
@@ -105,6 +115,23 @@ public class DosageVerifyService implements IDrugVeryfy {
 		}
 		VerifyUtil.packVerifyResultFinal(verifyResult, errMsgBuffer);
 		return verifyResult;
+	}
+	private DosageCheckResult compoundDosageIsValid(Drug chuFangDrug,
+			InstructionUse instructionUse, String instructionDoseSelection) {
+		if (StringUtils.isBlank(chuFangDrug.getDosageUnit())
+				|| StringUtils.isBlank(instructionUse.getDosageUnit())
+				|| !chuFangDrug.getDosageUnit().trim()
+						.equals(instructionUse.getDosageUnit().trim())) {
+			logger.error(String.format("<%s>处方药品的用量单位<%s>或者说明书药品的用量单位<%s>为空或者不相同", chuFangDrug.getDrugCombinationName(),chuFangDrug.getDosageUnit(),instructionUse.getDosageUnit()));
+			return null;
+		}
+		String chuFangDrugDosageStandard = chuFangDrug.getDosage();
+		String instructionDosageStandard = instructionUse.getDosage();
+		double doubleCFDosage = DoubleUtil.parseStr2Double(
+				chuFangDrugDosageStandard, 3);
+		double doubleInstDosage = DoubleUtil.parseStr2Double(
+				instructionDosageStandard, 3);
+		return dosageIsValid(doubleCFDosage, doubleInstDosage, instructionDoseSelection);
 	}
 	private String appendDosageErrors(Drug chuFangDrug,
 			List<ChuFangCheckRecord> dosageErrors) {
@@ -143,9 +170,6 @@ public class DosageVerifyService implements IDrugVeryfy {
 		}
 		return errorResults;
 	}
-	
-	
-	
 	/**
 	 * 根据剂量选择判断处方和说明书的剂量是否适宜
 	 * @param standardDosageAndUnit
@@ -153,11 +177,40 @@ public class DosageVerifyService implements IDrugVeryfy {
 	 * @param instructionDosingFrequency 
 	 * @return
 	 */
-	private DosageCheckResult dosageIsValid(String[] standardDosageAndUnit, String instructionDoseSelection) {
-		String chuFangDrugDosageStandard = standardDosageAndUnit[0];
-		String instructionDosageStandard = standardDosageAndUnit[2];
-		double doubleCFDosage = DoubleUtil.parseStr2Double(chuFangDrugDosageStandard,3);
-		double doubleInstDosage = DoubleUtil.parseStr2Double(instructionDosageStandard,3);
+	private DosageCheckResult dosageIsValid(double doubleCFDosage,double[] doubleInstDosage, String instructionDoseSelection) {
+		DosageCheckResult dosageCheckResult = new DosageCheckResult();
+		dosageCheckResult.setDoseSelection(instructionDoseSelection);
+		if(instructionDoseSelection.matches("常规剂量|起始剂量|负荷剂量|维持剂量|剂量调整")){
+			if(doubleCFDosage >= doubleInstDosage[0] && doubleCFDosage <= doubleInstDosage[1]){
+				dosageCheckResult.setValid(true);
+			}else{
+				dosageCheckResult.setValid(false);
+			}
+		}else if(instructionDoseSelection.matches("单次剂量上限")){
+			if(doubleCFDosage >= doubleInstDosage[0] && doubleCFDosage <= doubleInstDosage[1]){
+				dosageCheckResult.setValid(true);
+			}else{
+				dosageCheckResult.setValid(false);
+			}
+		}else if(instructionDoseSelection.matches("单次剂量下限")){
+			if(doubleCFDosage >= doubleInstDosage[0] && doubleCFDosage <= doubleInstDosage[1]){
+				dosageCheckResult.setValid(true);
+			}else{
+				dosageCheckResult.setValid(false);
+			}
+		}else{
+			dosageCheckResult.setValid(true);
+		}
+		return dosageCheckResult;
+	}
+	/**
+	 * 根据剂量选择判断处方和说明书的剂量是否适宜
+	 * @param standardDosageAndUnit
+	 * @param instructionDoseSelection
+	 * @param instructionDosingFrequency 
+	 * @return
+	 */
+	private DosageCheckResult dosageIsValid(double doubleCFDosage,double doubleInstDosage, String instructionDoseSelection) {
 		DosageCheckResult dosageCheckResult = new DosageCheckResult();
 		dosageCheckResult.setDoseSelection(instructionDoseSelection);
 		if(instructionDoseSelection.matches("常规剂量|起始剂量|负荷剂量|维持剂量|剂量调整")){
@@ -182,6 +235,36 @@ public class DosageVerifyService implements IDrugVeryfy {
 			dosageCheckResult.setValid(true);
 		}
 		return dosageCheckResult;
+	}
+	
+	
+	/**
+	 * 非复方制剂 - 根据剂量选择判断处方和说明书的剂量是否适宜 
+	 * @param standardDosageAndUnit
+	 * @param instructionDoseSelection
+	 * @param instructionDosingFrequency 
+	 * @return
+	 */
+	private DosageCheckResult nonCompoundDosageIsValid(String[] standardDosageAndUnit, String instructionDoseSelection) {
+		
+		String chuFangDrugDosageStandard = standardDosageAndUnit[0];
+		String instructionDosageStandard = standardDosageAndUnit[2];
+		boolean isRangeDosage = VerifyUtil.isRange(instructionDosageStandard);
+		double doubleCFDosage = DoubleUtil.parseStr2Double(chuFangDrugDosageStandard,3);
+		
+		if(isRangeDosage){
+			String[] rangeArr = VerifyUtil.getRange(instructionDosageStandard);
+			String rangeStart = rangeArr[0];
+			String rangeEnd = rangeArr[1];
+			double doubleInstDosageStart = DoubleUtil.parseStr2Double(rangeStart,3);
+			double doubleInstDosageEnd = DoubleUtil.parseStr2Double(rangeEnd,3);
+			double[] doubleInstDosageArr = {doubleInstDosageStart,doubleInstDosageEnd};
+			return dosageIsValid(doubleCFDosage, doubleInstDosageArr, instructionDoseSelection);
+		}
+		
+		double doubleInstDosage = DoubleUtil.parseStr2Double(instructionDosageStandard,3);
+		return dosageIsValid(doubleCFDosage, doubleInstDosage, instructionDoseSelection);
+		
 	}
 	
 	static class DosageCheckResult{

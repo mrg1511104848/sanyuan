@@ -28,9 +28,9 @@ public class DrugEffectVerifyService implements IDrugVeryfy {
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
-		VerifyResult verifyResult = new VerifyResult(true);
+		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errorMsgSb = new StringBuffer();
-		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，查看两两药品间有没有相互作用
+		List<Drug> chuFangDrugVerifingList = chuFang.getOldDrugs();// 需要遍历处方中的药品，查看两两药品间有没有相互作用
 		for (int i = 0; i < chuFangDrugVerifingList.size(); i++) {
 			Drug drugI = chuFangDrugVerifingList.get(i);
 			DrugCombinationName drugCombinationNameI = new DrugCombinationName(
