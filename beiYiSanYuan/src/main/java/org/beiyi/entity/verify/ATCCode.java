@@ -12,6 +12,13 @@ public class ATCCode {
 	public ATCCode() {
 		super();
 	}
+	public ATCCode(String atcNo, String chName, String enName) {
+		super();
+		this.atcNo = atcNo;
+		this.chName = chName;
+		this.enName = enName;
+	}
+
 	public ATCCode(String atcNo) {
 		super();
 		this.atcNo = atcNo;

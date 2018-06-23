@@ -9,7 +9,9 @@ public class ICD10 {
 	private String name;
 	private String nameEn;
 	private String version;
-	
+	private String parentName ;
+	private String parentNameEn ;
+	private String parentCode ;
 	public ICD10() {
 		super();
 	}
@@ -19,6 +21,17 @@ public class ICD10 {
 		this.name = name;
 		this.nameEn = nameEn;
 		this.version = version;
+	}
+	public ICD10(String code, String name, String nameEn, String version,
+			String parentName, String parentNameEn, String parentCode) {
+		super();
+		this.code = code;
+		this.name = name;
+		this.nameEn = nameEn;
+		this.version = version;
+		this.parentName = parentName;
+		this.parentNameEn = parentNameEn;
+		this.parentCode = parentCode;
 	}
 	public String getCode() {
 		return code;
@@ -43,5 +56,23 @@ public class ICD10 {
 	}
 	public void setVersion(String version) {
 		this.version = version;
+	}
+	public String getParentName() {
+		return parentName;
+	}
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+	public String getParentNameEn() {
+		return parentNameEn;
+	}
+	public void setParentNameEn(String parentNameEn) {
+		this.parentNameEn = parentNameEn;
+	}
+	public String getParentCode() {
+		return parentCode;
+	}
+	public void setParentCode(String parentCode) {
+		this.parentCode = parentCode;
 	}
 }
