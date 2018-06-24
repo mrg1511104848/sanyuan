@@ -43,7 +43,7 @@ public class InstructionsReadUtil {
 		
 		try {
 			String instrunctionPath = "D://爱客服/数据_ALL/北医三院/三院提供/20180418说明书提取框架&demo新.xlsx";
-//			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
+			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
 			
 			records = ExcelUtils.getInstance().readExcel2List(instrunctionPath);
 		} catch (InvalidFormatException | IOException e) {
@@ -251,4 +251,11 @@ public class InstructionsReadUtil {
 		}
 		return false;
 	}
+	public static List<Instruction> getInstructions() {
+		return instructions;
+	}
+	public static void setInstructions(List<Instruction> instructions) {
+		InstructionsReadUtil.instructions = instructions;
+	}
+	
 }

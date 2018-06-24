@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class Resources {
 	public static List<String> routeOfMedicineList = new ArrayList<String>();
 	public static Map<String, String[]> dosageUnitConversionMap = new HashMap<String, String[]>();
 	public static List<String> useForDosageSplitDicts = new ArrayList<String>();
+	public static Map<String, String> ICD_VERSION_MAP = new HashMap<String, String>();
 	static{
 		loadDDDS();
 		loadDDDSCalculate();
@@ -39,6 +41,7 @@ public class Resources {
 		loadRouteOfMedicineList();
 		loadDosageUnitConversion();
 		loadUseForDosageSplitDicts();
+		loadICD10VersionMap();
 	}
 	public static List<String> readFile2Lines(String filePath) throws IOException{
 		File file = ResourceUtils.getFile(filePath);
@@ -132,6 +135,24 @@ public class Resources {
 			e.printStackTrace();
 		}
 	}
+	
+	public static Map<String, String> loadICD10VersionMap(){
+		try {
+			List<String> icdVersions = Resources.readFile2Lines("classpath:icd_versions.txt");
+			for (String icdVersion : icdVersions) {
+				if(StringUtils.isBlank(icdVersion)) continue;
+				String[] icdVersionArr = icdVersion.split(" ");
+				System.out.println(icdVersionArr);
+				ICD_VERSION_MAP.put(icdVersionArr[0], icdVersionArr[1]);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ICD_VERSION_MAP;
+	}
+	
+	
+
 	/**
 	 * 剂量选择 分组，用于将剂量选择分组,判断某个处方是否等于、小于、大于这个剂量分组
 	 * @return
@@ -168,5 +189,12 @@ public class Resources {
 	}
 	public static void main(String[] args) {
 		Resources.test();
+	}
+	public static Map<String, String> getICD_VERSION_MAP() {
+		return ICD_VERSION_MAP;
+	}
+
+	public static void setICD_VERSION_MAP(Map<String, String> iCD_VERSION_MAP) {
+		ICD_VERSION_MAP = iCD_VERSION_MAP;
 	}
 }
