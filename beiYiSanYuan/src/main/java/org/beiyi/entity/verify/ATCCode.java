@@ -93,7 +93,8 @@ public class ATCCode {
 	}
 	@Override
 	public String toString() {
-		return "[atcNo=" + atcNo + "]";
+		return "ATCCode [atcNo=" + atcNo + ", chName=" + chName + ", enName="
+				+ enName + "]";
 	}
 	
 }

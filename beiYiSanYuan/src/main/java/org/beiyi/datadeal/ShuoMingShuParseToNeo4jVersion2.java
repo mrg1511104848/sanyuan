@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.beiyi.entity.DDI;
+import org.beiyi.entity.Drug;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.verify.ATCCode;
 import org.beiyi.entity.verify.Instruction;
@@ -59,11 +61,19 @@ public class ShuoMingShuParseToNeo4jVersion2 {
 	public static void main(String[] args) throws IOException, InvalidFormatException {
 		//转换所有药品
 		ShuoMingShuParseToNeo4jVersion2 shuoMingShuParseToNeo4jVersion2 = new ShuoMingShuParseToNeo4jVersion2();
-		shuoMingShuParseToNeo4jVersion2.parseMedicines();
+		/*shuoMingShuParseToNeo4jVersion2.parseMedicines();
 		shuoMingShuParseToNeo4jVersion2.parseYongFaNodeAndDiseaseRelation();
 		shuoMingShuParseToNeo4jVersion2.parseICD10ToNeo4j();
 		shuoMingShuParseToNeo4jVersion2.dealShiYingZheng2Neo4j(records);
-		Neo4jBuildUtil.writeNeo4jDataTo(path+"bysy.data.json");
+		shuoMingShuParseToNeo4jVersion2.getAllDDI();
+		Neo4jBuildUtil.writeNeo4jDataTo(path+"bysy.data.json");*/
+		
+		List<Instruction> instructions = shuoMingShuParseToNeo4jVersion2.getAllShuoMingShu();
+		for (Instruction instruction : instructions) {
+			String combinationName = instruction.getDrugCombinationName();
+			DrugCombinationName drugCombinationName = new DrugCombinationName(combinationName);
+			List<ATCCode> atcCodes = shuoMingShuParseToNeo4jVersion2.getAllDrugIngredients(drugCombinationName);
+		}
 	}
 	public void parseICD10ToNeo4j(){
 		List<String> titles = new ArrayList<String>();
@@ -312,7 +322,67 @@ public class ShuoMingShuParseToNeo4jVersion2 {
 			Neo4jBuildUtil.getNodeList().add(drug);
 		}
 	}
-	
+	static Map<org.bson.Document, List<String>> drugIdAndEnNameList;
+	/**
+	 * 获取一个药品的根据ATC匹配的成分
+	 * @param drugCombinationName
+	 * @return
+	 */
+	private List<ATCCode> getAllDrugIngredients(DrugCombinationName drugCombinationName){
+		List<ATCCode> atcCodes = new ArrayList<ATCCode>(); 
+		Map<String, Object> filter = new HashMap<String, Object>();
+		filter.put("shangPinMing", drugCombinationName.getShangPinName());
+		filter.put("tongYongMing", drugCombinationName.getTongYongName());
+		
+		Document document = MongoUtil.findOne("dxy_app_drug_detail_deal_final",filter);
+		String englishName = document.getString("englishName");
+		String[] englishNameArr = englishName.split(" ");
+		List<String> enNameList = new ArrayList<String>();
+		for (String enName : englishNameArr) {
+			Map<String, Object> query = new HashMap<String, Object>();
+			Map<String, Object> subQuery = new HashMap<String, Object>();
+			subQuery.put("$regex", "^"+enName+"$");
+			subQuery.put("$options", "i");
+			query.put("enName", subQuery);
+			Document resultDoc = MongoUtil.findOne("bysy_atc_code", query);
+			if(resultDoc == null){
+				continue;
+			}
+			ATCCode atcCode = new ATCCode();
+			atcCode.setAtcNo(resultDoc.getString("atcNo"));
+			atcCode.setChName(resultDoc.getString("chName"));
+			atcCode.setEnName(resultDoc.getString("enName"));
+			atcCodes.add(atcCode);
+			System.out.println(drugCombinationName.getCombinationName()+"["+englishName+"] -> "+enName+" -> "+atcCode);
+		}
+		if(atcCodes.size() == 0){
+			System.err.println(drugCombinationName.getCombinationName()+"["+englishName+"]"+" has no macthed ingredients");
+		}
+		return atcCodes;
+	}
+	private static List<org.beiyi.entity.Drug> getDrugList(String icd10DiseaseEnName){
+		List<org.beiyi.entity.Drug> drugList = new ArrayList<Drug>();
+		Iterator<Entry<org.bson.Document, List<String>>> itr = drugIdAndEnNameList.entrySet().iterator();
+		while (itr.hasNext()) {
+			Entry<org.bson.Document, List<String>> entry = itr.next();
+			List<String> enNameList = entry.getValue();
+			org.bson.Document doc = entry.getKey();
+			if(enNameList!=null){
+				for (String enName : enNameList) {
+					if(icd10DiseaseEnName.trim().equalsIgnoreCase(enName.trim())){
+						Drug d = new Drug();
+						d.setId(doc.getString("drugId"));
+						d.setShangPinName(doc.getString("shangPinMing"));
+						d.setTongYongName(doc.getString("tongYongMing"));
+						d.setEnName(doc.getString("englishName"));
+						d.getEffectCFList().add(enName);
+						drugList.add(d);
+					}
+				}
+			}
+		}
+		return drugList;
+	}
 	/**
 	 * 提取ATC(药品成分)
 	 */
@@ -411,7 +481,9 @@ public class ShuoMingShuParseToNeo4jVersion2 {
 				String drugBAtcNo = document.getString("drugBAtcNo");
 				String drugBAtcChName = document.getString("drugBAtcChName");
 				String drugBAtcEnName = document.getString("drugBAtcEnName");
+				
 				Neo4jBuildUtil.addRelationToNeo4j("药品_ATC", dxyDrugATongYongMing, drugAAtcNo);
+				
 				Neo4jBuildUtil.addRelationToNeo4j("药品_ATC", dxyDrugBTongYongMing, drugBAtcNo);
 				
 				
