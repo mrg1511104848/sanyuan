@@ -1,6 +1,8 @@
 package org.beiyi.datadeal;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,8 +12,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import net.sf.json.JSONObject;
+
 import org.ansj.domain.Term;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.beiyi.entity.DrugCombinationName;
@@ -22,8 +27,11 @@ import org.skynet.frame.util.AnalysisUtil;
 import org.skynet.frame.util.ListUtil;
 import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.excel.ExcelUtil;
+import org.skynet.frame.util.jsoup.JsoupUtil;
 import org.skynet.frame.util.map.MapUtil;
 import org.skynet.frame.util.mongo.MongoUtil;
+
+import ch.qos.logback.core.util.FileUtil;
 
 import com.github.crab2died.ExcelUtils;
 import com.mongodb.client.MongoCursor;
@@ -136,9 +144,65 @@ public class DxyShuoMingShuDosageDeal {
 			}
 		}
 	}
-
-	static {
+	private static void filter(){
+		List<String> validDrugs = null;
 		try {
+			validDrugs = FileUtils.readLines(new File("C://combinationStandardNameList.txt"),Charset.forName("utf-8"));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		List<String> validDrugsFilterd = new ArrayList<String>();
+		List<String> drugIds = new ArrayList<String>();
+		for (String valid : validDrugs) {
+			DrugCombinationName drugCombinationName = new DrugCombinationName(valid);
+			validDrugsFilterd.add(drugCombinationName.getCombinationStandardName());
+		}
+		List<String> combinationStandardNameList = new ArrayList<String>();
+		List<Document> docs = MongoUtil.findDocList("dxy_app_drug_detail_simple");
+		for (Document doc : docs) {
+			DrugCombinationName drugCombinationName = new DrugCombinationName(doc.getString("cnName"),doc.getString("commonName"));
+			String combinationStandardName = drugCombinationName.getCombinationStandardName();
+			if(validDrugsFilterd.contains(combinationStandardName)){
+				System.out.println(combinationStandardName);
+				if(combinationStandardNameList.contains(combinationStandardName)) continue;
+				combinationStandardNameList.add(combinationStandardName);
+				String drugId = doc.getString("drugId");
+				drugIds.add(drugId);
+			}
+		}
+		List<String> newList = ListUtils.subtract(validDrugsFilterd, combinationStandardNameList);
+		for (String newE : newList) {
+			System.out.println(newE);
+		}
+		try {
+			FileUtils.writeLines(new File("C://combinationStandardNameList1.txt"), combinationStandardNameList);
+			drugIds.add("92019");
+			drugIds.add("50121");
+			drugIds.add("148806");
+			FileUtils.writeLines(new File("C://drugIds.txt"), drugIds);
+			
+			List<String> druginfoList = new ArrayList<String>();
+			for (String drugId : drugIds) {
+				Document doc = MongoUtil.findOne("dxy_app_drug_detail", "drugId" , drugId);
+				
+				String jinji = DXYUtil.getString(doc, "禁忌", true);
+				String syz = DXYUtil.getString(doc, "适应症", true);
+				String spm = DXYUtil.getString(doc, "商品名", true);
+				String tym = DXYUtil.getString(doc, "通用名", true);
+				
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("spm", spm);
+				map.put("tym", tym);
+				map.put("syz", syz);
+				map.put("jinji", jinji);
+				MongoUtil.saveDoc("temp_drugInfo", map);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	static {
+		/*try {
 			loadDicts();
 			loadTestDrugNameList();
 			DxyShuoMingShuIndicationDeal.loadICD10Dict();
@@ -147,15 +211,16 @@ public class DxyShuoMingShuDosageDeal {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public static void main(String[] args) throws InvalidFormatException,
 			IOException {
+		filter();
 		// deal();
 //		 System.out.println("本品为双时相胰岛素制剂。本品的双时相组份包含短效胰岛素和中效胰岛素。 在需要快速起效使效应延长时，通常给予预混胰岛素一天一次或一天二次。 "
 //				 .matches(".*[日|曰|天|周|月|小时].*[mg|g|片|粒|颗|袋|mg|g|毫克|克|次].*"));
-		MongoCursor<Document> dxy_app_drug_detail_simple_cursor = MongoUtil
+		/*MongoCursor<Document> dxy_app_drug_detail_simple_cursor = MongoUtil
 				.iterator("dxy_app_drug_detail_simple");
 		List<String> cells = new ArrayList<String>();
 		cells.add("药品名称");
@@ -185,13 +250,6 @@ public class DxyShuoMingShuDosageDeal {
 			DrugCombinationName drugCombinationName = new DrugCombinationName(
 					cnName + "(" + commonName + ")");
 			
-			/*if (!testDrugNameList.contains(drugCombinationName)) {
-				continue;
-			}*/
-			/*if (drugCombinationExistsInExport.contains(drugCombinationName
-					.getCombinationStandardName())) {
-				continue;
-			}*/
 			if(drugCombinationName.getCombinationStandardName().contains("诺和灵30R")){
 				System.out.println();
 			}
@@ -241,7 +299,7 @@ public class DxyShuoMingShuDosageDeal {
 		}
 		ExcelUtil.export("D://temp_丁香园剂量导出V6.xls", cells, values);
 		ExcelUtil.export("D://temp_丁香园剂量导出V6(不确定的药品).xls", cells,
-				probablyMedicineValues);
+				probablyMedicineValues);*/
 	}
 
 	private static void loadDicts() {
