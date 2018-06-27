@@ -1,14 +1,19 @@
 package org.beiyi.controller;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.beiyi.entity.ChuFang;
@@ -130,7 +136,7 @@ public class ChuFangController {
 	 * @throws RuntimeException 
 	 */
 	@RequestMapping("/verify.htm")
-	public ResponseEntity<byte[]> verify(HttpServletRequest request,HttpServletResponse response,@RequestParam("file") CommonsMultipartFile file){
+	public void verify(HttpServletRequest request,HttpServletResponse response,@RequestParam("file") CommonsMultipartFile file){
 		//如果文件不为空，写入上传路径
 		InputStream is = null;
         if(!file.isEmpty()) {
@@ -142,15 +148,15 @@ public class ChuFangController {
 				List<String> titles = records.get(0);
 				String[] exportZipFilePathInfo = verify(request,titles,chuFangList);
 				
-				byte[] body = null;
+		        this.downloadFile(new File(exportZipFilePathInfo[0]), response, true);
+		        /*byte[] body = null;
 				is = new FileInputStream(new File(exportZipFilePathInfo[0]));
 				body = new byte[is.available()];
 				is.read(body);
 				HttpHeaders headers = new HttpHeaders();
 				headers.add("Content-Disposition", "attchement;filename=" + exportZipFilePathInfo[1]);
 				HttpStatus statusCode = HttpStatus.OK;
-				ResponseEntity<byte[]> entity = new ResponseEntity<byte[]>(body, headers, statusCode);
-				return entity;
+				ResponseEntity<byte[]> entity = new ResponseEntity<byte[]>(body, headers, statusCode);*/
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally{
@@ -164,8 +170,31 @@ public class ChuFangController {
 			}
         } else {
         }
-		return null;
 	}
+	public void downloadFile(File file,HttpServletResponse response,boolean isDelete) {
+        try {
+            // 以流的形式下载文件。
+            BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file.getPath()));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            // 清空response
+            response.reset();
+            OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment;filename=" + new String(file.getName().getBytes("UTF-8"),"ISO-8859-1"));
+            toClient.write(buffer);
+            toClient.flush();
+            toClient.close();
+            if(isDelete)
+            {
+                file.delete();        //是否将生成的服务器端文件删除
+            }
+         } 
+         catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    } 
 	private String[] verify(HttpServletRequest request,List<String> titles,List<org.beiyi.entity.verify.ChuFang> chuFangList) throws RuntimeException, Exception{
 		DrugVerifyService drugVerifyService = new DrugVerifyService();
 		List<IDrugVeryfy> drugVerifyServices = new ArrayList<IDrugVeryfy>();
@@ -223,7 +252,7 @@ public class ChuFangController {
         String exportZipFileName = chufangsExportPath+File.separator+currDate+".zip";
         ZipUtils.toZip(basePath, exportZipFileName, true);
         
-		return new String[]{basePath,currDate+".zip"};
+		return new String[]{basePath+".zip",currDate+".zip"};
 	}
 	public static List<org.beiyi.entity.verify.ChuFang> read2ChuFangList(List<List<String>> records) {
 		List<org.beiyi.entity.verify.ChuFang> chuFangList = new ArrayList<org.beiyi.entity.verify.ChuFang>();
