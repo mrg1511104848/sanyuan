@@ -19,8 +19,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class IndexController {
-	@Autowired
-	MongoTemplate testMongoTemplate;
+	/*@Autowired
+	MongoTemplate testMongoTemplate;*/
 
 	/**
 	 * 到用户录入界面
@@ -39,7 +39,7 @@ public class IndexController {
 	@RequestMapping("/getDrugOne.htm")
 	public Map<String, Object> getDrugOne(String id) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		try {
+		/*try {
 			if(!StringUtils.isEmpty(id)){
 				ObjectId objectId = new ObjectId(id);
 				Drug drug = testMongoTemplate.findById(objectId, Drug.class,"bysy_drug_user_input");
@@ -53,14 +53,14 @@ public class IndexController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			resultMap.put("msg", "error");
-		}
+		}*/
 		return resultMap;
 	}
 	@ResponseBody
 	@RequestMapping("/save.htm")
 	public Map<String, Object> save(Drug drug) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		try {
+		/*try {
 			List<BigAdaptationDisease> bigAdaptationDiseases = drug
 					.getBigAdaptationDiseases();
 			Iterator<BigAdaptationDisease> bigAdaptationDiseaseItr = bigAdaptationDiseases
@@ -85,7 +85,7 @@ public class IndexController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			resultMap.put("msg", "error");
-		}
+		}*/
 		return resultMap;
 	}
 
@@ -98,14 +98,14 @@ public class IndexController {
 	@RequestMapping("/list.htm")
 	public Map<String, Object> list(Drug drug) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
-		try {
+		/*try {
 			List<Drug> drugs = testMongoTemplate.findAll(Drug.class, "bysy_drug_user_input");
 			resultMap.put("data", drugs);
 			resultMap.put("msg", "success");
 		} catch (Exception e) {
 			e.printStackTrace();
 			resultMap.put("msg", "error");
-		}
+		}*/
 		return resultMap;
 	}
 }

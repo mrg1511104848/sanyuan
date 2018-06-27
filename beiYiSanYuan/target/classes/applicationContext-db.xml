@@ -10,7 +10,7 @@
           http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <!-- <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="order" value="2" />
         <property name="ignoreUnresolvablePlaceholders" value="true" />
         <property name="locations">
@@ -20,8 +20,8 @@
         </property>
     </bean>
     
-    <!-- mongo config -->
-    <!-- Default bean name is 'mongo' -->
+    mongo config
+    Default bean name is 'mongo'
     <mongo:mongo id="mongoData" host="${mongo.ip}" port="${mongo.port}">
         <mongo:options connections-per-host="${mongo.connections-per-host}"
             threads-allowed-to-block-for-connection-multiplier="${mongo.threads-allowed-to-block-for-connection-multiplier}"
@@ -36,9 +36,9 @@
             />
     </mongo:mongo>
     
-    <!-- <mongo:db-factory dbname="database" mongo-ref="mongoData" /> -->
+    <mongo:db-factory dbname="database" mongo-ref="mongoData" />
     
-    <!-- 用户信息配置 -->
+    用户信息配置
     <bean id="userCredentials" class="org.springframework.data.authentication.UserCredentials">  
         <constructor-arg name="username"  value="${mongo.username}"/>  
         <constructor-arg name="password"  value="${mongo.password}"/>  
@@ -48,6 +48,6 @@
         <constructor-arg ref="mongoData" />
         <constructor-arg name="databaseName" value="huilanData" />
         <constructor-arg ref="userCredentials" />
-    </bean>
+    </bean> -->
     
 </beans>

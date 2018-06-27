@@ -1,5 +1,7 @@
 package org.beiyi.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import org.beiyi.entity.verify.Instruction;
 import org.beiyi.entity.verify.InstructionUse;
 import org.bson.Document;
 import org.skynet.frame.util.mongo.MongoUtil;
+import org.springframework.util.ResourceUtils;
 
 import com.github.crab2died.ExcelUtils;
 
@@ -42,10 +45,10 @@ public class InstructionsReadUtil {
 		}*/
 		
 		try {
-			String instrunctionPath = "D://爱客服/数据_ALL/北医三院/三院提供/20180418说明书提取框架&demo新.xlsx";
+//			String instrunctionPath = "D://爱客服/数据_ALL/北医三院/三院提供/20180418说明书提取框架&demo新.xlsx";
 //			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
-			
-			records = ExcelUtils.getInstance().readExcel2List(instrunctionPath);
+			File instrunctionFile = ResourceUtils.getFile("classpath:20180418说明书提取框架&demo新.xlsx");
+			records = ExcelUtils.getInstance().readExcel2List(new FileInputStream(instrunctionFile));
 		} catch (InvalidFormatException | IOException e) {
 			e.printStackTrace();
 		}

@@ -43,7 +43,8 @@ public class PrescriptionReadUtil {
 //	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/整体流程测试_模拟处方.xlsx";
 	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/模拟处方180621 - 单SHEET.xlsx";
 	static {
-		try {
+		//临时修改20180627
+		/*try {
 			// records =
 			// ExcelReadUtil.getRecords("D://爱客服/北医三院/三院提供/三院提供的数据/处方/test.xlsx");
 			records = ExcelReadUtil.getRecords(chuFangPath);
@@ -51,7 +52,7 @@ public class PrescriptionReadUtil {
 			read2ChuFangList();
 		} catch (InvalidOperationException | IOException | OpenXML4JException | ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public static void read2ChuFangList() {
@@ -81,7 +82,7 @@ public class PrescriptionReadUtil {
 		}
 	}
 
-	private static ChuFang parseChuFangRows2ChuFang(
+	public static ChuFang parseChuFangRows2ChuFang(
 			List<List<String>> chuFangRows) {
 		ChuFang chuFang = new ChuFang();
 		List<String> firstRow = chuFangRows.get(0);
@@ -132,7 +133,7 @@ public class PrescriptionReadUtil {
 	 * @param list
 	 * @return
 	 */
-	private static String getUniquePrescriptionNo(List<String> list) {
+	public static String getUniquePrescriptionNo(List<String> list) {
 		String prescriptionNoI = list.get(1);
 
 		String huanZheIdNoI = list.get(3);
