@@ -11,7 +11,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.skynet.frame.util.RegexUtils;
-import org.skynet.frame.util.http.HttpUtil;
 import org.skynet.frame.util.mongo.MongoUtil;
 
 import com.mongodb.client.MongoCursor;

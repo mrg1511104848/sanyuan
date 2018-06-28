@@ -2,7 +2,6 @@ package org.beiyi.datadeal;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,14 +9,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import net.sf.json.JSONArray;
 
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -25,15 +21,12 @@ import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.beiyi.entity.Drug;
 import org.beiyi.util.DrugInfoParseToStandard;
-import org.beiyi.util.ICD10ParseUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.skynet.frame.persistent.MongoIndex;
 import org.skynet.frame.persistent.MongoPersistent;
 import org.skynet.frame.util.ListUtil;
-import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.excel.ExcelUtil;
 import org.skynet.frame.util.http.HttpUtil;
 import org.skynet.frame.util.map.MapUtil;

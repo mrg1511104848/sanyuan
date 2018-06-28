@@ -1,13 +1,10 @@
 package org.beiyi.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.verify.ATCCode;
-import org.skynet.frame.util.mongo.MongoUtil;
 
 /**
  * ATC加载工具类

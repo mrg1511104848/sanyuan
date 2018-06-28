@@ -1,16 +1,9 @@
 package org.beiyi.controller;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import org.beiyi.entity.AdaptationDisease;
-import org.beiyi.entity.BigAdaptationDisease;
 import org.beiyi.entity.Drug;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -12,7 +12,6 @@ import org.beiyi.service.verify.impl.DosageMaxLimitVerifyService;
 import org.beiyi.service.verify.impl.DosageVerifyService;
 import org.beiyi.service.verify.impl.DrugEffectVerifyService;
 import org.beiyi.service.verify.impl.DrugNotExistsVerifyService;
-import org.beiyi.service.verify.impl.JiLiangVerifyService;
 import org.beiyi.service.verify.impl.RepeatedPrescriptions;
 import org.beiyi.service.verify.impl.SexVerifyService;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;

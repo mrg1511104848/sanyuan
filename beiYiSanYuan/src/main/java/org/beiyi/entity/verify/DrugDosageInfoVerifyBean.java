@@ -1,11 +1,7 @@
 package org.beiyi.entity.verify;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-
-import org.beiyi.entity.DrugCombinationName;
 
 /**
  * 针对处方中的剂量审核封装的关于审核结果的bean

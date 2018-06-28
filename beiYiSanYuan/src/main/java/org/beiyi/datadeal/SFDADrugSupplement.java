@@ -186,7 +186,7 @@ public class SFDADrugSupplement {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("href", href);
 			map.put("html", driver.getPageSource());
-			String hrefId = StringUtils.substringAfter(href,"&Id=");
+//			String hrefId = StringUtils.substringAfter(href,"&Id=");
 //			FileUtils.writeStringToFile(new File(sfdaCheckCollectionPath+"/drugfutureSupplementBySFDA/"+hrefId+".txt"), driver.getPageSource(),Charset.forName("utf-8"));
 			MongoUtil.saveDoc("drugfutureSupplementBySFDA", map);
 			

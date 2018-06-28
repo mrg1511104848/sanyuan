@@ -28,7 +28,6 @@ import org.beiyi.util.ATCUtil;
 import org.beiyi.util.InstructionsReadUtil;
 import org.beiyi.util.Neo4jBuildUtil;
 import org.bson.Document;
-import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.encrypt.MD5Util;
 import org.skynet.frame.util.mongo.MongoUtil;
 import org.springframework.core.io.ClassPathResource;
@@ -122,7 +121,7 @@ public class ShuoMingShuParseToNeo4jVersion2 {
 		values0.add(Resources.getICD_VERSION_MAP().get("0"));
 		Neo4jBuildUtil.addToNeo4j("ICD10", titles, values0, "编码","ICD-10");
 		
-		List<String> uniqueList = new ArrayList<String>();
+//		List<String> uniqueList = new ArrayList<String>();
 		List<Map<String, String>> shuoMingShuoDiseaseICDMap = readShuoMingShuDiseaseICDMap();
 		for (Map<String, String> map : shuoMingShuoDiseaseICDMap) {
 			String code = map.get("code").toString();
@@ -139,8 +138,8 @@ public class ShuoMingShuParseToNeo4jVersion2 {
 				String nameEn = document.getString("nameEn");
 				String version = document.getString("version");
 
-				String parentName = document.getString("_parentName");
-				String parentNameEn = document.getString("_parentNameEn");
+//				String parentName = document.getString("_parentName");
+//				String parentNameEn = document.getString("_parentNameEn");
 				String parentCode = document.getString("parent");
 				
 				
@@ -380,7 +379,7 @@ public class ShuoMingShuParseToNeo4jVersion2 {
 		atcTitles.add("英文名");
 		
 		for (Document bysy_drug_major_constituent_document : bysy_drug_major_constituent) {
-			String shangPinMing = bysy_drug_major_constituent_document.getString("shangPinMing");
+//			String shangPinMing = bysy_drug_major_constituent_document.getString("shangPinMing");
 			String tongYongMing = bysy_drug_major_constituent_document.getString("tongYongMing");
 			String majorConstituents = bysy_drug_major_constituent_document.getString("major_constituent");
 			String[] majorConstituentArr = majorConstituents.split(";|；|,|，");
@@ -421,7 +420,7 @@ public class ShuoMingShuParseToNeo4jVersion2 {
 		Document document = MongoUtil.findOne("dxy_app_drug_detail_deal_final",filter);
 		String englishName = document.getString("englishName");
 		String[] englishNameArr = englishName.split(" ");
-		List<String> enNameList = new ArrayList<String>();
+//		List<String> enNameList = new ArrayList<String>();
 		for (String enName : englishNameArr) {
 			Map<String, Object> query = new HashMap<String, Object>();
 			Map<String, Object> subQuery = new HashMap<String, Object>();

@@ -11,11 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.io.FileUtils;
@@ -29,7 +26,6 @@ import org.skynet.frame.util.mongo.MongoUtil;
 import org.skynet.frame.util.translate.ITranslate;
 import org.skynet.frame.util.translate.impl.SougouTranslate;
 
-import com.gargoylesoftware.htmlunit.javascript.host.dom.Node;
 import com.mongodb.client.MongoCursor;
 
 /**
@@ -347,7 +343,6 @@ public class MicromedexDataDeal {
 		}
 		ITranslate translate = new SougouTranslate();
 		Iterator<Entry<String, List<String>>> translateMapItr = translateMap.entrySet().iterator();
-		outter:
 		while (translateMapItr.hasNext()) {
 			List<String> values = new ArrayList<String>();
 			Entry<String, List<String>> translateEntry = translateMapItr.next();

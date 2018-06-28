@@ -2,7 +2,6 @@ package org.beiyi.service.verify.impl;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
@@ -23,7 +22,7 @@ import org.skynet.frame.util.RegexUtils;
  *
  */
 public class ShiYingZhengVerifyService implements IDrugVeryfy{
-	private static Logger logger = Logger.getLogger(ShiYingZhengVerifyService.class);
+//	private static Logger logger = Logger.getLogger(ShiYingZhengVerifyService.class);
 	
 	/**
 	 * 判定药品对应的适应症是否合理

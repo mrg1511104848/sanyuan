@@ -6,13 +6,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
-
-import net.sf.json.JSONObject;
 
 import org.ansj.domain.Term;
 import org.apache.commons.collections4.ListUtils;
@@ -22,16 +18,9 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.reource.Resources;
 import org.bson.Document;
-import org.jsoup.Jsoup;
 import org.skynet.frame.util.AnalysisUtil;
-import org.skynet.frame.util.ListUtil;
 import org.skynet.frame.util.RegexUtils;
-import org.skynet.frame.util.excel.ExcelUtil;
-import org.skynet.frame.util.jsoup.JsoupUtil;
-import org.skynet.frame.util.map.MapUtil;
 import org.skynet.frame.util.mongo.MongoUtil;
-
-import ch.qos.logback.core.util.FileUtil;
 
 import com.github.crab2died.ExcelUtils;
 import com.mongodb.client.MongoCursor;
@@ -181,7 +170,7 @@ public class DxyShuoMingShuDosageDeal {
 			drugIds.add("148806");
 			FileUtils.writeLines(new File("C://drugIds.txt"), drugIds);
 			
-			List<String> druginfoList = new ArrayList<String>();
+//			List<String> druginfoList = new ArrayList<String>();
 			for (String drugId : drugIds) {
 				Document doc = MongoUtil.findOne("dxy_app_drug_detail", "drugId" , drugId);
 				

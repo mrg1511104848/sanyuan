@@ -3,9 +3,6 @@ package org.beiyi.changliang;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.beiyi.util.DrugInfoParseToStandard;
-import org.skynet.frame.util.RegexUtils;
-
 public class DrugInfoEnum {
 	public static List<String> shiYingZhengRegex;
 	public static final Integer SHANGPIN_NAME = 1;

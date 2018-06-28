@@ -6,9 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.beiyi.datadeal.entity.DrugfutureSupplementBySFDA;
 import org.bson.Document;
-import org.jsoup.Jsoup;
-import org.skynet.frame.annotation.Path;
-import org.skynet.frame.base.SkynetEntity;
 import org.skynet.frame.util.mongo.MongoUtil;
 
 /**
