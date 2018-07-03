@@ -1,0 +1,92 @@
+/*
+ * It is advised not to edit the smartadmin_production.css
+ * as this will override any changes you make in the 
+ * later versions of this theme. 
+ * 
+ * We advise that you use use this CSS to override 
+ * SmartAdmin styles. 
+ * 
+ * Rename the stylesheet to whatever your liking so it will stay
+ * unique to you with each update of SmartAdmin.
+ */
+
+/*
+ * INDEX
+ * 
+ * - HTML
+ * - BODY
+ * - CUSTOM STYLES
+ */
+ .cls{
+ 	clear:both;
+ }
+.warning-clo{
+    background-color: red;
+}
+.nomal-clo{
+    background-color: white;
+}
+ .dataTables_info{
+ 	float:left;
+ }
+ .dataTables_length{
+ 	float: right;
+ }
+ .underline{
+ 	text-decoration:underline;
+ }
+ .nodata{
+ 	padding-top: 10px;
+    padding-bottom: 10px;
+ }
+ .margin_L5{margin-left:5px;}
+.margin_LR5{margin:0 5px;}
+.margin_R5{margin-right:5px;}
+.margin_B5{margin-bottom:5px;}
+.padding_B5{padding-bottom:5px;}
+.aui_close:focus,.aui_close:hover{text-decoration:none;color: white;}
+.superbox-list {
+padding: 0px;
+margin:15px;
+}
+.tree li.parent_li>span:hover {
+background-color: #3276b1;
+border: 1px solid #3276b1;
+color: #fff;
+}
+.tree li.parent_li>span:hover+ul li::before {
+border-left-color: #3276b1;
+}
+.tree li.parent_li>span:hover+ul li::before {
+border-left-color: #3276b1;
+}
+.tree li.parent_li>span:hover+ul li span {
+background: #3276b1!important;
+border: 1px solid #3276b1;
+color: #fff;
+}
+.tree li.parent_li>span:hover+ul li::after {
+border-top-color: #3276b1;
+}
+.jarviswidget>header {
+	background:white;
+	color:#000;
+	border: 1px solid #C2C2C2;
+	border-color:#C2C2C2!important;
+}
+.jarviswidget-color-darken>header{
+}
+.jarviswidget>header>.jarviswidget-ctrls a {
+	color: #838383!important;
+}
+
+.fatch_processing.css("position", "absolute").css({
+          "margin":"0px",
+          "top": function () {
+              return (that.$element.height() - that.$element.children().eq(0).height()-40) / 2 + "px";
+          },
+          "left": function () {
+              return (that.$element.width() - that.$element.children().eq(0).width()) / 2 + "px";
+          }
+ });
+ 

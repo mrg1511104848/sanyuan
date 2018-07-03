@@ -14,7 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class IndexController {
 	/*@Autowired
 	MongoTemplate testMongoTemplate;*/
-
+	
 	/**
 	 * 到用户录入界面
 	 * 

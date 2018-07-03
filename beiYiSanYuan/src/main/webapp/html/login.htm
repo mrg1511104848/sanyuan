@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html id="extr-page" style="background: none;">
+	<head>
+		<meta charset="utf-8">
+		<title>北医三院审方系统</title>
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		
+		<!-- #CSS Links -->
+		<!-- Basic Styles -->
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/font-awesome.min.css">
+
+		<!-- SmartAdmin Styles : Please note (smartadmin-production.css) was created using LESS variables -->
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/smartadmin-production.min.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/smartadmin-skins.min.css">
+
+		<!-- SmartAdmin RTL Support is under construction
+			 This RTL CSS will be released in version 1.5
+		<link rel="stylesheet" type="text/css" media="screen" href="css/smartadmin-rtl.min.css"> -->
+
+		<!-- We recommend you use "your_style.css" to override SmartAdmin
+		     specific styles this will also ensure you retrain your customization with each SmartAdmin update.
+		<link rel="stylesheet" type="text/css" media="screen" href="css/your_style.css"> -->
+
+		<!-- Demo purpose only: goes with demo.js, you can delete this css when designing your own WebApp -->
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/demo.min.css">
+
+		<!-- #FAVICONS -->
+		<link rel="shortcut icon" href="../resources/img/favicon/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="../resources/img/favicon/favicon.ico" type="image/x-icon">
+
+		<!-- #GOOGLE FONT -->
+		<!-- <link rel="stylesheet" href="http://fonts.useso.com/css?family=Open+Sans:400italic,700italic,300,400,700"> -->
+
+		<!-- #APP SCREEN / ICONS -->
+		<!-- Specifying a Webpage Icon for Web Clip 
+			 Ref: https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html -->
+		<link rel="apple-touch-icon" href="../resources/img/splash/sptouch-icon-iphone.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="../resources/img/splash/touch-icon-ipad.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="../resources/img/splash/touch-icon-iphone-retina.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="../resources/img/splash/touch-icon-ipad-retina.png">
+		
+		<!-- iOS web-app metas : hides Safari UI Components and Changes Status Bar Appearance -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		
+		<!-- Startup image for web apps -->
+		<link rel="apple-touch-startup-image" href="../resources/img/splash/ipad-landscape.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)">
+		<link rel="apple-touch-startup-image" href="../resources/img/splash/ipad-portrait.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)">
+		<link rel="apple-touch-startup-image" href="../resources/img/splash/iphone.png" media="screen and (max-device-width: 320px)">
+		<link rel="stylesheet" type="text/css" media="screen" href="../resources/css/chanese-fixed.css">
+		<style type="text/css">
+			.img{
+				background-repeat: no-repeat;
+			    background-size: 208px 208px;
+			    width: 52px;
+			    height: 52px;
+			    display:inline-block;
+			    background-position-y:0;
+			    margin-right:5px;
+			}
+		</style>
+	</head>
+	
+	<body class="animated fadeInDown">
+		<header id="header" style="background: #000!important;height: 50px;padding: 0 20px;">
+
+			<div id="logo-group">
+				<!-- <span id="logo">  </span> -->
+				<h3 style="color: #BBB!important;font-weight: bold;margin: 8px 0;font-size: 16px;"> 北医三院审单系统</h3>
+			</div>
+
+		</header>
+
+		<div id="main" role="main" style="background: none;">
+
+			<!-- MAIN CONTENT -->
+			<div id="content" class="container" style="width: 400px;padding: 100px 14px;">
+
+				<div class="row">
+					<div>
+						<div class="well no-padding" style="box-shadow: -31px 32px 53px rgba(0,0,0,.2);border: none;">
+							<form id="login-form" class="smart-form client-form" method="post" style="background: white;" onsubmit="subBefore()">
+								<header style="border: none">
+									<h1 style="font-weight: normal;text-align: center;font-size: 20px;">北医三院审单系统</h1>
+								</header>
+
+								<fieldset>
+									<section>
+									<div id="div_msg"></div>
+									</section>
+									<section>
+										<label class="label">用户名</label>
+										<label class="input"> 
+											<i class="icon-append fa fa-user" style="font-size: 2em;display: inline-block;height: 34px;line-height: 34px;right: 5px;"></i>
+											<input type="userName" name="eq_userName" class="input-lg">
+											
+											<b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i> 请输入正确的用户名</b></label>
+									</section>
+
+									<section>
+										<label class="label">密码</label>
+										<label class="input"> <i class="icon-append fa fa-lock" style="font-size: 2em;display: inline-block;height: 34px;line-height: 34px;right: 5px;"></i>
+											<input type="passWord" name="eq_passWord" class="input-lg">
+											<b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i> 请输入您的密码</b> </label>
+									</section>
+								</fieldset>
+								<footer style="margin-top: 29px;border: none;">
+									<button type="submit" id="btnLogin" class="btn btn-primary">
+										登录
+									</button>
+								</footer>
+							</form>
+
+						</div>
+						<div style="float: left;">Copyright <a href="http://www.huilan.com" target="_blank">北医三院</a> 2018.</div><div style="float: right;">TEL : 010-88888888<div/>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<!--================================================== -->	
+
+		<!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
+		<script src="../resources/js/plugin/pace/pace.min.js"></script>
+
+	    <!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+	    <!-- <script src="http://libs.useso.com/js/jquery/2.0.2/jquery.min.js"></script> -->
+	    <script src="../resources/js/libs/jquery-2.0.2.min.js"></script>
+
+	    <script src="../resources/js/libs/jquery-ui-1.10.3.min.js"></script>
+
+		<!-- JS TOUCH : include this plugin for mobile drag / drop touch events 		
+		<script src="js/plugin/jquery-touch/jquery.ui.touch-punch.min.js"></script> -->
+		
+
+		<!-- BOOTSTRAP JS -->		
+		<script src="../resources/js/bootstrap/bootstrap.min.js"></script>
+
+		<!-- JQUERY VALIDATE -->
+		<script src="../resources/js/plugin/jquery-validate/jquery.validate.min.js"></script>
+		
+		<!-- JQUERY MASKED INPUT -->
+		<script src="../resources/js/plugin/masked-input/jquery.maskedinput.min.js"></script>
+		<script src="../resources/js/jquery.form.js"></script>
+		
+		<!--[if IE 8]>
+			
+			<h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>
+			
+		<![endif]-->
+
+		<!-- MAIN APP JS FILE -->
+		<script src="../resources/js/app.min.js"></script>
+
+		<script type="text/javascript">
+			runAllForms();
+			login = {};
+			
+			function subBefore(){
+				return true;
+			}
+			function genRandomCode(){
+				r_code_index_0 = 0;
+				r_code_index_1 = 0;
+				r_code_index_2 = 0;
+				r_code_index_3 = 0;
+				$.ajax({
+					url:"/genRandomCode.html",
+					cache:false,
+					dataType:'json',
+					success:function(d){
+						var explorer = window.navigator.userAgent ;
+						var $imgs = $(".r_code_box .img");
+						$imgs.css("backgroundImage","url(/randomCodes/"+d.randomCode+".png?)");
+						$imgs.each(function(index){
+							var w = $(this).width();
+							$(this).css("background-position","-"+(index*w)+"px 0px");
+						})
+					}
+				})
+			}
+			
+			function rotateRandomCodeImage(ele){
+				ele = $(ele);
+				var h = $(".img").height();
+				var index = $(".img").index(ele);
+				switch(index)
+				{
+					case 0:
+						r_code_index_0++;
+					  	break;
+					case 1:
+						r_code_index_1++;
+					  	break;
+					case 2:
+						r_code_index_2++;
+					  	break;
+					default:
+						r_code_index_3++;
+				}
+				var backpositionXY = $(ele).css("background-position").split(" ");
+				var backgroundPositionX = backpositionXY[0];
+				var backgroundPositionY = backpositionXY[1];
+				if(parseInt(backgroundPositionY)>-h*3){
+					$(ele).css("background-position",backgroundPositionX+" "+(parseInt(backgroundPositionY)-h)+"px");
+				}else{
+					$(ele).css("background-position",backgroundPositionX+" "+"0px");
+				}
+			}
+			function showRequest(formData, jqForm, options) {
+				$("#btnLogin").html("登录中...").addClass("disabled");
+				var queryString = $.param(formData);
+				return true;
+			}
+
+			function showResponse(responseText, statusText) {
+				if (responseText.success == true) {
+					window.location = "index";
+				} else {
+					var html_ = '<div class="alert alert-danger fade in"><a class="close" onclick="closeTip(this)" data-dismiss="alert">×</a><i class="fa-fw fa fa-times"></i><span id="tip">'+responseText.success+'</span></div>';
+					$("#div_msg").html(html_);
+					$("#btnLogin").html("登录").removeClass("disabled");
+				}
+			}
+			function closeTip(ele){
+				$(ele).parent().removeClass("in").addClass("out");
+				$("#div_msg").html("");
+			}
+			function showError(responseText){
+				console.log(responseText);
+			}
+			$(function() {
+				/* genRandomCode(); */
+				// Validation
+				$("#login-form").validate( {
+					// Rules for form validation
+					rules : {
+						eq_userName : {
+							required : true,
+							minlength : 3,
+							maxlength : 20
+						},
+						eq_password : {
+							required : true,
+							minlength : 3,
+							maxlength : 20
+						}
+					},
+					submitHandler : function(form) {
+						$(form).ajaxSubmit( {
+							beforeSubmit : showRequest,
+							success : showResponse,
+							error: showError,
+							url : "login",
+							type : "post",
+							dataType : "json",
+							resetForm : false
+						});
+					},
+					// Messages for form validation
+					messages : {
+						eq_userName : {
+							required : '请输入用户名'
+
+						},
+						eq_passWord : {
+							required : '请输入密码'
+						}
+					},
+
+					// Do not change code below
+					errorPlacement : function(error, element) {
+						error.insertAfter(element.parent());
+					}
+				});
+			});
+		</script>
+
+	</body>
+</html>

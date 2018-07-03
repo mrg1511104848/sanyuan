@@ -124,21 +124,12 @@ public class ChuFangController {
         if(!file.isEmpty()) {
             try {
 				DiskFileItem fi = (DiskFileItem)file.getFileItem(); 
-				File f = fi.getStoreLocation();
-				List<List<String>> records = ExcelReadUtil.getRecords(f);
+				List<List<String>> records = ExcelReadUtil.getRecords(fi.getInputStream());
 				List<org.beiyi.entity.verify.ChuFang> chuFangList = read2ChuFangList(records);
 				List<String> titles = records.get(0);
 				String[] exportZipFilePathInfo = verify(request,titles,chuFangList);
 				
 		        this.downloadFile(new File(exportZipFilePathInfo[0]), response, true);
-		        /*byte[] body = null;
-				is = new FileInputStream(new File(exportZipFilePathInfo[0]));
-				body = new byte[is.available()];
-				is.read(body);
-				HttpHeaders headers = new HttpHeaders();
-				headers.add("Content-Disposition", "attchement;filename=" + exportZipFilePathInfo[1]);
-				HttpStatus statusCode = HttpStatus.OK;
-				ResponseEntity<byte[]> entity = new ResponseEntity<byte[]>(body, headers, statusCode);*/
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally{
@@ -239,7 +230,6 @@ public class ChuFangController {
 	public static List<org.beiyi.entity.verify.ChuFang> read2ChuFangList(List<List<String>> records) {
 		List<org.beiyi.entity.verify.ChuFang> chuFangList = new ArrayList<org.beiyi.entity.verify.ChuFang>();
 		for (int i = 1; i < records.size(); i++) {
-			System.out.println(i);
 			List<String> rI = records.get(i);
 			List<List<String>> chuFangRows = new ArrayList<List<String>>();
 			chuFangRows.add(rI);
@@ -263,22 +253,4 @@ public class ChuFangController {
 		}
 		return chuFangList;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

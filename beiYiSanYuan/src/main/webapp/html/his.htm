@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html id="extr-page" style="background: rgb(171, 171, 171);">
+	<head>
+		<meta charset="utf-8">
+		<title>北医三院审单系统</title>
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		
+		<!-- #CSS Links -->
+		<!-- Basic Styles -->
+		<link rel="stylesheet" type="text/css" media="screen" href="/resources/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="/resources/css/font-awesome.min.css">
+
+		<!-- SmartAdmin Styles : Please note (smartadmin-production.css) was created using LESS variables -->
+		<link rel="stylesheet" type="text/css" media="screen" href="/resources/css/smartadmin-production.min.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="/resources/css/smartadmin-skins.min.css">
+
+		<!-- SmartAdmin RTL Support is under construction
+			 This RTL CSS will be released in version 1.5
+		<link rel="stylesheet" type="text/css" media="screen" href="css/smartadmin-rtl.min.css"> -->
+
+		<!-- We recommend you use "your_style.css" to override SmartAdmin
+		     specific styles this will also ensure you retrain your customization with each SmartAdmin update.
+		<link rel="stylesheet" type="text/css" media="screen" href="css/your_style.css"> -->
+
+		<!-- Demo purpose only: goes with demo.js, you can delete this css when designing your own WebApp -->
+		<link rel="stylesheet" type="text/css" media="screen" href="/resources/css/demo.min.css">
+
+		<!-- #FAVICONS -->
+		<link rel="shortcut icon" href="/resources/img/favicon/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="/resources/img/favicon/favicon.ico" type="image/x-icon">
+
+		<!-- #GOOGLE FONT -->
+		<!-- <link rel="stylesheet" href="http://fonts.useso.com/css?family=Open+Sans:400italic,700italic,300,400,700"> -->
+
+		<!-- #APP SCREEN / ICONS -->
+		<!-- Specifying a Webpage Icon for Web Clip 
+			 Ref: https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html -->
+		<link rel="apple-touch-icon" href="/resources/img/splash/sptouch-icon-iphone.png">
+		<link rel="apple-touch-icon" sizes="76x76" href="/resources/img/splash/touch-icon-ipad.png">
+		<link rel="apple-touch-icon" sizes="120x120" href="/resources/img/splash/touch-icon-iphone-retina.png">
+		<link rel="apple-touch-icon" sizes="152x152" href="/resources/img/splash/touch-icon-ipad-retina.png">
+		
+		<!-- iOS web-app metas : hides Safari UI Components and Changes Status Bar Appearance -->
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		
+		<!-- Startup image for web apps -->
+		<link rel="apple-touch-startup-image" href="/resources/img/splash/ipad-landscape.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)">
+		<link rel="apple-touch-startup-image" href="/resources/img/splash/ipad-portrait.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)">
+		<link rel="apple-touch-startup-image" href="/resources/img/splash/iphone.png" media="screen and (max-device-width: 320px)">
+		<link rel="stylesheet" type="text/css" media="screen" href="/resources/css/chanese-fixed.css">
+		<style type="text/css">
+			.img{
+				background-repeat: no-repeat;
+			    background-size: 208px 208px;
+			    width: 52px;
+			    height: 52px;
+			    display:inline-block;
+			    background-position-y:0;
+			    margin-right:5px;
+			}
+			#l>p{
+			    font-size: 25px;
+			    text-align: center;
+			    margin: 5px;
+			    box-shadow: 0px 1px 5px #888888;
+			}
+			#r>input{
+				padding: 3px;
+				margin: 3px;
+			}
+			
+			table.gridtable {
+				margin: auto;
+				margin-top: 30px;
+				font-size: 18px;
+			    font-family: verdana,arial,sans-serif;
+			    color:#333333;
+			    border-width: 1px;
+			    border-color: #666666;
+			    border-collapse: collapse;
+			}
+			table.gridtable th {
+			    border-width: 1px;
+			    padding: 8px;
+			    border-style: solid;
+			    border-color: #666666;
+			    background-color: #dedede;
+			}
+			table.gridtable td {
+			    border-width: 1px;
+			    padding: 8px;
+			    border-style: solid;
+			    border-color: #666666;
+			    background-color: #ffffff;
+			}
+			table.gridtable a {
+			    font-size: 15px;
+			    cursor: pointer;
+			}
+			a.p{
+				color: green;
+				display: none;
+			}
+			a.n_p{
+				color: red;
+				display: none;
+			}
+			input.err{
+				background: red;
+			}
+		</style>
+	</head>
+	
+	<body class="animated fadeInDown">
+		
+		<div id="t" style="width:100%;height: 100px;background: rgb(240, 240, 240);border-bottom: 1px solid #b5b5b5;"> 
+			<h2 style="text-align: center;">北医三院HIS</h2>
+			<p style="text-align: center;">心内科 刘一</p>
+		</div>
+		<div id ="l" style="width:13.5%;height: 500px;background: rgb(240, 240, 240);border-right: 1px solid #b5b5b5;border-bottom: 1px solid #b5b5b5;float: left;"> 
+			<p>新处方 </p>
+			<p>检查 </p>
+			<p>检验 </p>
+		</div>
+		<div id="r" style="width:86%;height: 100px;background: rgb(240, 240, 240);border-bottom: 1px solid #b5b5b5;float: left;"> 
+			门诊号：<input value="123456" />
+			患者ID：<input id="patientId" value="fdagafaffg" />
+			姓名：<input id="name" value="张三" />
+			性别：<input id="sex" value="女" />
+			年龄：<input id="age" value="69" />
+			体重：<input id="weight" value="60kg" />
+			肌酐清除率：<input id="info" value="32.3ml/min" />
+			主要诊断：<input id="mainDiagnosis" value="高血压，糖尿病" />
+		
+		</div>
+		<div id="r" style="width:86%;height: 400px;background: rgb(240, 240, 240);border-bottom: 1px solid #b5b5b5;float: left;"> 
+			<table class="gridtable">
+				<tr><td>&nbsp;</td> <th>姓名</th> <th>处方号</th> <th>科别</th> <th>药品名称</th> <th>单次剂量</th> <th>频次</th> <th>途径</th> <th>数量</th> <th>单位</th> <th>操作</th></tr>
+				<tr id="l1" name="1"><td>&nbsp;<a class="p">通过</a><a class="n_p">不通过</a> </td> <td>张三</td> <td name="recipeId">987654321</td> <td name="category">心血管内科</td> <td><input name="drugName" style="width: 300px;" value="络活喜（苯磺酸氨氯地平片）5mg/片"/> </td> <td><input name="singleDose" style="width: 80px;" value="5mg"/> </td> <td><input name="frequency" style="width: 80px;" value="1次/天"/> </td> <td><input name="channel" style="width: 90px;" value="口服"/> </td> <td name="amount">14</td> <td name="unit">盒</td> <td><a name="r_r">强制提交</a> <br/><a name="m_r">药师复审</a></td> </tr>
+				<tr id="l2" name="2"><td>&nbsp;<a class="p">通过</a><a class="n_p">不通过</a> </td> <td>张三</td> <td name="recipeId">123456789</td> <td name="category">内分泌科</td> <td><input name="drugName" style="width: 300px;" value="来得时（甘精胰岛素）"/> </td> <td><input name="singleDose" style="width: 80px;" value="12U"/> </td> <td><input name="frequency" style="width: 80px;" value="每晚"/> </td> <td><input name="channel" style="width: 90px;" value="静脉注射"/> </td> <td name="amount">1</td> <td name="unit">盒</td> <td > <a name="r_r">强制提交</a><br/><a name="m_r">药师复审</a></td> </tr>
+			</table>
+			
+			<p style="right: 0px;
+    padding-right: 30px;
+    padding-top: 50px;
+    text-align: right;"><button class="newMsg">新消息 </button></p>
+		</div>
+		
+		<!--================================================== -->	
+
+		<!-- PACE LOADER - turn this on if you want ajax loading to show (caution: uses lots of memory on iDevices)-->
+		<script src="/resources/js/plugin/pace/pace.min.js"></script>
+
+	    <!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+	    <!-- <script src="http://libs.useso.com/js/jquery/2.0.2/jquery.min.js"></script> -->
+	    <script src="/resources/js/libs/jquery-2.0.2.min.js"></script>
+
+	    <script src="/resources/js/libs/jquery-ui-1.10.3.min.js"></script>
+
+		<!-- JS TOUCH : include this plugin for mobile drag / drop touch events 		
+		<script src="js/plugin/jquery-touch/jquery.ui.touch-punch.min.js"></script> -->
+		
+
+		<!-- BOOTSTRAP JS -->		
+		<script src="/resources/js/bootstrap/bootstrap.min.js"></script>
+
+		<!-- JQUERY VALIDATE -->
+		<script src="/resources/js/plugin/jquery-validate/jquery.validate.min.js"></script>
+		
+		<!-- JQUERY MASKED INPUT -->
+		<script src="/resources/js/plugin/masked-input/jquery.maskedinput.min.js"></script>
+		<script src="/resources/js/jquery.form.js"></script>
+		
+		<!--[if IE 8]>
+			
+			<h1>Your browser is out of date, please update your browser by going to www.microsoft.com/download</h1>
+			
+		<![endif]-->
+
+		<!-- MAIN APP JS FILE -->
+		<script src="/resources/js/app.min.js"></script>
+
+		<script type="text/javascript">
+			var msgs = [];
+			$("td[name=recipeId]").each(function(i){
+				$(this).text(new Date().getTime()+i);
+				
+			});
+		
+			var arr1 = ["络活喜（苯磺酸氨氯地平片）5mg/片","5mg","1次/天","口服"];
+			var arr2 = ["来得时（甘精胰岛素）","12U","每晚","静脉注射"];
+			var reason1 = ["用药不适宜：高血压推荐用药：络活喜（苯磺酸氨氯地平片）5mg/片。（建议出处）","单词剂量不适宜：氨氯地平，单次剂量过大，推荐的用法用量为单次剂量5mg。（建议出处）","用法用量不适宜：氨氯地平半衰期较长，一般不推荐1日3次给药，推荐的用法用量为1日1次给药。（建议出处）","用药途径不适宜：氨氯地平，建议口服。（建议出处）"];
+			var reason2 = ["用药不适宜：糖尿病推荐用药：来得时（甘精胰岛素）。（建议出处）","单词剂量不适宜：甘精胰岛素，单次剂量过大，推荐的用法用量为单次剂量12U。（建议出处）","用法用量不适宜：甘精胰岛素，推荐的用法用量为每晚给药。（建议出处）","用药途径不适宜：甘精胰岛素，建议静脉注射。（建议出处）"];
+			var n_p_con = "医师您好，此处方不合理。不合理原因为:";
+			var list_reason = new Set([""]);
+			
+			$(".gridtable input").keyup(function(e){
+		    	var c0 = $(this).parent().parent("tr").find("input:eq(0)").val();
+				var c1 = $(this).parent().parent("tr").find("input:eq(1)").val();
+				var c2 = $(this).parent().parent("tr").find("input:eq(2)").val();
+				var c3 = $(this).parent().parent("tr").find("input:eq(3)").val();
+				var l_no =  $(this).parent().parent("tr").attr("id");
+				var p = $(this).parent().parent("tr").find("a.p");
+				var n_p = $(this).parent().parent("tr").find("a.n_p");
+				
+				p.show();
+				n_p.hide();
+				$(this).parent().parent("tr").find("input").attr("class","")
+				if(l_no=='l1'){
+					if(c0!=arr1[0]){
+						$(this).parent().parent("tr").find("input:eq(0)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+					if(c1!=arr1[1]){
+						$(this).parent().parent("tr").find("input:eq(1)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+					if(c2!=arr1[2]){
+						$(this).parent().parent("tr").find("input:eq(2)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+					if(c3!=arr1[3]){
+						$(this).parent().parent("tr").find("input:eq(3)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+				}
+				if(l_no=='l2'){
+					if(c0!=arr2[0]){
+						$(this).parent().parent("tr").find("input:eq(0)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+					if(c1!=arr2[1]){
+						$(this).parent().parent("tr").find("input:eq(1)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+					if(c2!=arr2[2]){
+						$(this).parent().parent("tr").find("input:eq(2)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+					if(c3!=arr2[3]){
+						$(this).parent().parent("tr").find("input:eq(3)").attr("class","err");
+						p.hide();
+						n_p.show();
+					}
+				}
+				
+			});
+			
+			$("a.n_p").bind("click",function(){
+				var reasons = "";
+				$(this).parent().parent("tr").find("input").each(function(i,e){
+					if($(e).hasClass("err")){
+						if($(e).parent().parent("tr").attr("name")=='1'){
+							reasons += reason1[i];
+						}else{
+							reasons += reason2[i];
+						}
+					}
+				});
+				alert(n_p_con+reasons);
+			});
+			
+			$("a[name=r_r]").bind("click",function(){
+				var p = $(this).parent().parent("tr").find("a.p");
+				var n_p = $(this).parent().parent("tr").find("a.n_p");
+				var m_r = $(this).parent().parent("tr").find("a[name=m_r]");
+				var url = "his/saveByForce";
+				var $this = $(this);
+				var $tr = $(this).parent().parent();
+				var drugNameState = $tr.find("input[name=drugName]").hasClass("err")?1:0;
+				var singleDoseState = $tr.find("input[name=singleDose]").hasClass("err")?1:0;
+				var frequencyState = $tr.find("input[name=frequency]").hasClass("err")?1:0;
+				var channelState = $tr.find("input[name=channel]").hasClass("err")?1:0;
+				var amountState = $tr.find("input[name=amount]").hasClass("err")?1:0;
+				var data= 
+				{
+				"patientId":$("#patientId").val(),
+				"name":$("#name").val(),
+				"sex":$("#sex").val(),
+				"age":$("#age").val(),
+				"weight":$("#weight").val(),
+				"info":$("#info").val(),
+				"mainDiagnosis":$("#mainDiagnosis").val(),
+				
+				"recipeId":$tr.find("td[name=recipeId]").text(),
+				"category":$tr.find("td[name=category]").text(),
+				"amount":$tr.find("td[name=amount]").text(),
+				"unit":$tr.find("td[name=unit]").text(),
+				"drugName":$tr.find("input[name=drugName]").val(),
+				"drugNameState":drugNameState,
+				"singleDoseState":singleDoseState,
+				"frequencyState":frequencyState,
+				"channelState":channelState,
+				"amountState":amountState,
+				"singleDose":$tr.find("input[name=singleDose]").val(),
+				"frequency":$tr.find("input[name=frequency]").val(),
+				"channel":$tr.find("input[name=channel]").val()
+				};
+				$.ajax({
+					url:url,
+					data:data,
+					type:"POST",
+					success:function(d){
+						p.show();
+						n_p.hide();
+						m_r.text("已强制提交");
+						alert("强制提交提交成功！");
+					}
+				});
+			});
+			
+			$("a[name=m_r]").click(function(){
+				var url = "his/saveOrUpdate";
+				var $this = $(this);
+				var $tr = $(this).parent().parent();
+				var drugNameState = $tr.find("input[name=drugName]").hasClass("err")?1:0;
+				var singleDoseState = $tr.find("input[name=singleDose]").hasClass("err")?1:0;
+				var frequencyState = $tr.find("input[name=frequency]").hasClass("err")?1:0;
+				var channelState = $tr.find("input[name=channel]").hasClass("err")?1:0;
+				var amountState = $tr.find("input[name=amount]").hasClass("err")?1:0;
+				var data= 
+				{
+				"patientId":$("#patientId").val(),
+				"name":$("#name").val(),
+				"sex":$("#sex").val(),
+				"age":$("#age").val(),
+				"weight":$("#weight").val(),
+				"info":$("#info").val(),
+				"mainDiagnosis":$("#mainDiagnosis").val(),
+				
+				"recipeId":$tr.find("td[name=recipeId]").text(),
+				"category":$tr.find("td[name=category]").text(),
+				"amount":$tr.find("td[name=amount]").text(),
+				"unit":$tr.find("td[name=unit]").text(),
+				"drugName":$tr.find("input[name=drugName]").val(),
+				"drugNameState":drugNameState,
+				"singleDoseState":singleDoseState,
+				"frequencyState":frequencyState,
+				"channelState":channelState,
+				"amountState":amountState,
+				"singleDose":$tr.find("input[name=singleDose]").val(),
+				"frequency":$tr.find("input[name=frequency]").val(),
+				"channel":$tr.find("input[name=channel]").val()
+				};
+				$.ajax({
+					url:url,
+					data:data,
+					type:"POST",
+					success:function(d){
+						$this.text("复审中。。。");
+						alert("复审申请提交成功！请稍后。");
+					}
+				});
+			});
+			var timesRun;
+			var interval = setInterval(function(){
+				var url = "his/getMsg";
+				var recipeIds = "";
+				$("td[name=recipeId]").each(function(i){
+					recipeIds += $(this).text()+",";
+					
+				});
+				var data= {"recipeIds":recipeIds};
+				$.ajax({
+					url:url,
+					data:data,
+					type:"POST",
+					success:function(d){
+						var dd = $.parseJSON(d);
+						if(dd.msg.length>0){
+							$(".newMsg").text("新消息（"+dd.msg.length+"）")
+							msgs = dd.msg;
+						}
+					}
+				});
+				
+				timesRun += 1;
+				if(timesRun === 60){
+// 					clearInterval(interval);
+				}
+				//do whatever here..
+			}, 1000);
+			
+			$(".newMsg").click(function(){
+				$(".newMsg").text("新消息");
+				msgs.forEach(function(e){  
+					if(e.indexOf("药师端审核通过")>-1){
+						var recipeId = e.substr(18,13);
+						var $tr = $("td:contains("+recipeId+")").parent("tr");
+						
+						var p = $tr.find("a.p");
+						var n_p = $tr.find("a.n_p");
+						var m_r = $tr.find("a[name=m_r]");
+						
+						p.show();
+						n_p.hide();
+						m_r.text("药师已通过");
+					}
+					if(e.indexOf("药师端审核不通过")>-1){
+						var recipeId = e.substr(19,13);
+						var $tr = $("td:contains("+recipeId+")").parent("tr");
+						
+						var p = $tr.find("a.p");
+						var n_p = $tr.find("a.n_p");
+						var m_r = $tr.find("a[name=m_r]");
+						
+// 						p.show();
+// 						n_p.hide();
+						m_r.text("药师审核不通过");
+					}
+				});
+				
+				if(msgs!=""){
+					alert(msgs);
+				}
+				msgs = [];
+			});
+		</script>
+
+	</body>
+</html>
