@@ -14,7 +14,16 @@ import org.springframework.web.servlet.ModelAndView;
 public class IndexController {
 	/*@Autowired
 	MongoTemplate testMongoTemplate;*/
-	
+	/**
+	 * 到用户录入界面
+	 * 
+	 * @return
+	 */
+	@RequestMapping("/index.htm")
+	public ModelAndView index(String id) {
+		ModelAndView modelAndView = new ModelAndView("html/index");
+		return modelAndView;
+	}
 	/**
 	 * 到用户录入界面
 	 * 

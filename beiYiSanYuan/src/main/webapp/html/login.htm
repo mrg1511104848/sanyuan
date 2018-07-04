@@ -95,7 +95,7 @@
 										<label class="label">用户名</label>
 										<label class="input"> 
 											<i class="icon-append fa fa-user" style="font-size: 2em;display: inline-block;height: 34px;line-height: 34px;right: 5px;"></i>
-											<input type="userName" name="eq_userName" class="input-lg">
+											<input type="userName" name="username" class="input-lg">
 											
 											<b class="tooltip tooltip-top-right"><i class="fa fa-user txt-color-teal"></i> 请输入正确的用户名</b></label>
 									</section>
@@ -103,7 +103,7 @@
 									<section>
 										<label class="label">密码</label>
 										<label class="input"> <i class="icon-append fa fa-lock" style="font-size: 2em;display: inline-block;height: 34px;line-height: 34px;right: 5px;"></i>
-											<input type="passWord" name="eq_passWord" class="input-lg">
+											<input type="passWord" name="password" class="input-lg">
 											<b class="tooltip tooltip-top-right"><i class="fa fa-lock txt-color-teal"></i> 请输入您的密码</b> </label>
 									</section>
 								</fieldset>
@@ -218,10 +218,10 @@
 			}
 
 			function showResponse(responseText, statusText) {
-				if (responseText.success == true) {
-					window.location = "index";
+				if (responseText.code == '0') {
+					window.location = "/beiYiSanYuan/index.htm";
 				} else {
-					var html_ = '<div class="alert alert-danger fade in"><a class="close" onclick="closeTip(this)" data-dismiss="alert">×</a><i class="fa-fw fa fa-times"></i><span id="tip">'+responseText.success+'</span></div>';
+					var html_ = '<div class="alert alert-danger fade in"><a class="close" onclick="closeTip(this)" data-dismiss="alert">×</a><i class="fa-fw fa fa-times"></i><span id="tip">登陆失败，用户名或者密码错误</span></div>';
 					$("#div_msg").html(html_);
 					$("#btnLogin").html("登录").removeClass("disabled");
 				}
@@ -239,12 +239,12 @@
 				$("#login-form").validate( {
 					// Rules for form validation
 					rules : {
-						eq_userName : {
+						username : {
 							required : true,
 							minlength : 3,
 							maxlength : 20
 						},
-						eq_password : {
+						password : {
 							required : true,
 							minlength : 3,
 							maxlength : 20
@@ -255,7 +255,7 @@
 							beforeSubmit : showRequest,
 							success : showResponse,
 							error: showError,
-							url : "login",
+							url : "login.htm",
 							type : "post",
 							dataType : "json",
 							resetForm : false
@@ -263,11 +263,11 @@
 					},
 					// Messages for form validation
 					messages : {
-						eq_userName : {
+						username : {
 							required : '请输入用户名'
 
 						},
-						eq_passWord : {
+						password : {
 							required : '请输入密码'
 						}
 					},

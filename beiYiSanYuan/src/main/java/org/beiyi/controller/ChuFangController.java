@@ -68,36 +68,6 @@ public class ChuFangController {
 	@RequestMapping("/search.htm")
 	public void search(ChuFang chuFang, HttpServletResponse response)
 			throws IOException {
-		/*String[] keywords = chuFang.getDiseaseKeyword().split(" ");
-		String drugName = chuFang.getDrugName();
-
-		StringBuffer diseasePtn = new StringBuffer();
-		for (String k : keywords) {
-			diseasePtn.append(".*" + k + ".*|");
-		}
-		String strDiseasePtn = diseasePtn.substring(0, diseasePtn.length() - 1);
-
-		Criteria criteria = Criteria.where("drugName").regex(".*" +drugName+ ".*");
-		Criteria criteria1 = Criteria.where("disease").regex(strDiseasePtn);
-		Query query = new Query();
-		query.addCriteria(criteria);
-		query.addCriteria(criteria1);
-		List<ChuFang> chufangList = testMongoTemplate.find(query,
-				ChuFang.class, "bysy_chufang_drug_disease");
-		StringBuffer resultBuffer = new StringBuffer();
-		for (ChuFang c : chufangList) {
-			resultBuffer.append(c.getDrugName());
-			resultBuffer.append(" ");
-			resultBuffer.append(c.getDisease());
-			resultBuffer.append("\r\n");
-		}
-		response.setCharacterEncoding("utf-8");
-		response.setContentType("application/octet-stream");
-		response.setHeader("Content-Disposition", String
-				.format("attachment; filename=\"" + "prescription.txt" + "\""));
-		ServletOutputStream out = response.getOutputStream();
-		out.write(resultBuffer.toString().getBytes());
-		out.close();*/
 	}
 	/**
 	 * 去处方审核界面
