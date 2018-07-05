@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.beiyi.entity.db.AtcCode;
 import org.beiyi.entity.verify.ATCCode;
 
 /**
@@ -13,7 +14,6 @@ import org.beiyi.entity.verify.ATCCode;
  */
 public class ATCUtil {
 	public static void main(String[] args) {
-		getATCCodeParentsByAtcCode("J02AC03");
 	}
 	/**
 	 * 根据ATCCode获取父ATCCodes
@@ -46,5 +46,21 @@ public class ATCUtil {
 		}
 		String atcNo = atcCode.getAtcNo();
 		return getATCCodeParentsByAtcCode(atcNo);
+	}
+	/**
+	 * 根据ATCCode获取父ATCCode
+	 * @return
+	 */
+	public static String getATCCodeParentByAtcCode(String atcNo){
+		atcNo = atcNo.trim();  // AB022
+		if(atcNo.length() - 2 < 1){
+			return null; 
+		}
+		String atcParentNo = atcNo.substring(0,atcNo.length() - 2);
+		return atcParentNo;
+	}
+	
+	public static int getAtcNoLevel(String atcNo){
+		return atcNo.length()/2;
 	}
 }

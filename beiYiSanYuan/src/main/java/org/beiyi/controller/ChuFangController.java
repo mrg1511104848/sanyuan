@@ -32,6 +32,7 @@ import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
 import org.beiyi.service.verify.impl.UsageVerifyService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.PrescriptionReadUtil;
+import org.beiyi.util.VerifyUtil;
 import org.beiyi.util.ZipUtils;
 import org.skynet.frame.util.excel.ExcelBean;
 import org.skynet.frame.util.excel.ExcelReadUtil;
@@ -95,7 +96,7 @@ public class ChuFangController {
             try {
 				DiskFileItem fi = (DiskFileItem)file.getFileItem(); 
 				List<List<String>> records = ExcelReadUtil.getRecords(fi.getInputStream());
-				List<org.beiyi.entity.verify.ChuFang> chuFangList = read2ChuFangList(records);
+				List<org.beiyi.entity.verify.ChuFang> chuFangList = VerifyUtil.read2ChuFangList(records);
 				List<String> titles = records.get(0);
 				String[] exportZipFilePathInfo = verify(request,titles,chuFangList);
 				
@@ -196,31 +197,5 @@ public class ChuFangController {
         ZipUtils.toZip(basePath, exportZipFileName, true);
         
 		return new String[]{basePath+".zip",currDate+".zip"};
-	}
-	public static List<org.beiyi.entity.verify.ChuFang> read2ChuFangList(List<List<String>> records) {
-		List<org.beiyi.entity.verify.ChuFang> chuFangList = new ArrayList<org.beiyi.entity.verify.ChuFang>();
-		for (int i = 1; i < records.size(); i++) {
-			List<String> rI = records.get(i);
-			List<List<String>> chuFangRows = new ArrayList<List<String>>();
-			chuFangRows.add(rI);
-			String chuFangUniqueStrI = PrescriptionReadUtil.getUniquePrescriptionNo(rI);
-
-			int sameChuFangCount = 0;
-			for (int j = i + 1; j < records.size(); j++) {
-				List<String> rJ = records.get(j);
-				String chuFangUniqueStrJ = PrescriptionReadUtil.getUniquePrescriptionNo(rJ);
-
-				if (chuFangUniqueStrI.equals(chuFangUniqueStrJ)) {// 证明是同一个处方
-					chuFangRows.add(rJ);
-					sameChuFangCount++;
-				} else {
-					break;
-				}
-			}
-			org.beiyi.entity.verify.ChuFang chuFang = PrescriptionReadUtil.parseChuFangRows2ChuFang(chuFangRows);
-			chuFangList.add(chuFang);
-			i = i + sameChuFangCount;
-		}
-		return chuFangList;
 	}
 }

@@ -156,4 +156,22 @@
       way_of_taking = #{wayOfTaking,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  
+  <select id="selectByChName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Atc_Code_Column_List" />
+    from bysy_atc_code
+    where ch_name = #{chName,jdbcType=VARCHAR}
+  </select>
+  <select id="findByAtcNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Atc_Code_Column_List" />
+    from bysy_atc_code
+    where atc_no = #{atcNo,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Atc_Code_Column_List" />
+    from bysy_atc_code
+  </select>
 </mapper>

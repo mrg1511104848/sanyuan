@@ -591,4 +591,30 @@ public class VerifyUtil {
 		}
 		return null;
 	}
+	public static List<org.beiyi.entity.verify.ChuFang> read2ChuFangList(List<List<String>> records) {
+		List<org.beiyi.entity.verify.ChuFang> chuFangList = new ArrayList<org.beiyi.entity.verify.ChuFang>();
+		for (int i = 1; i < records.size(); i++) {
+			List<String> rI = records.get(i);
+			List<List<String>> chuFangRows = new ArrayList<List<String>>();
+			chuFangRows.add(rI);
+			String chuFangUniqueStrI = PrescriptionReadUtil.getUniquePrescriptionNo(rI);
+
+			int sameChuFangCount = 0;
+			for (int j = i + 1; j < records.size(); j++) {
+				List<String> rJ = records.get(j);
+				String chuFangUniqueStrJ = PrescriptionReadUtil.getUniquePrescriptionNo(rJ);
+				
+				if (chuFangUniqueStrI.equals(chuFangUniqueStrJ)) {// 证明是同一个处方
+					chuFangRows.add(rJ);
+					sameChuFangCount++;
+				} else {
+					break;
+				}
+			}
+			org.beiyi.entity.verify.ChuFang chuFang = PrescriptionReadUtil.parseChuFangRows2ChuFang(chuFangRows);
+			chuFangList.add(chuFang);
+			i = i + sameChuFangCount;
+		}
+		return chuFangList;
+	}
 }

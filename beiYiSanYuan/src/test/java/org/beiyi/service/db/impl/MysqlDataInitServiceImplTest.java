@@ -13,6 +13,21 @@ public class MysqlDataInitServiceImplTest extends BaseJunit4Test {
 	public void init() {
 //		dataInitService.initAtcCode();
 
-		dataInitService.initIcd10();
+//		dataInitService.initIcd10();
+		
+//		dataInitService.initInstructions();
+		
+//		dataInitService.initInstructionComponentAndInstructionComponentAtc();
+		
+//		dataInitService.initInstructionsAtc();
+		
+//		dataInitService.initAtcConflict();
+		
+//		dataInitService.initAtcBelongTo();
+		
+//		dataInitService.initDisease();
+		
+		dataInitService.initInstructionContraindication();
+		dataInitService.initInstructionIndication();
 	}
 }

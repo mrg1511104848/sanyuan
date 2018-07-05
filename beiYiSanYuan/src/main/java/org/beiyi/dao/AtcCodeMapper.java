@@ -1,6 +1,10 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.beiyi.entity.db.AtcCode;
+import org.beiyi.entity.verify.ATCCode;
 
 public interface AtcCodeMapper {
     /**
@@ -50,4 +54,11 @@ public interface AtcCodeMapper {
      * @mbggenerated Wed Jul 04 15:15:03 CST 2018
      */
     int updateByPrimaryKey(AtcCode record);
+    
+    
+    List<AtcCode> selectByChName(@Param(value="chName") String chName);
+
+	AtcCode findByAtcNo(@Param(value="atcNo") String atcNo);
+
+	List<AtcCode> selectAll();
 }
