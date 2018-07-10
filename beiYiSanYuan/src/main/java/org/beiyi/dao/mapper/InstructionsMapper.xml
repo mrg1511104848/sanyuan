@@ -293,4 +293,19 @@
     from instructions
     where commodity_name = #{commodityName,jdbcType=VARCHAR} and common_name = #{commonName,jdbcType=VARCHAR}
   </select>
+  <select id="getCount" resultType="int" >
+    select 
+    count(1)
+    from instructions
+    where commodity_name = #{commodityName,jdbcType=VARCHAR} and common_name = #{commonName,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByInstruction" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from instructions
+    where commodity_name = #{commodityName,jdbcType=VARCHAR} and common_name = #{commonName,jdbcType=VARCHAR}
+      <if test="companyName != null">
+       and company_name = #{companyName,jdbcType=VARCHAR}
+      </if>
+  </select>
 </mapper>

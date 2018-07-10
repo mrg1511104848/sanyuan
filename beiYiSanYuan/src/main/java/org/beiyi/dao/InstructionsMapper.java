@@ -57,4 +57,8 @@ public interface InstructionsMapper {
     int updateByPrimaryKey(Instructions record);
 
 	List<Instructions> selectByCommodityNameAndCommonName(@Param(value="commodityName") String commodityName,@Param(value="commonName") String commonName);
+	
+	int getCount(Instructions instructions);
+
+	Instructions selectByInstruction(Instructions instructions);
 }
