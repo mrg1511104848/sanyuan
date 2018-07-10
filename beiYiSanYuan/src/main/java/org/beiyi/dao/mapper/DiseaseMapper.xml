@@ -138,5 +138,10 @@
     from disease
     where dis_name = #{disName,jdbcType=VARCHAR}
   </select>
+  <select id="findAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from disease
+  </select>
   
 </mapper>

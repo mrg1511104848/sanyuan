@@ -1,5 +1,7 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
 import org.beiyi.entity.db.InstructionIndication;
 
 public interface InstructionIndicationMapper {
@@ -50,4 +52,9 @@ public interface InstructionIndicationMapper {
      * @mbggenerated Thu Jul 05 18:01:03 CST 2018
      */
     int updateByPrimaryKey(InstructionIndication record);
+
+	InstructionIndication selectByInstructionIndication(
+			InstructionIndication instructionIndication);
+
+	List<InstructionIndication> findAll();
 }

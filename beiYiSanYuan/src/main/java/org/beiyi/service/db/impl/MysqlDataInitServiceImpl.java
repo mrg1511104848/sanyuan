@@ -15,8 +15,10 @@ import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.beiyi.dao.AtcBelongToMapper;
 import org.beiyi.dao.AtcCodeMapper;
 import org.beiyi.dao.AtcConflictMapper;
+import org.beiyi.dao.DiseaseIcd10Mapper;
 import org.beiyi.dao.DiseaseMapper;
 import org.beiyi.dao.Icd10Mapper;
+import org.beiyi.dao.IndicationTherapeuticRegimenMapper;
 import org.beiyi.dao.InstructionComponentAtcMapper;
 import org.beiyi.dao.InstructionComponentMapper;
 import org.beiyi.dao.InstructionContraindicationMapper;
@@ -29,15 +31,20 @@ import org.beiyi.entity.db.AtcBelongTo;
 import org.beiyi.entity.db.AtcCode;
 import org.beiyi.entity.db.AtcConflict;
 import org.beiyi.entity.db.Disease;
+import org.beiyi.entity.db.DiseaseIcd10;
 import org.beiyi.entity.db.Icd10;
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
 import org.beiyi.entity.db.InstructionComponent;
 import org.beiyi.entity.db.InstructionComponentAtc;
 import org.beiyi.entity.db.InstructionContraindication;
 import org.beiyi.entity.db.InstructionIndication;
 import org.beiyi.entity.db.Instructions;
 import org.beiyi.entity.db.InstructionsAtc;
+import org.beiyi.entity.db.TherapeuticRegimen;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.Instruction;
+import org.beiyi.entity.verify.InstructionUse;
+import org.beiyi.reource.BysyConfig;
 import org.beiyi.reource.Resources;
 import org.beiyi.service.db.itr.IMysqlDataInitService;
 import org.beiyi.util.ATCUtil;
@@ -77,6 +84,11 @@ public class MysqlDataInitServiceImpl implements IMysqlDataInitService {
 	@Autowired
 	InstructionIndicationMapper instructionIndicationMapper;
 	
+	@Autowired
+	IndicationTherapeuticRegimenMapper indicationTherapeuticRegimenMapper;
+	
+	@Autowired
+	DiseaseIcd10Mapper diseaseIcd10Mapper;
 	static String updateDate = null;
 	static{
 		updateDate = new SimpleDateFormat(
@@ -442,30 +454,62 @@ public class MysqlDataInitServiceImpl implements IMysqlDataInitService {
 			}
 		}
 	}
-
-	@Override
-	public void initIndicationTherapeuticRegimen() {
-		// TODO Auto-generated method stub
-
-	}
-
 	@Override
 	public void initTherapeuticRegimen() {
-		// TODO Auto-generated method stub
-
+		List<Instruction> excelinstructions = InstructionsReadUtil.getInstructions();
+		for (Instruction  exInstruction : excelinstructions) {
+			List<String> diagnosises = exInstruction.getDiagnosises();
+			for (String diagnosise : diagnosises) {
+				DrugCombinationName drugCombinationName = new DrugCombinationName(exInstruction.getDrugCombinationName());
+				InstructionIndication instructionIndicationCondition = new InstructionIndication();
+				instructionIndicationCondition.setIndicationName(diagnosise);
+				instructionIndicationCondition.setCommodityName(drugCombinationName.getShangPinName());
+				instructionIndicationCondition.setCommonName(drugCombinationName.getTongYongName());
+				InstructionIndication insIndicationResult = instructionIndicationMapper.selectByInstructionIndication(instructionIndicationCondition);
+				List<InstructionUse> instructionUses = exInstruction.getInstructionUses();
+				for (InstructionUse instructionUse : instructionUses) {
+					IndicationTherapeuticRegimen therapeuticRegimen = new IndicationTherapeuticRegimen();
+					therapeuticRegimen.setDosage(instructionUse.getDosage());
+					therapeuticRegimen.setDosageUnit(instructionUse.getDosageUnit());
+					therapeuticRegimen.setDosageFrequency(instructionUse.getDosingFrequency());
+					therapeuticRegimen.setCourseRestriction(instructionUse.getCourseControl());
+					therapeuticRegimen.setDoseSelection(instructionUse.getDoseSelection());
+					therapeuticRegimen.setIndicationId(insIndicationResult.getIndicationId());
+					therapeuticRegimen.setInstructionId(insIndicationResult.getInstructionId());
+					therapeuticRegimen.setPatientStatus(instructionUse.getPatientStatus());
+					therapeuticRegimen.setRouteMedication(instructionUse.getRouteOfMedication());
+					indicationTherapeuticRegimenMapper.insert(therapeuticRegimen);
+				}
+			}
+		}
 	}
 
-	
 
 	@Override
 	public void initDiseaseIcd10() {
-		// TODO Auto-generated method stub
-
+		List<Disease> diseases = diseaseMapper.findAll();
+		for (Disease d : diseases) {
+			Document doc = MongoUtil.findOne("bysy_drug_syz_final","shiYingZheng",d.getDisName());
+			if(doc == null) continue;
+			String code = doc.getString("code");
+//			String version = doc.getString("version");
+			Icd10 icd10 = new Icd10();
+			icd10.setCode(code);
+			List<Icd10> icd10s = icd10Mapper.findByIcd10(icd10);
+			for (Icd10 icd10Result : icd10s) {
+				DiseaseIcd10 diseaseIcd10 = new DiseaseIcd10();
+				diseaseIcd10.setDiseaseId(d.getId());
+				diseaseIcd10.setDiseaseName(d.getDisName());
+				diseaseIcd10.setIcd10Code(icd10Result.getCode());
+				diseaseIcd10.setIcd10Name(icd10Result.getName());
+				diseaseIcd10.setIcd10Id(icd10Result.getId());
+				diseaseIcd10.setIcd10Version(icd10Result.getVersion());
+				diseaseIcd10Mapper.insert(diseaseIcd10);
+			}
+		}
 	}
 
 	@Override
 	public void initIcd10BelongTo() {
-		// TODO Auto-generated method stub
-
 	}
 }

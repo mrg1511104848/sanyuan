@@ -38,10 +38,6 @@ public interface IMysqlDataInitService {
 	 */
 	void initInstructionIndication();
 	/**
-	 * 适应症治疗方案关系初始化
-	 */
-	void initIndicationTherapeuticRegimen();
-	/**
 	 * 治疗方案初始化
 	 */
 	void initTherapeuticRegimen();

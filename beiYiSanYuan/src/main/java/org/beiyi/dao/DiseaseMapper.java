@@ -1,5 +1,7 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.beiyi.entity.db.Disease;
 
@@ -53,4 +55,6 @@ public interface DiseaseMapper {
     int updateByPrimaryKey(Disease record);
 
 	Disease selectByDiseaseName(@Param(value="disName") String disName);
+
+	List<Disease> findAll();
 }

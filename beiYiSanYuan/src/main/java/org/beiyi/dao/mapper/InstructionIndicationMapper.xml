@@ -157,4 +157,20 @@
       commodity_name = #{commodityName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  
+  <select id="selectByInstructionIndication" parameterType="org.beiyi.entity.db.InstructionIndication" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from instruction_indication
+    where 
+    indication_name = #{indicationName,jdbcType=VARCHAR} and 
+    common_name = #{commonName,jdbcType=VARCHAR} and
+    commodity_name = #{commodityName,jdbcType=VARCHAR}
+  </select>
+  <select id="findAll" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from instruction_indication
+  </select>
+  
 </mapper>

@@ -27,7 +27,11 @@ public class MysqlDataInitServiceImplTest extends BaseJunit4Test {
 		
 //		dataInitService.initDisease();
 		
-		dataInitService.initInstructionContraindication();
-		dataInitService.initInstructionIndication();
+//		dataInitService.initInstructionContraindication();
+//		dataInitService.initInstructionIndication();
+		
+//		dataInitService.initTherapeuticRegimen();
+		
+		dataInitService.initDiseaseIcd10();
 	}
 }

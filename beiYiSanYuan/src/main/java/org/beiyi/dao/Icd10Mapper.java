@@ -1,5 +1,7 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
 import org.beiyi.entity.db.Icd10;
 
 public interface Icd10Mapper {
@@ -50,4 +52,6 @@ public interface Icd10Mapper {
      * @mbggenerated Wed Jul 04 14:52:37 CST 2018
      */
     int updateByPrimaryKey(Icd10 record);
+
+	List<Icd10> findByIcd10(Icd10 icd10);
 }
