@@ -168,4 +168,12 @@
       atc_no = #{atcNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  <select id="findByInstructionsAtc" parameterType="org.beiyi.entity.db.InstructionsAtc" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from instructions_atc
+    where common_name = #{commonName,jdbcType=VARCHAR} and
+      	  commodity_name = #{commodityName,jdbcType=VARCHAR}
+  </select>
+  
 </mapper>

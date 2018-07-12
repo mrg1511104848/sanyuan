@@ -5,39 +5,41 @@ import java.util.List;
 
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
-import org.beiyi.service.verify.impl.ContraindicationVerifyService;
-import org.beiyi.service.verify.impl.CourseOfTreatmentVerifyService;
-import org.beiyi.service.verify.impl.DDDSVerifyService;
-import org.beiyi.service.verify.impl.DosageMaxLimitVerifyService;
-import org.beiyi.service.verify.impl.DosageVerifyService;
-import org.beiyi.service.verify.impl.DrugEffectVerifyService;
+import org.beiyi.service.BaseJunit4Test;
 import org.beiyi.service.verify.impl.DrugNotExistsVerifyService;
-import org.beiyi.service.verify.impl.RepeatedPrescriptions;
-import org.beiyi.service.verify.impl.SexVerifyService;
+import org.beiyi.service.verify.impl.RepeatedPrescriptionsService;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
-import org.beiyi.service.verify.impl.UsageVerifyService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.PrescriptionReadUtil;
+import org.junit.Test;
 import org.skynet.frame.util.excel.ExcelBean;
 import org.skynet.frame.util.excel.ExcelUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class DrugVerifyServiceTest {
+public class DrugVerifyServiceTest  extends BaseJunit4Test{
 //	private static Logger logger = Logger.getLogger(DrugVerifyServiceTest.class);
-
-	public static void main(String[] args) {
+	@Autowired
+	DrugNotExistsVerifyService drugNotExistsVerifyService;
+	@Autowired
+	ShiYingZhengVerifyService shiYingZhengVerifyService;
+	@Autowired
+	RepeatedPrescriptionsService repeatedPrescriptionsService;
+	@Test
+	public void testVerify(){
 		DrugVerifyService drugVerifyService = new DrugVerifyService();
 		List<IDrugVeryfy> drugVerifyServices = new ArrayList<IDrugVeryfy>();
-		drugVerifyServices.add(new DrugNotExistsVerifyService());
-		drugVerifyServices.add(new RepeatedPrescriptions());
-		drugVerifyServices.add(new DrugEffectVerifyService());
+		drugVerifyServices.add(drugNotExistsVerifyService);
+		drugVerifyServices.add(shiYingZhengVerifyService);
+		drugVerifyServices.add(repeatedPrescriptionsService);
+		/*drugVerifyServices.add(new DrugEffectVerifyService());
 		drugVerifyServices.add(new SexVerifyService());
 		drugVerifyServices.add(new DDDSVerifyService());
-		drugVerifyServices.add(new ShiYingZhengVerifyService());
+//		drugVerifyServices.add(new ShiYingZhengVerifyService());
 		drugVerifyServices.add(new ContraindicationVerifyService());
 		drugVerifyServices.add(new DosageMaxLimitVerifyService());
 		drugVerifyServices.add(new DosageVerifyService());
 		drugVerifyServices.add(new CourseOfTreatmentVerifyService());
-		drugVerifyServices.add(new UsageVerifyService());
+		drugVerifyServices.add(new UsageVerifyService());*/
 		
 		for (IDrugVeryfy iDrugVeryfy : drugVerifyServices) {
 			drugVerifyService.registerDrugVerify(iDrugVeryfy);
@@ -74,5 +76,8 @@ public class DrugVerifyServiceTest {
 		String exportTestResultPath = "D://logs/错误处方模拟_其他测试/";
 //		exportTestResultPath = "C://公司/北医三院/错误处方模拟_其他测试/";
 		ExcelUtil.export(exportTestResultPath, excelBeans);
+	}
+	public static void main(String[] args) {
+		
 	}
 }

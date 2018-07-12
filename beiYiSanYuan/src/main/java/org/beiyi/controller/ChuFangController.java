@@ -26,7 +26,7 @@ import org.beiyi.service.verify.impl.DosageMaxLimitVerifyService;
 import org.beiyi.service.verify.impl.DosageVerifyService;
 import org.beiyi.service.verify.impl.DrugEffectVerifyService;
 import org.beiyi.service.verify.impl.DrugNotExistsVerifyService;
-import org.beiyi.service.verify.impl.RepeatedPrescriptions;
+import org.beiyi.service.verify.impl.RepeatedPrescriptionsService;
 import org.beiyi.service.verify.impl.SexVerifyService;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
 import org.beiyi.service.verify.impl.UsageVerifyService;
@@ -143,7 +143,7 @@ public class ChuFangController {
 		DrugVerifyService drugVerifyService = new DrugVerifyService();
 		List<IDrugVeryfy> drugVerifyServices = new ArrayList<IDrugVeryfy>();
 		drugVerifyServices.add(new DrugNotExistsVerifyService());
-		drugVerifyServices.add(new RepeatedPrescriptions());
+		drugVerifyServices.add(new RepeatedPrescriptionsService());
 		drugVerifyServices.add(new DrugEffectVerifyService());
 		drugVerifyServices.add(new SexVerifyService());
 		drugVerifyServices.add(new DDDSVerifyService());

@@ -1,6 +1,7 @@
 package org.beiyi.dao;
 
 import org.beiyi.entity.db.InstructionsAtc;
+import org.beiyi.entity.verify.Drug;
 
 public interface InstructionsAtcMapper {
     /**
@@ -50,4 +51,6 @@ public interface InstructionsAtcMapper {
      * @mbggenerated Thu Jul 05 15:05:45 CST 2018
      */
     int updateByPrimaryKey(InstructionsAtc record);
+
+	InstructionsAtc findByInstructionsAtc(InstructionsAtc instructionsAtc);
 }

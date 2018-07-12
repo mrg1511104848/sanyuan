@@ -1,10 +1,13 @@
 package org.beiyi.service.verify.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.beiyi.changliang.DrugInfoEnum;
+import org.beiyi.dao.InstructionIndicationMapper;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.InstructionIndication;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
@@ -14,6 +17,8 @@ import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.InstructionsReadUtil;
 import org.skynet.frame.util.RegexUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 适应症相关业务类
@@ -21,16 +26,18 @@ import org.skynet.frame.util.RegexUtils;
  * @author 2bu
  *
  */
+@Service
 public class ShiYingZhengVerifyService implements IDrugVeryfy{
 //	private static Logger logger = Logger.getLogger(ShiYingZhengVerifyService.class);
-	
+	@Autowired
+	InstructionIndicationMapper instructionIndicationMapper;
 	/**
 	 * 判定药品对应的适应症是否合理
 	 * @param combinationName 组合名称      商品名(通用名)
 	 * @param srcShiYingZheng 适应症
 	 * @return
 	 */
-	public static Boolean match( DrugCombinationName combinationName,String srcShiYingZheng) {
+	public Boolean match( DrugCombinationName combinationName,String srcShiYingZheng) {
 		if(combinationName == null || srcShiYingZheng == null) {
 			return false;
 		}
@@ -38,8 +45,19 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 		if(!InstructionsReadUtil.contains(combinationName.getCombinationStandardName())){
 			return false;
 		}
-		Instruction instruction = InstructionsReadUtil.get(combinationName.getCombinationStandardName());
-		List<String> shiYingZheng = instruction.getDiagnosises();
+		InstructionIndication instructionIndication = new InstructionIndication();
+		instructionIndication.setCommodityName(combinationName.getShangPinName());
+		instructionIndication.setCommonName(combinationName.getTongYongName());
+		List<InstructionIndication> instructionIndications = instructionIndicationMapper.findIndications(instructionIndication);
+		List<String> shiYingZheng = new ArrayList<String>();
+		if(instructionIndications!=null && instructionIndications.size() > 0){
+			for (InstructionIndication insIndication : instructionIndications) {
+				shiYingZheng.add(insIndication.getIndicationName());
+			}
+		}
+//		Instruction instruction = InstructionsReadUtil.get(combinationName.getCombinationStandardName());
+//		List<String> shiYingZheng = instruction.getDiagnosises();
+		
 		if (shiYingZheng == null || shiYingZheng.size() == 0) {
 			return false;
 		}
@@ -83,7 +101,7 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 			//判断这个药在所有的适应症中是否有能治疗的适应症(是否能够匹配)
 			boolean drugMatchShiYingZheng = false;
 			for (String syz : shiYingZhengs) {
-				Boolean matchResult = ShiYingZhengVerifyService.match(new DrugCombinationName(drugCombinationName), syz);
+				Boolean matchResult = match(new DrugCombinationName(drugCombinationName), syz);
 				if (matchResult == true) {
 					drugMatchShiYingZheng = true;
 					break;

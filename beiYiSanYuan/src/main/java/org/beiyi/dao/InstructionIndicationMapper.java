@@ -57,4 +57,11 @@ public interface InstructionIndicationMapper {
 			InstructionIndication instructionIndication);
 
 	List<InstructionIndication> findAll();
+	/**
+	 * 获取适应症列表
+	 * @param instructionIndication
+	 * @return
+	 */
+	List<InstructionIndication> findIndications(
+			InstructionIndication instructionIndication);
 }

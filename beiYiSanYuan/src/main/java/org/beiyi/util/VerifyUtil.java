@@ -13,6 +13,7 @@ import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.changliang.JiLiangOpratorEnum;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.InstructionsCategory;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
@@ -577,17 +578,6 @@ public class VerifyUtil {
 			drugCategory.setCategoryName(category);
 			drugCategory.setSource("医脉通");
 			return drugCategory;
-		}
-		return null;
-	}
-	public static DrugCategory isSameCategory(Drug chuFangDrugA,
-			Drug chuFangDrugB) {
-		DrugCategory chuFangDrugACata = getDrugCatagory(chuFangDrugA);
-		DrugCategory chuFangDrugBCata = getDrugCatagory(chuFangDrugB);
-		if (chuFangDrugACata != null && chuFangDrugBCata != null) {
-			if (chuFangDrugACata.getCategoryName().equals(chuFangDrugBCata.getCategoryName())) {
-				return chuFangDrugACata;
-			}
 		}
 		return null;
 	}

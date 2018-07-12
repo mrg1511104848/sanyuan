@@ -1,12 +1,19 @@
 package org.beiyi.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.HuanZhe;
+import org.skynet.frame.util.excel.ExcelReadUtil;
+import org.xml.sax.SAXException;
 
 /**
  * 处方读取类
@@ -36,7 +43,7 @@ public class PrescriptionReadUtil {
 	public static String chuFangPath = "D://logs/错误处方模拟_其他测试/模拟处方180621 - 单SHEET.xlsx";
 	static {
 		//临时修改20180627
-		/*try {
+		try {
 			// records =
 			// ExcelReadUtil.getRecords("D://爱客服/北医三院/三院提供/三院提供的数据/处方/test.xlsx");
 			records = ExcelReadUtil.getRecords(chuFangPath);
@@ -44,7 +51,7 @@ public class PrescriptionReadUtil {
 			read2ChuFangList();
 		} catch (InvalidOperationException | IOException | OpenXML4JException | ParserConfigurationException | SAXException e) {
 			e.printStackTrace();
-		}*/
+		}
 	}
 
 	public static void read2ChuFangList() {

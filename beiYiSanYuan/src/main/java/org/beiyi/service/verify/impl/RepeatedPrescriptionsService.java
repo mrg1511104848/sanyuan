@@ -4,7 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.beiyi.dao.InstructionsAtcMapper;
+import org.beiyi.dao.InstructionsCategoryMapper;
+import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.InstructionsAtc;
+import org.beiyi.entity.db.InstructionsCategory;
 import org.beiyi.entity.verify.ATCCode;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
@@ -16,6 +21,8 @@ import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.ATCUtil;
 import org.beiyi.util.VerifyUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 重复给药审核
@@ -23,10 +30,12 @@ import org.beiyi.util.VerifyUtil;
  * @author 2bu
  *
  */
-public class RepeatedPrescriptions implements IDrugVeryfy {
-	public static void main(String[] args) {
-	}
-
+@Service
+public class RepeatedPrescriptionsService implements IDrugVeryfy {
+	@Autowired
+	InstructionsAtcMapper instructionsAtcMapper;
+	@Autowired
+	InstructionsCategoryMapper InstructionsCategoryMapper;
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
@@ -36,10 +45,20 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 		List<Drug> chuFangDrugVerifingList = chuFang.getOldDrugs();// 需要遍历处方中的药品，挨个进行审核
 		for (int i = 0; i < chuFangDrugVerifingList.size(); i++) {
 			Drug chuFangDrugI = chuFangDrugVerifingList.get(i);
-			Instruction instructionI = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugI);
+//			Instruction instructionI = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugI);
+			
+			DrugCombinationName drugCombinationNameI = new DrugCombinationName(chuFangDrugI.getDrugCombinationName());
+			InstructionsAtc instructionsAtcI = instructionsAtcMapper.findByInstructionsAtc(new InstructionsAtc(
+					drugCombinationNameI.getTongYongName(), drugCombinationNameI.getShangPinName()));
+			
 			for (int j = i + 1; j < chuFangDrugVerifingList.size(); j++) {
 				Drug chuFangDrugJ = chuFangDrugVerifingList.get(j);
-				Instruction instructionJ = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugJ);
+				
+				DrugCombinationName drugCombinationNameJ = new DrugCombinationName(chuFangDrugJ.getDrugCombinationName());
+				InstructionsAtc instructionsAtcJ = instructionsAtcMapper.findByInstructionsAtc(new InstructionsAtc(
+						drugCombinationNameJ.getTongYongName(), drugCombinationNameJ.getShangPinName()));
+				
+//				Instruction instructionJ = VerifyUtil.getInstructionOfChuFangDrug(chuFangDrugJ);
 //				if (instructionJ == null) {
 //					notExistsDrugs.add(chuFangDrugJ);
 //					continue;
@@ -53,15 +72,13 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 									.getDrugCombinationName(),
 									chuFangDrugJ
 									.getDrugCombinationName()));
-				}else if (instructionI==null || instructionJ == null || instructionI.getAtcCode() == null
-						|| (instructionI.getAtcCode() != null && StringUtils
-								.isBlank(instructionI.getAtcCode().getAtcNo()))
-						|| instructionJ.getAtcCode() == null
-						|| (instructionJ.getAtcCode() != null && StringUtils
-						.isBlank(instructionJ.getAtcCode().getAtcNo()))) {
+				}else if (instructionsAtcI==null || instructionsAtcJ == null || StringUtils.isBlank(instructionsAtcI.getAtcNo()) 
+						|| StringUtils.isBlank(instructionsAtcJ.getAtcNo())) {
+					List<InstructionsCategory> chuFangDrugICatagories = InstructionsCategoryMapper.selectByCombinationStandardName(drugCombinationNameI.getCombinationStandardName());
+					List<InstructionsCategory> chuFangDrugJCatagories = InstructionsCategoryMapper.selectByCombinationStandardName(drugCombinationNameJ.getCombinationStandardName());
 					// 当a与b药其中某个药的atcCode为空时，则直接去yiMaiTongFinalStandard数据库查找医脉通的分类，查看是否属于同一分类。
-					DrugCategory category = VerifyUtil.isSameCategory(chuFangDrugI,
-							chuFangDrugJ);
+					String category = isSameCategory(chuFangDrugICatagories,
+							chuFangDrugJCatagories);
 					if (category != null) {
 						// 属于同一分类，
 						DrugVerifyInfo drugVerifyInfoI = new DrugVerifyInfo(
@@ -77,11 +94,10 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 								drugVerifyInfoI.getDrug()
 										.getDrugCombinationName(),
 								drugVerifyInfoJ.getDrug()
-										.getDrugCombinationName(), category
-										.getCategoryName()));
+										.getDrugCombinationName(), category));
 					}
 				} else {
-					ATCCode atcCode = getSameAtcCode(instructionI, instructionJ);
+					ATCCode atcCode = getSameAtcCode(instructionsAtcI, instructionsAtcJ);
 					if (atcCode != null) {
 						// 属于同一分类，
 						DrugVerifyInfo drugVerifyInfoI = new DrugVerifyInfo(
@@ -123,14 +139,27 @@ public class RepeatedPrescriptions implements IDrugVeryfy {
 	}
 
 	
-
-	private ATCCode getSameAtcCode(Instruction instructionI,
-			Instruction instructionJ) {
+	private String isSameCategory(List<InstructionsCategory> chuFangDrugICatagories,
+			List<InstructionsCategory> chuFangDrugJCatagories) {
+		if(chuFangDrugICatagories == null || chuFangDrugJCatagories == null){
+			return null;
+		}
+		for (InstructionsCategory chuFangDrugJCatagory : chuFangDrugJCatagories) {
+			for (InstructionsCategory chuFangDrugICatagory : chuFangDrugICatagories) {
+				if(chuFangDrugJCatagory.getCategory().equals(chuFangDrugICatagory.getCategory())){
+					return chuFangDrugJCatagory.getCategory();
+				}
+			}
+		}
+		return null;
+	}
+	private ATCCode getSameAtcCode(InstructionsAtc instructionsAtcI,
+			InstructionsAtc instructionsAtcJ) {
 		// 直接判断四级编码是否一致，若不一致，进行atc库的三级编码查询。
 		Map<Integer, ATCCode> insIAtcLevelCodeMap = ATCUtil
-				.getATCCodeParentsByAtcCode(instructionI.getAtcCode());
+				.getATCCodeParentsByAtcCode(instructionsAtcI.getAtcNo());
 		Map<Integer, ATCCode> insJAtcLevelCodeMap = ATCUtil
-				.getATCCodeParentsByAtcCode(instructionJ.getAtcCode());
+				.getATCCodeParentsByAtcCode(instructionsAtcJ.getAtcNo());
 		if (insIAtcLevelCodeMap == null || insJAtcLevelCodeMap == null) {
 			return null;
 		}

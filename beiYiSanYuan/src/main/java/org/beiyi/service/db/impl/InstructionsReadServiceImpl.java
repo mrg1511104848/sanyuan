@@ -12,13 +12,14 @@ import org.springframework.stereotype.Service;
 public class InstructionsReadServiceImpl implements IInstructionsReadService {
 	@Autowired
 	InstructionsMapper instructionMapper;
+	
 	@Override
 	public Instructions getByInstructions(Instructions instructions) {
 		Instructions instruction = instructionMapper.selectByInstruction(instructions);
 		//TODO 获取说明书
 		return instruction;
 	}
-
+	
 	@Override
 	public boolean contains(String drugCombinationName) {
 		DrugCombinationName combinationName = new DrugCombinationName(drugCombinationName);
@@ -30,5 +31,5 @@ public class InstructionsReadServiceImpl implements IInstructionsReadService {
 		return instructionMapper.getCount(instructions)>0;
 	}
 
-
+	
 }
