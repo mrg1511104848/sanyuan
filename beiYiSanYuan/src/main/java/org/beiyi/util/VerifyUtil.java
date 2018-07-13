@@ -13,6 +13,7 @@ import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.changliang.JiLiangOpratorEnum;
 import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
 import org.beiyi.entity.db.InstructionsCategory;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
@@ -172,7 +173,7 @@ public class VerifyUtil {
 		}
 		return false;
 	}
-	public static String[] parseUnitToStandard(Drug chuFangDrug,Instruction instructionDrug,InstructionUse instructionUse,
+	public static String[] parseUnitToStandard(Drug chuFangDrug, DrugCombinationName drugCombinationName,IndicationTherapeuticRegimen instructionUse,
 			StringBuffer chuFangErrBuffer,VerifyResult verifyResult) {
 		String chuFangDrugDosageUnit = chuFangDrug.getDosageUnit(); // 用量单位;
 		String instructionDosageUnit = instructionUse.getDosageUnit(); // 粒 片 次/日
@@ -185,7 +186,7 @@ public class VerifyUtil {
 			if (dosageArr == null) {
 				String errorMsg = String
 						.format(" [统一剂量单位] %s 换算失败  [chuFangDrugDosageUnit] %s [instructionDosageUnit] %s",
-								instructionDrug.getDrugCombinationName(),
+								drugCombinationName.getCombinationName(),
 								chuFangDrugDosageUnit,
 								instructionDosageUnit);
 				log.error(errorMsg);
@@ -221,7 +222,7 @@ public class VerifyUtil {
 	 * @return index:[0] 处方中的格式化后的剂量 index:[1] 说明书中的格式化后的剂量
 	 */
 	private static String[] parseToStandardUnit(Drug chuFangDrug,
-			InstructionUse instructionUse) {
+			IndicationTherapeuticRegimen instructionUse) {
 		if (chuFangDrug == null || instructionUse == null) {
 			return null;
 		}

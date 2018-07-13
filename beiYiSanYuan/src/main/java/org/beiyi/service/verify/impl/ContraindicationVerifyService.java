@@ -1,11 +1,20 @@
 package org.beiyi.service.verify.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.beiyi.dao.DiseaseIcd10Mapper;
+import org.beiyi.dao.Icd10Mapper;
+import org.beiyi.dao.InstructionContraindicationMapper;
+import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.DiseaseIcd10;
+import org.beiyi.entity.db.Icd10;
+import org.beiyi.entity.db.InstructionContraindication;
+import org.beiyi.entity.db.Instructions;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
@@ -13,9 +22,12 @@ import org.beiyi.entity.verify.ICD10;
 import org.beiyi.entity.verify.Instruction;
 import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.reource.BysyConfig;
+import org.beiyi.service.db.itr.IInstructionsReadService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.ICD10ParseUtil;
 import org.beiyi.util.VerifyUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 禁忌症审核
@@ -23,8 +35,16 @@ import org.beiyi.util.VerifyUtil;
  * @author 2bu
  *
  */
+@Service
 public class ContraindicationVerifyService implements IDrugVeryfy {
-
+	@Autowired
+	IInstructionsReadService instructionsReadService;
+	@Autowired
+	InstructionContraindicationMapper instructionContraindicationMapper;
+	@Autowired
+	DiseaseIcd10Mapper diseaseIcd10Mapper;
+	@Autowired
+	Icd10Mapper icd10Mapper;
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
@@ -37,15 +57,48 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行审核
 		for (int i = 0; i < chuFangDrugVerifingList.size(); i++) {
 			Drug chuFangDrug = chuFangDrugVerifingList.get(i);
-			Instruction instruction = VerifyUtil
-					.getInstructionOfChuFangDrug(chuFangDrug);
+//			Instruction instruction = VerifyUtil
+//					.getInstructionOfChuFangDrug(chuFangDrug);
 //			if (instruction == null) {// 药品不存在于说明书
 //				notExistsDrugs.add(chuFangDrug);
 //				continue;
 //			}
-
-			List<String> instructionContraindications = instruction
-					.getContraindications();
+			//查询禁忌症
+			Instructions instructionsCondition = new Instructions();
+			DrugCombinationName drugCombinationName = new DrugCombinationName(chuFangDrug.getDrugCombinationName());
+			instructionsCondition.setCommodityName(drugCombinationName.getShangPinName());
+			instructionsCondition.setCommonName(drugCombinationName.getTongYongName());
+			Instructions dbInstructions = instructionsReadService.getByInstructions(instructionsCondition);
+			
+			InstructionContraindication instructionContraindicationCondition = new InstructionContraindication();
+			instructionContraindicationCondition.setCommodityName(drugCombinationName.getShangPinName());
+			instructionContraindicationCondition.setCommonName(drugCombinationName.getTongYongName());
+			if(dbInstructions!=null){
+				instructionContraindicationCondition.setInstructionId(dbInstructions.getId());
+			}
+			List<InstructionContraindication> dbInstructionContraindications = instructionContraindicationMapper.findByCondition(instructionContraindicationCondition);
+			if(dbInstructionContraindications == null){
+				dbInstructionContraindications = new ArrayList<InstructionContraindication>();
+			}
+			//处理禁忌症
+			List<String> instructionContraindications = new ArrayList<String>();
+			for (InstructionContraindication instructionContraindication : dbInstructionContraindications) {
+				
+				String diseaseName = instructionContraindication.getDiseaseName();
+				if(StringUtils.isNotBlank(diseaseName) && !instructionContraindications.contains(diseaseName)){
+					instructionContraindications.add(diseaseName);
+				}
+				
+				String diseaseAliasName = instructionContraindication.getDiseaseAliasName();
+				if(StringUtils.isNotBlank(diseaseAliasName)){
+					String[] diseaseAliasNameArr = diseaseAliasName.split(" |；|;");
+					for (String aliasName : diseaseAliasNameArr) {
+						if(StringUtils.isNotBlank(aliasName) && !instructionContraindications.contains(aliasName)){
+							instructionContraindications.add(aliasName);
+						}
+					}
+				}
+			}
 			Set<String> contraindicationEntirelyEqResult = compareContraindicationEntirelyEq(
 					instructionContraindications, chuFangAlldiagnosises);
 
@@ -139,14 +192,21 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 	 * @param object
 	 * @return
 	 */
-	private ContraindicationICD10VerifyResult checkICD10CodeEq(
+	public ContraindicationICD10VerifyResult checkICD10CodeEq(
 			String chuFangDiagnosis, String instructionContraindication,
 			String lenToVerifys) {
+		//TODO 这里判断上下位 有问题
 		
-		List<ICD10> chuFangDiagnosisICD10List = ICD10ParseUtil
-				.getIcd10ListByDiseaseName(chuFangDiagnosis);
-		List<ICD10> instructionContraindicationICD10List = ICD10ParseUtil
-				.getIcd10ListByDiseaseName(instructionContraindication);
+		List<DiseaseIcd10> chuFangDiagnosisICD10List = diseaseIcd10Mapper.findByDiseaseName(chuFangDiagnosis);
+		List<DiseaseIcd10> instructionContraindicationICD10List = diseaseIcd10Mapper.findByDiseaseName(instructionContraindication);
+		
+		
+//		List<ICD10> chuFangDiagnosisICD10List = ICD10ParseUtil
+//				.getIcd10ListByDiseaseName(chuFangDiagnosis);
+//		List<ICD10> instructionContraindicationICD10List = ICD10ParseUtil
+//				.getIcd10ListByDiseaseName(instructionContraindication);
+		
+		
 		if (chuFangDiagnosisICD10List == null
 				|| chuFangDiagnosisICD10List.size() == 0
 				|| instructionContraindicationICD10List == null
@@ -162,9 +222,9 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 					}
 					Integer icd10Len = Integer.parseInt(icd10LenStr);
 					String chuFangDiagnosisIcd10Code = chuFangDiagnosisICD10List
-							.get(i).getCode();
+							.get(i).getIcd10Code();
 					String instructionContraindicationICD10Code = instructionContraindicationICD10List
-							.get(j).getCode();
+							.get(j).getIcd10Code();
 
 					if (chuFangDiagnosisIcd10Code.length() < icd10Len
 							|| instructionContraindicationICD10Code.length() < icd10Len) {
@@ -176,20 +236,26 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 					String instructionIcd10CodeSubString = instructionContraindicationICD10Code
 							.substring(0, icd10Len);
 					String chuFangIcd10Version = chuFangDiagnosisICD10List.get(
-							i).getVersion();
+							i).getIcd10Version();
 					String instructionIcd10Version = instructionContraindicationICD10List
-							.get(j).getVersion();
+							.get(j).getIcd10Version();
 					if (chuFangIcd10CodeSubString
 							.equals(instructionIcd10CodeSubString)
 							&& chuFangIcd10Version
 									.equals(instructionIcd10Version)) {
 
 						ContraindicationICD10VerifyResult contraindicationICD10VerifyResult = new ContraindicationICD10VerifyResult();
-						ICD10 icd10 = ICD10ParseUtil.getIcd10ByCode(
-								chuFangIcd10CodeSubString);
-						if (icd10 == null) {
+//						ICD10 icd10 = ICD10ParseUtil.getIcd10ByCode(
+//								chuFangIcd10CodeSubString);
+						
+						Icd10 condition = new Icd10();
+						condition.setCode(chuFangIcd10CodeSubString);
+						List<Icd10> icd10List = icd10Mapper.findByIcd10(condition);
+						
+						if (icd10List == null || icd10List.size() == 0) {
 							continue;
 						}
+						Icd10 icd10 = icd10List.get(0);
 						contraindicationICD10VerifyResult.setDiseaseName(icd10
 								.getName());
 						contraindicationICD10VerifyResult.setIcd10Code(icd10
@@ -228,7 +294,7 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 		return contraindicationEntirelyEqList;
 	}
 
-	class ContraindicationICD10VerifyResult {
+	public class ContraindicationICD10VerifyResult {
 		private String diseaseName;
 		private String icd10Code;
 

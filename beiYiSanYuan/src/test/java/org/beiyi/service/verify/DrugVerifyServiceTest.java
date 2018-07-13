@@ -6,9 +6,17 @@ import java.util.List;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.service.BaseJunit4Test;
+import org.beiyi.service.verify.impl.ContraindicationVerifyService;
+import org.beiyi.service.verify.impl.ContraindicationVerifyService.ContraindicationICD10VerifyResult;
+import org.beiyi.service.verify.impl.CourseOfTreatmentVerifyService;
+import org.beiyi.service.verify.impl.DDDSVerifyService;
+import org.beiyi.service.verify.impl.DosageMaxLimitVerifyService;
+import org.beiyi.service.verify.impl.DosageVerifyService;
 import org.beiyi.service.verify.impl.DrugNotExistsVerifyService;
 import org.beiyi.service.verify.impl.RepeatedPrescriptionsService;
+import org.beiyi.service.verify.impl.SexVerifyService;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
+import org.beiyi.service.verify.impl.UsageVerifyService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.PrescriptionReadUtil;
 import org.junit.Test;
@@ -24,23 +32,40 @@ public class DrugVerifyServiceTest  extends BaseJunit4Test{
 	ShiYingZhengVerifyService shiYingZhengVerifyService;
 	@Autowired
 	RepeatedPrescriptionsService repeatedPrescriptionsService;
+//	@Autowired
+//	DrugEffectVerifyService drugEffectVerifyService;
+	@Autowired
+	SexVerifyService sexVerifyService;
+	@Autowired
+	ContraindicationVerifyService contraindicationVerifyService;
+	@Autowired
+	DosageMaxLimitVerifyService dosageMaxLimitVerifyService;
+	@Autowired
+	DosageVerifyService dosageVerifyService;
+	@Autowired
+	CourseOfTreatmentVerifyService courseOfTreatmentVerifyService;
+	@Autowired
+	UsageVerifyService usageVerifyService;
+	@Autowired
+	DDDSVerifyService dddsVerifyService;
 	@Test
 	public void testVerify(){
 		DrugVerifyService drugVerifyService = new DrugVerifyService();
 		List<IDrugVeryfy> drugVerifyServices = new ArrayList<IDrugVeryfy>();
-		drugVerifyServices.add(drugNotExistsVerifyService);
-		drugVerifyServices.add(shiYingZhengVerifyService);
-		drugVerifyServices.add(repeatedPrescriptionsService);
-		/*drugVerifyServices.add(new DrugEffectVerifyService());
-		drugVerifyServices.add(new SexVerifyService());
-		drugVerifyServices.add(new DDDSVerifyService());
-//		drugVerifyServices.add(new ShiYingZhengVerifyService());
-		drugVerifyServices.add(new ContraindicationVerifyService());
-		drugVerifyServices.add(new DosageMaxLimitVerifyService());
-		drugVerifyServices.add(new DosageVerifyService());
-		drugVerifyServices.add(new CourseOfTreatmentVerifyService());
-		drugVerifyServices.add(new UsageVerifyService());*/
+//		drugVerifyServices.add(drugNotExistsVerifyService);
+
+//		drugVerifyServices.add(repeatedPrescriptionsService);
+//		drugVerifyServices.add(new DrugEffectVerifyService());
+//		drugVerifyServices.add(sexVerifyService);
+//		drugVerifyServices.add(dddsVerifyService);
+//		drugVerifyServices.add(shiYingZhengVerifyService);
+//		drugVerifyServices.add(contraindicationVerifyService);
 		
+		
+//		drugVerifyServices.add(dosageMaxLimitVerifyService);
+//		drugVerifyServices.add(dosageVerifyService);
+//		drugVerifyServices.add(courseOfTreatmentVerifyService);
+//		drugVerifyServices.add(usageVerifyService);
 		for (IDrugVeryfy iDrugVeryfy : drugVerifyServices) {
 			drugVerifyService.registerDrugVerify(iDrugVeryfy);
 		}
@@ -77,7 +102,9 @@ public class DrugVerifyServiceTest  extends BaseJunit4Test{
 //		exportTestResultPath = "C://公司/北医三院/错误处方模拟_其他测试/";
 		ExcelUtil.export(exportTestResultPath, excelBeans);
 	}
-	public static void main(String[] args) {
-		
+	@Test
+	public void t(){
+		ContraindicationICD10VerifyResult result = contraindicationVerifyService.checkICD10CodeEq("高血压", "高血压", "5");
+		System.out.println(result);
 	}
 }

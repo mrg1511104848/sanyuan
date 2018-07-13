@@ -7,7 +7,11 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.beiyi.dao.IndicationTherapeuticRegimenMapper;
+import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
+import org.beiyi.entity.db.condition.IndicationTherapeuticRegimenCondition;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
@@ -19,6 +23,8 @@ import org.beiyi.util.InstructionsReadUtil;
 import org.beiyi.util.VerifyUtil;
 import org.skynet.frame.util.DoubleUtil;
 import org.skynet.frame.util.StringBufferUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 剂量审核第二版
@@ -26,9 +32,11 @@ import org.skynet.frame.util.StringBufferUtil;
  * @author 2bu
  *
  */
+@Service
 public class DosageVerifyService implements IDrugVeryfy {
 	private Logger log = Logger.getLogger(DosageVerifyService.class);
-	
+	@Autowired
+	IndicationTherapeuticRegimenMapper indicationTherapeuticRegimenMapper;
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
@@ -47,7 +55,7 @@ public class DosageVerifyService implements IDrugVeryfy {
 				continue;
 			}
 			// 获取整理好的说明书的药品
-			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
+//			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
 //			if (instructionDrug == null) {
 //				notExistsDrugs.add(chuFangDrug);
 //				continue;
@@ -56,16 +64,25 @@ public class DosageVerifyService implements IDrugVeryfy {
 			if(containsInVerifyResultErrorDrugs){ continue;}
 			// 用来存放剂量审核的记录，最后进行最终剂量评判的标准
 			List<ChuFangCheckRecord> dosageCheckRecords = new ArrayList<ChuFangCheckRecord>();
-			List<InstructionUse> instructionUses = instructionDrug.getInstructionUses();
+			/*List<InstructionUse> instructionUses = instructionDrug.getInstructionUses();
 			// 遍历 整理好的说明书 - 药品使用相关信息
-			for (InstructionUse instructionUse : instructionUses) {
+			for (InstructionUse instructionUse : instructionUses) {*/
+			List<String> diagnosises = chuFang.getDiagnosises();
+			IndicationTherapeuticRegimenCondition condition = new IndicationTherapeuticRegimenCondition();
+			DrugCombinationName drugCombinationName = new DrugCombinationName(chuFangDrug.getDrugCombinationName());
+			condition.setCommodityName(drugCombinationName.getShangPinName());
+			condition.setCommonName(drugCombinationName.getTongYongName());
+			condition.setIndications(diagnosises);
+			
+			List<IndicationTherapeuticRegimen> results = indicationTherapeuticRegimenMapper.selectByCondition(condition);
+			for (IndicationTherapeuticRegimen instructionUse : results) {
 				String instructionPatientStatusText = instructionUse.getPatientStatus();// 患者状态
 				String instructionDoseSelection = instructionUse.getDoseSelection();// 剂量选择
 //				String instructionDosage = instructionUse.getDosage();// 1 or 1；2
 //				String instructionDosageUnit = instructionUse.getDosageUnit(); // 粒 片 次/日
 				instructionDoseSelection = VerifyUtil.parseDoseSelection(instructionDoseSelection); //转换一下说明书中的剂量选择
 //				String instructionDosingFrequency = instructionUse.getDosingFrequency(); // BID Q6H 次
-				if (checkInstructionElementsIsBlank(instructionDrug.getDrugCombinationName(),instructionUse)) {
+				if (checkInstructionElementsIsBlank(instructionUse.getCommodityName()+"("+instructionUse.getCommonName()+")",instructionUse)) {
 					continue;
 				}
 				// 0.筛选人群
@@ -88,7 +105,7 @@ public class DosageVerifyService implements IDrugVeryfy {
 				}else{
 					// 2.比较每次用量
 					//统一单位
-					String[] standardDosageAndUnit = VerifyUtil.parseUnitToStandard(chuFangDrug,instructionDrug,instructionUse,errMsgBuffer,verifyResult);
+					String[] standardDosageAndUnit = VerifyUtil.parseUnitToStandard(chuFangDrug,drugCombinationName,instructionUse,errMsgBuffer,verifyResult);
 					if(standardDosageAndUnit == null){
 						dosageCheckRecord.setInValidText("统一单位失败");
 						dosageCheckRecord.setInvalidDosageType(VerifyTypeEnums.INVALID_UNIT);
@@ -117,7 +134,7 @@ public class DosageVerifyService implements IDrugVeryfy {
 		return verifyResult;
 	}
 	private DosageCheckResult compoundDosageIsValid(Drug chuFangDrug,
-			InstructionUse instructionUse, String instructionDoseSelection) {
+			IndicationTherapeuticRegimen instructionUse, String instructionDoseSelection) {
 		if (StringUtils.isBlank(chuFangDrug.getDosageUnit())
 				|| StringUtils.isBlank(instructionUse.getDosageUnit())
 				|| !chuFangDrug.getDosageUnit().trim()
@@ -157,9 +174,9 @@ public class DosageVerifyService implements IDrugVeryfy {
 	}
 	private List<ChuFangCheckRecord> getErrorCheckRecords(
 			List<ChuFangCheckRecord> dosageCheckRecords) {
-		if(dosageCheckRecords== null || dosageCheckRecords.size() == 0){
+		/*if(dosageCheckRecords== null || dosageCheckRecords.size() == 0){
 			throw new RuntimeException("The dosageCheckRecords is blank!");
-		}
+		}*/
 		List<ChuFangCheckRecord> errorResults = new ArrayList<ChuFangCheckRecord>();
 		
 		for (ChuFangCheckRecord dosageCheckRecord : dosageCheckRecords) {
@@ -289,10 +306,10 @@ public class DosageVerifyService implements IDrugVeryfy {
 	
 	
 	private boolean checkInstructionElementsIsBlank(String drugCombinationName,
-			InstructionUse instructionUse) {
+			IndicationTherapeuticRegimen instructionUse) {
 		String instructionDosage = instructionUse.getDosage();// 1 or 1；2
 		String instructionDosageUnit = instructionUse.getDosageUnit(); // 粒 片 次/日
-		String instructionDosingFrequency = instructionUse.getDosingFrequency(); // BID Q6H 次
+		String instructionDosingFrequency = instructionUse.getDosageFrequency(); // BID Q6H 次
 		String[] instructionBlankElement = getBlankElement(
 				new String[] {
 						instructionDosageUnit,

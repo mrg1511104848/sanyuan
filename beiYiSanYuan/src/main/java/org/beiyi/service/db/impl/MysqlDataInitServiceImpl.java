@@ -24,6 +24,7 @@ import org.beiyi.dao.InstructionComponentMapper;
 import org.beiyi.dao.InstructionContraindicationMapper;
 import org.beiyi.dao.InstructionIndicationMapper;
 import org.beiyi.dao.InstructionsAtcMapper;
+import org.beiyi.dao.InstructionsCategoryMapper;
 import org.beiyi.dao.InstructionsMapper;
 import org.beiyi.datadeal.DXYUtil;
 import org.beiyi.entity.DrugCombinationName;
@@ -40,6 +41,7 @@ import org.beiyi.entity.db.InstructionContraindication;
 import org.beiyi.entity.db.InstructionIndication;
 import org.beiyi.entity.db.Instructions;
 import org.beiyi.entity.db.InstructionsAtc;
+import org.beiyi.entity.db.InstructionsCategory;
 import org.beiyi.entity.db.TherapeuticRegimen;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.entity.verify.Instruction;
@@ -89,6 +91,9 @@ public class MysqlDataInitServiceImpl implements IMysqlDataInitService {
 	
 	@Autowired
 	DiseaseIcd10Mapper diseaseIcd10Mapper;
+	
+	@Autowired
+	InstructionsCategoryMapper instructionsCategoryMapper;
 	static String updateDate = null;
 	static{
 		updateDate = new SimpleDateFormat(
@@ -457,6 +462,7 @@ public class MysqlDataInitServiceImpl implements IMysqlDataInitService {
 	@Override
 	public void initTherapeuticRegimen() {
 		List<Instruction> excelinstructions = InstructionsReadUtil.getInstructions();
+		
 		for (Instruction  exInstruction : excelinstructions) {
 			List<String> diagnosises = exInstruction.getDiagnosises();
 			for (String diagnosise : diagnosises) {
@@ -475,6 +481,9 @@ public class MysqlDataInitServiceImpl implements IMysqlDataInitService {
 					therapeuticRegimen.setCourseRestriction(instructionUse.getCourseControl());
 					therapeuticRegimen.setDoseSelection(instructionUse.getDoseSelection());
 					therapeuticRegimen.setIndicationId(insIndicationResult.getIndicationId());
+					therapeuticRegimen.setIndicationName(diagnosise);
+					therapeuticRegimen.setCommodityName(insIndicationResult.getCommodityName());
+					therapeuticRegimen.setCommonName(insIndicationResult.getCommonName());
 					therapeuticRegimen.setInstructionId(insIndicationResult.getInstructionId());
 					therapeuticRegimen.setPatientStatus(instructionUse.getPatientStatus());
 					therapeuticRegimen.setRouteMedication(instructionUse.getRouteOfMedication());
@@ -511,5 +520,29 @@ public class MysqlDataInitServiceImpl implements IMysqlDataInitService {
 
 	@Override
 	public void initIcd10BelongTo() {
+	}
+
+	@Override
+	public void initInstructionsCategory() {
+		List<Document> yiMaiTongFinalStandardDocs = MongoUtil.findDocList("yiMaiTongFinalStandard");
+		for (Document doc : yiMaiTongFinalStandardDocs) {
+			String combinationStandardName = doc.getString("combinationStandardName");
+			String shangPinMing = doc.getString("shangPinMing");
+			String tongYongMing = doc.getString("tongYongMing");
+			String category = doc.getString("category");
+			List<Instructions> instructions = instructionsMapper.selectByCommodityNameAndCommonName(shangPinMing, tongYongMing);
+			if(instructions!=null){
+				for (Instructions ins : instructions) {
+					InstructionsCategory record = new InstructionsCategory();
+					record.setCombinationStandardName(combinationStandardName);
+					record.setCommodityName(shangPinMing);
+					record.setCommonName(tongYongMing);
+					record.setInstructionId(ins.getId());
+					record.setCategory(category);
+					record.setLastUpdateTime(updateDate);
+					instructionsCategoryMapper.insert(record);
+				}
+			}
+		}
 	}
 }

@@ -7,25 +7,27 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
-import org.beiyi.entity.verify.Instruction;
-import org.beiyi.entity.verify.InstructionUse;
 import org.beiyi.entity.verify.enums.VerifyTypeEnums;
 import org.beiyi.reource.Resources;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
-import org.beiyi.util.InstructionsReadUtil;
 import org.beiyi.util.VerifyUtil;
 import org.skynet.frame.util.StringBufferUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 用药频率审核
  * @author 2bu
  *
  */
+@Service
 public class DDDSVerifyService implements IDrugVeryfy {
-
+	@Autowired
+	CommonSearchService commonSearchService;
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
@@ -34,27 +36,24 @@ public class DDDSVerifyService implements IDrugVeryfy {
 //		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
-			if(chuFangDrug.getDrugCombinationName().contains("布洛芬缓释胶囊")){
-				System.out.println();
-			}
 			// 获取整理好的说明书的药品
-			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
+//			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
 //			if (instructionDrug == null) {
 //				notExistsDrugs.add(chuFangDrug);
 //				continue;
 //			}
 			String chuFangDrugDosingFrequency = chuFangDrug.getDosingFrequency(); // 用药频率
-			List<InstructionUse> instructionUses = instructionDrug.getInstructionUses();
 			// 用来存放剂量审核的记录，最后进行最终剂量评判的标准
 			List<ChuFangCheckRecord> dosageCheckRecords = new ArrayList<ChuFangCheckRecord>();
+			List<IndicationTherapeuticRegimen> instructionUses = commonSearchService.getIndicationTherapeuticRegimens(chuFangDrug.getDrugCombinationName(), chuFang.getDiagnosises());
 			// 遍历 整理好的说明书 - 药品使用相关信息
-			for (InstructionUse instructionUse : instructionUses) {
+			for (IndicationTherapeuticRegimen instructionUse : instructionUses) {
 				String instructionPatientStatusText = instructionUse.getPatientStatus();// 患者状态
 				
 				boolean containsInVerifyResultErrorDrugs = VerifyUtil.chuFangDrugContainsInVerifyResultErrorDrugs(verifyResult, chuFangDrug);
 				if(containsInVerifyResultErrorDrugs){ continue;}
 				
-				String instructionDosingFrequency = instructionUse.getDosingFrequency(); // BID Q6H 次
+				String instructionDosingFrequency = instructionUse.getDosageFrequency(); // BID Q6H 次
 				// 0.筛选人群
 				boolean crowdValid = VerifyUtil.crowdIsValid(chuFang,instructionPatientStatusText);
 				if (!crowdValid) {// 不属于该人群的话，continue;
@@ -92,7 +91,7 @@ public class DDDSVerifyService implements IDrugVeryfy {
 		resultMsg.append("（");
 		Set<String> dddsSets = new HashSet<String>();
 		for (ChuFangCheckRecord chuFangErrRecord : dddsErrors) {
-			String dosingFrequency = chuFangErrRecord.getInstructionUse().getDosingFrequency();
+			String dosingFrequency = chuFangErrRecord.getInstructionUse().getDosageFrequency();
 //			resultMsg.append(dosingFrequency+",");
 			if(StringUtils.isNotBlank(dosingFrequency))
 				dddsSets.add(dosingFrequency.trim());

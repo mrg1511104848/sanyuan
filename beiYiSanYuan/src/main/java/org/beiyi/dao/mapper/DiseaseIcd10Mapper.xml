@@ -156,4 +156,12 @@
       icd10_version = #{icd10Version,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  
+  
+  <select id="findByDiseaseName" resultMap="BaseResultMap" parameterType="String" >
+    select 
+    <include refid="Base_Column_List" />
+    from disease_icd10
+    where  disease_name = #{diseaseName,jdbcType=VARCHAR}
+  </select>
 </mapper>

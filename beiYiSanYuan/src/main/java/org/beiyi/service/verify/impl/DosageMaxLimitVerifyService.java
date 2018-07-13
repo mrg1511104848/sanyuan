@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.beiyi.dao.IndicationTherapeuticRegimenMapper;
+import org.beiyi.entity.DrugCombinationName;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
+import org.beiyi.entity.db.condition.IndicationTherapeuticRegimenCondition;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
@@ -17,6 +21,8 @@ import org.beiyi.util.DosingFrequencyUtil;
 import org.beiyi.util.InstructionsReadUtil;
 import org.beiyi.util.VerifyUtil;
 import org.skynet.frame.util.DoubleUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 最大日剂量审核
@@ -24,8 +30,10 @@ import org.skynet.frame.util.DoubleUtil;
  * @author 2bu
  *
  */
+@Service
 public class DosageMaxLimitVerifyService implements IDrugVeryfy {
-
+	@Autowired
+	IndicationTherapeuticRegimenMapper indicationTherapeuticRegimenMapper;
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
@@ -35,13 +43,23 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
 			// 获取整理好的说明书的药品
-			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug
-					.getDrugCombinationName());
+//			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug
+//					.getDrugCombinationName());
 			List<ChuFangCheckRecord> dosageCheckRecords = new ArrayList<ChuFangCheckRecord>();
-			List<InstructionUse> instructionUses = instructionDrug
-					.getInstructionUses();
-			// 遍历 整理好的说明书 - 药品使用相关信息
-			for (InstructionUse instructionUse : instructionUses) {
+//			List<InstructionUse> instructionUses = instructionDrug
+//					.getInstructionUses();
+			if(chuFangDrug.getDrugCombinationName().contains("泰诺")){
+				System.out.println();
+			}
+			List<String> diagnosises = chuFang.getDiagnosises();
+			IndicationTherapeuticRegimenCondition condition = new IndicationTherapeuticRegimenCondition();
+			DrugCombinationName drugCombinationName = new DrugCombinationName(chuFangDrug.getDrugCombinationName());
+			condition.setCommodityName(drugCombinationName.getShangPinName());
+			condition.setCommonName(drugCombinationName.getTongYongName());
+			condition.setIndications(diagnosises);
+			
+			List<IndicationTherapeuticRegimen> results = indicationTherapeuticRegimenMapper.selectByCondition(condition);
+			for (IndicationTherapeuticRegimen instructionUse : results) {
 				String instructionPatientStatusText = instructionUse
 						.getPatientStatus();// 患者状态
 				// 0.筛选人群
@@ -55,7 +73,7 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 				instructionDoseSelection = VerifyUtil
 						.parseDoseSelection(instructionDoseSelection); // 转换一下说明书中的剂量选择
 				String instructionDosingFrequency = instructionUse
-						.getDosingFrequency(); // BID Q6H 次
+						.getDosageFrequency(); // BID Q6H 次
 				if (instructionDoseSelection
 						.matches("单日最大剂量/最大日剂量|单日最大剂量|最大日剂量")) {
 					// 判断是否是复方制剂，如果是，转换时需要另处理
@@ -70,7 +88,7 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 								dosageCheckRecord,dosageCheckRecords);
 						
 					} else {
-						checkResult = nonCompoundDrugOverstepMaxDayDosageLimit(chuFangDrug, instructionDrug, instructionUse, 
+						checkResult = nonCompoundDrugOverstepMaxDayDosageLimit(chuFangDrug,drugCombinationName, instructionUse, 
 								verifyResult, errMsgBuffer, instructionDoseSelection, 
 								instructionDosingFrequency, dosageCheckRecord, dosageCheckRecords);
 					}
@@ -79,7 +97,6 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 						break;
 					}
 				}
-
 			}
 			if (dosageCheckRecords.size() > 0) {
 				ChuFangCheckRecord chuFangCheckRecord = dosageCheckRecords
@@ -109,7 +126,7 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 		VerifyUtil.packVerifyResultFinal(verifyResult, errMsgBuffer);
 		return verifyResult;
 	}
-	private ChuFangCheckRecord compoundDrugOverstepMaxDayDosageLimit(Drug chuFangDrug, InstructionUse instructionUse, String instructionDoseSelection, 
+	private ChuFangCheckRecord compoundDrugOverstepMaxDayDosageLimit(Drug chuFangDrug, IndicationTherapeuticRegimen instructionUse, String instructionDoseSelection, 
 			String instructionDosingFrequency, ChuFangCheckRecord dosageCheckRecord, List<ChuFangCheckRecord> dosageCheckRecords){
 		// 比较单日剂量上限
 		DosageCheckResult dosageIsMatchDayLimit = dosageIsMatchDayLimitForCompoundDrug(
@@ -127,13 +144,12 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 		dosageCheckRecord.setValid(true);
 		return dosageCheckRecord;
 	}
-	private ChuFangCheckRecord nonCompoundDrugOverstepMaxDayDosageLimit(Drug chuFangDrug,Instruction instructionDrug, InstructionUse instructionUse,
+	private ChuFangCheckRecord nonCompoundDrugOverstepMaxDayDosageLimit(Drug chuFangDrug, DrugCombinationName drugCombinationName,IndicationTherapeuticRegimen instructionUse,
 			VerifyResult verifyResult,StringBuffer errMsgBuffer,String instructionDoseSelection, 
 			String instructionDosingFrequency, ChuFangCheckRecord dosageCheckRecord, List<ChuFangCheckRecord> dosageCheckRecords){
 		// 统一单位
 		String[] standardDosageAndUnit = VerifyUtil
-				.parseUnitToStandard(chuFangDrug,
-						instructionDrug, instructionUse,
+				.parseUnitToStandard(chuFangDrug,drugCombinationName, instructionUse,
 						errMsgBuffer, verifyResult);
 		if (standardDosageAndUnit == null) {
 			dosageCheckRecord.setValid(false);
@@ -160,7 +176,7 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 		}
 	}
 	private DosageCheckResult dosageIsMatchDayLimitForCompoundDrug(
-			Drug chuFangDrug, InstructionUse instructionUse,
+			Drug chuFangDrug, IndicationTherapeuticRegimen instructionUse,
 			String instructionDoseSelection, String instructionDosingFrequency) {
 		if (StringUtils.isBlank(chuFangDrug.getDosageUnit())
 				|| StringUtils.isBlank(instructionUse.getDosageUnit())

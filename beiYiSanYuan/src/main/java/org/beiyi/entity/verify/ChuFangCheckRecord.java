@@ -1,8 +1,10 @@
 package org.beiyi.entity.verify;
 
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
+
 public class ChuFangCheckRecord {
 	private Drug chuFangDrug;
-	private InstructionUse instructionUse;
+	private IndicationTherapeuticRegimen instructionUse;
 	private Boolean valid = new Boolean(false);
 	private String inValidText ;
 	private int invalidDosageType;
@@ -12,10 +14,10 @@ public class ChuFangCheckRecord {
 	public void setChuFangDrug(Drug chuFangDrug) {
 		this.chuFangDrug = chuFangDrug;
 	}
-	public InstructionUse getInstructionUse() {
+	public IndicationTherapeuticRegimen getInstructionUse() {
 		return instructionUse;
 	}
-	public void setInstructionUse(InstructionUse instructionUse) {
+	public void setInstructionUse(IndicationTherapeuticRegimen instructionUse) {
 		this.instructionUse = instructionUse;
 	}
 	public Boolean getValid() {

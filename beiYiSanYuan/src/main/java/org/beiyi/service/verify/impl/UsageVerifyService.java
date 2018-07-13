@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
@@ -17,14 +18,18 @@ import org.beiyi.service.verify.itr.IDrugVeryfy;
 import org.beiyi.util.InstructionsReadUtil;
 import org.beiyi.util.VerifyUtil;
 import org.skynet.frame.util.excel.ExcelUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 用法审核
  * @author mrg
  *
  */
+@Service
 public class UsageVerifyService implements IDrugVeryfy {
-
+	@Autowired
+	CommonSearchService commonSearchService;
 	@Override
 	public VerifyResult verify(ChuFang chuFang,
 			VerifyResult lastStepVerifyResult) {
@@ -49,23 +54,14 @@ public class UsageVerifyService implements IDrugVeryfy {
 				chuFangRouteOfMedication = chuFangRouteOfMedication.trim();
 				chuFangDrug.setRouteOfMedication(chuFangRouteOfMedication);
 			}
-			// 获取整理好的说明书的药品
+			/*// 获取整理好的说明书的药品
 			Instruction instruction = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
-//			if(instruction == null){
-//				String errorMsg = String.format(" %s 在说明书中不存在！", chuFangDrug.getDrugCombinationName());
-//				errMsgBuffer.append(String.format("%s【药品】 %s 用法不适宜，具体原因为 ： %s",ExcelUtil.NEW_LINE, chuFangDrug.getDrugCombinationName(),errorMsg));
-//				
-//				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,VerifyTypeEnums.NO_DRUG);
-//				verifyResult.getErrorDrugs().add(drugVerifyInfo);
-//				
-//				continue;
-//			}
+			List<InstructionUse> instructionUses = instruction.getInstructionUses();*/
 			
-			List<InstructionUse> instructionUses = instruction.getInstructionUses();
-			
-			//遍历  整理好的说明书 - 药品使用相关信息
-			for (InstructionUse instructionUse : instructionUses) {
-				String instructionRouteOfMedication = instructionUse.getRouteOfMedication();
+			List<IndicationTherapeuticRegimen> instructionUses = commonSearchService.getIndicationTherapeuticRegimens(chuFangDrug.getDrugCombinationName(), chuFang.getDiagnosises());
+			// 遍历 整理好的说明书 - 药品使用相关信息
+			for (IndicationTherapeuticRegimen instructionUse : instructionUses) {
+				String instructionRouteOfMedication = instructionUse.getRouteMedication();
 				if(org.apache.commons.lang3.StringUtils.isBlank(instructionRouteOfMedication)){ //说明书中如果用法是空，直接略过
 					continue;
 				}

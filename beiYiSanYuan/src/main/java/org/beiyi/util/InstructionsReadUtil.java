@@ -39,7 +39,7 @@ public class InstructionsReadUtil {
 			e.printStackTrace();
 		}*/
 		
-		/*try {
+		try {
 //			String instrunctionPath = "D://爱客服/数据_ALL/北医三院/三院提供/20180418说明书提取框架&demo新.xlsx";
 //			instrunctionPath = "C://公司/北医三院/20180418说明书提取框架&demo新.xlsx";
 			File instrunctionFile = ResourceUtils.getFile("classpath:20180418说明书提取框架&demo新.xlsx");
@@ -49,7 +49,7 @@ public class InstructionsReadUtil {
 		}
 		instructionRead();
 //		loadTests();
-		loadInstructionCategorys();*/
+		loadInstructionCategorys();
 	}
 	public static Instruction get(String drugCombinationName){
 		/*for (Instruction instruction : instructions) {

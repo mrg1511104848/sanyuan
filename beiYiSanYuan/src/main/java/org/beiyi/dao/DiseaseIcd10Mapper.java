@@ -1,6 +1,10 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
 import org.beiyi.entity.db.DiseaseIcd10;
+import org.beiyi.entity.db.Icd10;
 
 public interface DiseaseIcd10Mapper {
     /**
@@ -50,4 +54,6 @@ public interface DiseaseIcd10Mapper {
      * @mbggenerated Tue Jul 10 17:04:15 CST 2018
      */
     int updateByPrimaryKey(DiseaseIcd10 record);
+    
+    List<DiseaseIcd10> findByDiseaseName(@Param(value="diseaseName")String diseaseName);
 }

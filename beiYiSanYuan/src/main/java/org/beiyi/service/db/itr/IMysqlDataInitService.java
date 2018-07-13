@@ -53,4 +53,8 @@ public interface IMysqlDataInitService {
 	 * ICD10编码关系初始化
 	 */
 	void initIcd10BelongTo();
+	/**
+	 * 说明书分类初始化
+	 */
+	void initInstructionsCategory();
 }

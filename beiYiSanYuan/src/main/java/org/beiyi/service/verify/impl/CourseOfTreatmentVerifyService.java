@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.beiyi.changliang.DrugInfoEnum;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.IndicationTherapeuticRegimen;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.ChuFangCheckRecord;
 import org.beiyi.entity.verify.Drug;
@@ -19,6 +20,8 @@ import org.beiyi.util.VerifyUtil;
 import org.skynet.frame.util.DoubleUtil;
 import org.skynet.frame.util.RegexUtils;
 import org.skynet.frame.util.StringBufferUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 疗程审核
@@ -26,8 +29,11 @@ import org.skynet.frame.util.StringBufferUtil;
  * @author mrg
  *
  */
+@Service
 public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 	private static final String COURSE_OF_TREATMENT_REGEX = "(\\d+([-~]\\d+)?)";
+	@Autowired
+	CommonSearchService commonSearchService;
 	public static void main(String[] args) {
 	}
 	@Override
@@ -38,16 +44,6 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 //		Set<Drug> notExistsDrugs = new HashSet<Drug>();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行计量审核
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
-			if(chuFangDrug.getDrugCombinationName().contains("布洛芬")){
-				System.out.println();
-			}
-			// 获取整理好的说明书的药品
-			Instruction instructionDrug = InstructionsReadUtil.get(chuFangDrug
-					.getDrugCombinationName());
-//			if (instructionDrug == null) {
-//				notExistsDrugs.add(chuFangDrug);
-//				continue;
-//			}
 			boolean containsInVerifyResultErrorDrugs = VerifyUtil
 					.chuFangDrugContainsInVerifyResultErrorDrugs(verifyResult,
 							chuFangDrug);
@@ -56,10 +52,9 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 			}
 			// 用来存放剂量审核的记录，最后进行最终剂量评判的标准
 			List<ChuFangCheckRecord> checkRecords = new ArrayList<ChuFangCheckRecord>();
-			List<InstructionUse> instructionUses = instructionDrug
-					.getInstructionUses();
+			List<IndicationTherapeuticRegimen> instructionUses = commonSearchService.getIndicationTherapeuticRegimens(chuFangDrug.getDrugCombinationName(), chuFang.getDiagnosises());
 			// 遍历 整理好的说明书 - 药品使用相关信息
-			for (InstructionUse instructionUse : instructionUses) {
+			for (IndicationTherapeuticRegimen instructionUse : instructionUses) {
 				String instructionPatientStatusText = instructionUse
 						.getPatientStatus();// 患者状态
 				String instructionDoseSelection = instructionUse
@@ -95,7 +90,7 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 				chuFangDrug.getDrugCombinationName()));
 		resultMsg.append("（");
 		for (ChuFangCheckRecord chuFangErrRecord : errors) {
-			String rangeEach = chuFangErrRecord.getInstructionUse().getCourseControl();
+			String rangeEach = chuFangErrRecord.getInstructionUse().getCourseRestriction();
 			resultMsg.append(rangeEach+",");
 		}
 		resultMsg = StringBufferUtil.removeEnd(resultMsg, ",");
@@ -110,7 +105,7 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 	 * @param chuFangDrug 
 	 * @return 
 	 */
-	private ChuFangCheckRecord checkDaysIsMatchCourseOfTreatment(Integer canUseDay, Drug chuFangDrug, InstructionUse instructionUse) {
+	private ChuFangCheckRecord checkDaysIsMatchCourseOfTreatment(Integer canUseDay, Drug chuFangDrug, IndicationTherapeuticRegimen instructionUse) {
 		ChuFangCheckRecord checkRecord = new ChuFangCheckRecord();
 		checkRecord.setValid(true);
 		
@@ -130,14 +125,14 @@ public class CourseOfTreatmentVerifyService implements IDrugVeryfy {
 		return checkRecord;
 	}
 
-	private ChuFangCheckRecord courseOfTreatmentIsValid(Integer canUseDay, Drug chuFangDrug, InstructionUse instructionUse) {
+	private ChuFangCheckRecord courseOfTreatmentIsValid(Integer canUseDay, Drug chuFangDrug, IndicationTherapeuticRegimen instructionUse) {
 		ChuFangCheckRecord chuFangCheckRecord = new ChuFangCheckRecord();
 		chuFangCheckRecord.setValid(true);
-		if(StringUtils.isBlank(instructionUse.getCourseControl())){
+		if(StringUtils.isBlank(instructionUse.getCourseRestriction())){
 //			logger.warn(String.format("The courseControl of drug “%s” is blank!", chuFangDrug.getDrugCombinationName()));
 			return chuFangCheckRecord;
 		}
-		String dayOrDayRange = RegexUtils.getByRegex(COURSE_OF_TREATMENT_REGEX, instructionUse.getCourseControl());
+		String dayOrDayRange = RegexUtils.getByRegex(COURSE_OF_TREATMENT_REGEX, instructionUse.getCourseRestriction());
 		if(StringUtils.isBlank(dayOrDayRange)){
 			logger.warn(String.format("The courseControl of drug “%s” is not match COURSE_OF_TREATMENT_REGEX", chuFangDrug.getDrugCombinationName()));
 			return chuFangCheckRecord;

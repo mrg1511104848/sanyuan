@@ -157,4 +157,15 @@
       commodity_name = #{commodityName,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
+  
+  <select id="findByCondition" parameterType="org.beiyi.entity.db.InstructionContraindication" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from instruction_contraindication
+    where common_name = #{commonName,jdbcType=VARCHAR} and
+      commodity_name = #{commodityName,jdbcType=VARCHAR}
+      <if test="instructionId != null">
+       or instruction_id = #{instructionId,jdbcType=VARCHAR}
+      </if>
+  </select>
 </mapper>

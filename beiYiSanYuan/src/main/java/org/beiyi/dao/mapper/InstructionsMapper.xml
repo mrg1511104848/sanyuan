@@ -307,5 +307,6 @@
       <if test="companyName != null">
        and company_name = #{companyName,jdbcType=VARCHAR}
       </if>
+      limit 1
   </select>
 </mapper>
