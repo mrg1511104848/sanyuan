@@ -1,5 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<head>
+	<meta charset="utf-8">
+</head>
 <div class="row">
 	<div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
 		<h1 class="page-title  txt-color-blueDark">
@@ -36,6 +37,7 @@
 </div>
 </section>
 <div id="remoteModal" style="display: none;"></div>
+<div id="dialog_edit" title="编辑文章" style=""></div>
 <div id="divDialog"></div>
 <script type="text/javascript" src="/resources/js/pending-recipe-common.js"></script>
 <script type="text/javascript">
@@ -56,7 +58,7 @@
 			"bPaginate" : true,
 			"bProcessing" : false,
 			"bServerSide" : true,
-			"sAjaxSource" : "/alreadyRecipe/getPagedList.html",
+			"sAjaxSource" : "/beiYiSanYuan/prescription/getPrescriptionPagedList.htm",
 			"fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
 					oSettings.jqXHR = $.ajax( {
 						"dataType" : 'json',
@@ -75,64 +77,22 @@
 			
 			"aoColumns" : [ {
                 "sTitle": "操作", "sClass": "center", "data" : function (row,type,set) {
-                    var deleteBtn = "<button  onclick=\"app_edit.getMessageInfo('"+row.recipeId+"');\" title=\"查看消息\" class=\"btn btn-xs btn-default\">查看消息</button>&nbsp;";
-                    return deleteBtn;
+                    var showResultBtn = "<button  onclick=\"showResult('"+row.id+"');\" title=\"查看结果\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
+                    var showDetailBtn = "<button  onclick=\"showDetail('"+row.id+"');\" title=\"查看处方详细\" class=\"btn btn-xs btn-default\">查看处方详细</button>&nbsp;";
+                    return showResultBtn+showDetailBtn;
                 }
             },{
                 "sTitle": "姓名", "sClass": "center", "data" : function(row,type,set){
-                    var nameBtn = "<button  onclick=\"app_edit.getPatientInfo('"+row.patientId+"');\" title=\"姓名\" class=\"btn btn-xs btn-default\">"+row.name+"</button>&nbsp;";
+                    var nameBtn = "<button  onclick=\"app_edit.getPatientInfo('"+row.patientId+"');\" title=\"姓名\" class=\"btn btn-xs btn-default\">"+row.patientName+"</button>&nbsp;";
                     return nameBtn;
                 }
             },{
                 "sTitle": "处方号", "sClass": "center", "data" : function(row,type,set){
-                    return genHtmlByObject(row.recipeId);
+                    return genHtmlByObject(row.prescriptionNo);
                 }
             },{
                 "sTitle": "科别", "sClass": "center", "data" : function(row,type,set){
-
                     return genHtmlByObject(row.category);
-                }
-            },{
-                "sTitle": "药品名称", "sClass": "center", "data" : function(row,type,set){
-                    if(row.drugNameState=="1"){
-
-                    }
-                    return genHtmlByObject(row.drugName);
-                }
-            },{
-                "sTitle": "单剂量", "sClass": "center", "data" : function(row,type,set){
-                    if(row.singleDoseState=="1"){
-
-                    }
-                    return genHtmlByObject(row.singleDose);
-                }
-            },{
-                "sTitle": "频次", "sClass": "center", "data" : function(row,type,set){
-                    if(row.frequencyDoseState=="1"){
-
-                    }
-
-                    return genHtmlByObject(row.frequency);
-                }
-            },{
-                "sTitle": "途径", "sClass": "center", "data" : function(row,type,set){
-                    if(row.channelDoseState=="1"){
-
-                    }
-                    return genHtmlByObject(row.channel);
-                }
-            },{
-                "sTitle": "数量", "sClass": "center", "data" : function(row,type,set){
-                    if(row.amountDoseState=="1"){
-
-                    }
-
-                    return genHtmlByObject(row.amount);
-                }
-            },{
-                "sTitle": "单位", "sClass": "center", "data" : function(row,type,set){
-
-                    return genHtmlByObject(row.unit);
                 }
             }
             ],
@@ -147,11 +107,6 @@
 		var s_appname_btn = '<input type="text" name="l_name" class="form-control ng-valid ng-dirty margin_R5" placeholder="应用名">';
 		var s_submit_btn = '<a class="btn btn-default" id="app_search" onclick="app_search()" >查询 </a>';
 		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_appname_btn)).append($(s_submit_btn));
-
-
-		//var add_btn = '<a class="btn btn-primary margin_L5" name="toAdd" id="weiboApp" style="float:right;" onclick="openDialog()" href="javascript:void(0);">添加应用</a>';
-		//$("#tbAppTable_wrapper .dt-toolbar div:eq(1)").append($(add_btn));
-		
 	}
 	var pagefunction=function(){
 		InitAppList();
@@ -163,6 +118,36 @@
 		url = addQueryParams(url,params);
 		app_edit.oTable.fnSettings().sAjaxSource=url;
 		app_edit.oTable.fnDraw(); //重新加载数据
+	}
+	function showResult(id)
+	{
+		$("#dialog_edit").load("/beiYiSanYuan/prescription/prescriptionDetail.htm?id="+id,function(){
+			var dialog = window.top.art.dialog({
+					title: "详情",
+					content: $("#dialog_edit").html(),
+					width:"850px",
+					padding: '0px 0px',
+					lock:true
+			});
+			$(".aui_content").css("width","100%");
+		});
+		//$('#dialog_edit').dialog("open");
+		//return false;
+	}
+	function showDetail(id)
+	{
+		$("#dialog_edit").load("/beiYiSanYuan/prescription/prescriptionDetail.htm?id="+id,function(){
+			var dialog = window.top.art.dialog({
+					title: "详情",
+					content: $("#dialog_edit").html(),
+					width:"850px",
+					padding: '0px 0px',
+					lock:true
+			});
+			$(".aui_content").css("width","100%");
+		});
+		//$('#dialog_edit').dialog("open");
+		//return false;
 	}
 	function changeAppState(ele,id,state){
 		$.ajax({

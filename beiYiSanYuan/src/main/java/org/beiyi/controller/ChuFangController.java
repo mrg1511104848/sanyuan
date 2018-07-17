@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.beiyi.entity.ChuFang;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.service.db.itr.IPrescriptionService;
 import org.beiyi.service.verify.DrugVerifyService;
 import org.beiyi.service.verify.impl.ContraindicationVerifyService;
 import org.beiyi.service.verify.impl.CourseOfTreatmentVerifyService;
@@ -37,6 +38,7 @@ import org.beiyi.util.ZipUtils;
 import org.skynet.frame.util.excel.ExcelBean;
 import org.skynet.frame.util.excel.ExcelReadUtil;
 import org.skynet.frame.util.excel.ExcelUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +50,33 @@ import org.springframework.web.servlet.ModelAndView;
 public class ChuFangController {
 	/*@Autowired
 	MongoTemplate testMongoTemplate;*/
+	
+	@Autowired
+	IPrescriptionService prescriptionService;
+	
+	
+	@Autowired
+	DrugNotExistsVerifyService drugNotExistsVerifyService;
+	@Autowired
+	ShiYingZhengVerifyService shiYingZhengVerifyService;
+	@Autowired
+	RepeatedPrescriptionsService repeatedPrescriptionsService;
+//	@Autowired
+//	DrugEffectVerifyService drugEffectVerifyService;
+	@Autowired
+	SexVerifyService sexVerifyService;
+	@Autowired
+	ContraindicationVerifyService contraindicationVerifyService;
+	@Autowired
+	DosageMaxLimitVerifyService dosageMaxLimitVerifyService;
+	@Autowired
+	DosageVerifyService dosageVerifyService;
+	@Autowired
+	CourseOfTreatmentVerifyService courseOfTreatmentVerifyService;
+	@Autowired
+	UsageVerifyService usageVerifyService;
+	@Autowired
+	DDDSVerifyService dddsVerifyService;
 
 	/**
 	 * 1.根据提供的关键词和药品名称，到两周处方中查找对应的疾病的功能
@@ -97,6 +126,11 @@ public class ChuFangController {
 				DiskFileItem fi = (DiskFileItem)file.getFileItem(); 
 				List<List<String>> records = ExcelReadUtil.getRecords(fi.getInputStream());
 				List<org.beiyi.entity.verify.ChuFang> chuFangList = VerifyUtil.read2ChuFangList(records);
+				
+				for (org.beiyi.entity.verify.ChuFang cf : chuFangList) {
+					prescriptionService.save(cf);
+				}
+				
 				List<String> titles = records.get(0);
 				String[] exportZipFilePathInfo = verify(request,titles,chuFangList);
 				
@@ -142,17 +176,17 @@ public class ChuFangController {
 	private String[] verify(HttpServletRequest request,List<String> titles,List<org.beiyi.entity.verify.ChuFang> chuFangList) throws RuntimeException, Exception{
 		DrugVerifyService drugVerifyService = new DrugVerifyService();
 		List<IDrugVeryfy> drugVerifyServices = new ArrayList<IDrugVeryfy>();
-		drugVerifyServices.add(new DrugNotExistsVerifyService());
-		drugVerifyServices.add(new RepeatedPrescriptionsService());
-		drugVerifyServices.add(new DrugEffectVerifyService());
-		drugVerifyServices.add(new SexVerifyService());
-		drugVerifyServices.add(new DDDSVerifyService());
-		drugVerifyServices.add(new ShiYingZhengVerifyService());
-		drugVerifyServices.add(new ContraindicationVerifyService());
-		drugVerifyServices.add(new DosageMaxLimitVerifyService());
-		drugVerifyServices.add(new DosageVerifyService());
-		drugVerifyServices.add(new CourseOfTreatmentVerifyService());
-		drugVerifyServices.add(new UsageVerifyService());
+		drugVerifyServices.add(drugNotExistsVerifyService);
+		drugVerifyServices.add(repeatedPrescriptionsService);
+//		drugVerifyServices.add(new DrugEffectVerifyService());
+		drugVerifyServices.add(sexVerifyService);
+		drugVerifyServices.add(dddsVerifyService);
+		drugVerifyServices.add(shiYingZhengVerifyService);
+		drugVerifyServices.add(contraindicationVerifyService);
+		drugVerifyServices.add(dosageMaxLimitVerifyService);
+		drugVerifyServices.add(dosageVerifyService);
+		drugVerifyServices.add(courseOfTreatmentVerifyService);
+		drugVerifyServices.add(usageVerifyService);
 		
 		for (IDrugVeryfy iDrugVeryfy : drugVerifyServices) {
 			drugVerifyService.registerDrugVerify(iDrugVeryfy);
@@ -166,6 +200,8 @@ public class ChuFangController {
 		for (org.beiyi.entity.verify.ChuFang chuFang : chuFangList) {
 			VerifyResult result = drugVerifyService.notifyObserver(chuFang);
 			String text = result.getResultMsg();
+			prescriptionService.updateResult(result, chuFang);
+			
 			for (List<String> list : chuFang.getChuFangOldRows()) {
 				List<String> subValues = new ArrayList<String>();
 				subValues.addAll(list);
