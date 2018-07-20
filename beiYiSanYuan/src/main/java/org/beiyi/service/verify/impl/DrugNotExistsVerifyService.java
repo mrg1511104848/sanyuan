@@ -40,7 +40,7 @@ public class DrugNotExistsVerifyService implements IDrugVeryfy {
 		}
 		for (Drug drug : notExistsDrugs) {
 			errMsgBuffer.append(String.format("药品“%s” 不存在；", drug.getDrugCombinationName()));
-			VerifyUtil.addErrorDrugToVerifyResult(verifyResult, drug, VerifyTypeEnums.NO_DRUG);
+			VerifyUtil.addErrorDrugToVerifyResult(verifyResult, drug, VerifyTypeEnums.NO_DRUG,"药品不存在");
 		}
 		VerifyUtil.packVerifyResultFinal(verifyResult, errMsgBuffer);
 		return verifyResult;

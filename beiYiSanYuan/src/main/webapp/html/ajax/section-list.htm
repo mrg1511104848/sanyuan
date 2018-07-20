@@ -4,8 +4,8 @@
 <div class="row">
 	<div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
 		<h1 class="page-title  txt-color-blueDark">
-			<i class="fa fa-table fa-fw "></i> 审单系统
-			<span>> 已审处方</span>
+			<i class="fa fa-table fa-fw "></i> 权限管理
+			<span>> 科室管理</span>
 		</h1>
 	</div>
 	<div class="col-xs-12 col-sm-5 col-md-5 col-lg-8" style="text-align:right;">
@@ -19,7 +19,7 @@
 		<header>
 		<span class="widget-icon"> <i class="fa fa-table"></i> </span>
 		<h2>
-			已审列表
+			科室管理
 		</h2>
 		</header>
 		<!-- widget div-->
@@ -64,11 +64,11 @@
 						<table id="prescription_drugs_detail_dialog_table" class="prescription_drugs_detail_dialog_table table table-striped table-bordered table-hover" width="100%">
 							<thead>
 								<tr>
-     								<th> 药品名</th>
-     								<th> 剂型</th>
-     								<th> 规格</th>
-     								<th> 包装</th>
-									<!-- <th> 操作</th> -->
+									<th> 操作</th>
+     								<th> 名称</th>
+     								<th> 类型</th>
+     								<th> 描述</th>
+									
 								</tr>
 							</thead>
 						</table>
@@ -156,6 +156,7 @@
 <div id="remoteModal" style="display: none;"></div>
 <div id="mechine_list_proccessed_edit_" title="编辑文章"  style="display: none;"></div>
 <div id="divDialog"></div>
+<div id="rule_dialog_div" class="row" style="display:none;"></div>
 <script type="text/javascript" src="/beiYiSanYuan/resources/js/pending-recipe-common.js"></script>
 <script type="text/javascript">
 	pageSetUp();
@@ -175,7 +176,7 @@
 			"bPaginate" : true,
 			"bProcessing" : false,
 			"bServerSide" : true,
-			"sAjaxSource" : "/beiYiSanYuan/prescription/getPrescriptionPagedList.htm",
+			"sAjaxSource" : "/beiYiSanYuan/section/getSectionPageList.htm",
 			"fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
 					oSettings.jqXHR = $.ajax( {
 						"dataType" : 'json',
@@ -194,23 +195,22 @@
 			
 			"aoColumns" : [ {
                 "sTitle": "操作", "sClass": "center", "data" : function (row,type,set) {
-                    var showResultBtn = "<button  onclick=\"showResult('"+row.id+"');\" title=\"查看结果\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
-                    var showResultBtn2 = "<button  onclick=\"showResult2('"+row.prescriptionNo+"');\" title=\"查看结果2\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
-                    var showDetailBtn = "<button  onclick=\"showDetail('"+row.id+"');\" title=\"查看处方详细\" class=\"btn btn-xs btn-default\">查看处方详细</button>&nbsp;";
-                    return showResultBtn+showResultBtn2+showDetailBtn;
+                    var deleteBtn = "<button  onclick=\"delete('"+row.id+"');\" title=\"删除\" class=\"btn btn-xs btn-default\">删除</button>&nbsp;";
+                    var editBtn = "<button  onclick=\"edit('"+row.id+"');\" title=\"编辑\" class=\"btn btn-xs btn-default\">编辑</button>&nbsp;";
+                    return editBtn+deleteBtn;
                 }
             },{
-                "sTitle": "姓名", "sClass": "center", "data" : function(row,type,set){
-                    var nameBtn = "<button  onclick=\"app_edit.getPatientInfo('"+row.patientId+"');\" title=\"姓名\" class=\"btn btn-xs btn-default\">"+row.patientName+"</button>&nbsp;";
+                "sTitle": "名称", "sClass": "center", "data" : function(row,type,set){
+                    var nameBtn = row.name;
                     return nameBtn;
                 }
             },{
-                "sTitle": "处方号", "sClass": "center", "data" : function(row,type,set){
-                    return genHtmlByObject(row.prescriptionNo);
+                "sTitle": "类型", "sClass": "center", "data" : function(row,type,set){
+                    return genHtmlByObject(row.type);
                 }
             },{
-                "sTitle": "科别", "sClass": "center", "data" : function(row,type,set){
-                    return genHtmlByObject(row.category);
+                "sTitle": "描述", "sClass": "center", "data" : function(row,type,set){
+                    return genHtmlByObject(row.desc);
                 }
             }
             ],
@@ -224,7 +224,8 @@
 		$("#tbAppTable_wrapper .dt-toolbar").addClass("padding_B5");
 		var s_appname_btn = '<input type="text" name="l_name" class="form-control ng-valid ng-dirty margin_R5" placeholder="应用名">';
 		var s_submit_btn = '<a class="btn btn-default" id="app_search" onclick="app_search()" >查询 </a>';
-		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_appname_btn)).append($(s_submit_btn));
+		var s_add_btn = '<a class="btn btn-default" id="app_add" onclick="app_add(-1)" >新增 </a>';
+		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_appname_btn)).append($(s_submit_btn)).append('&nbsp;').append($(s_add_btn));
 	}
 	var pagefunction=function(){
 		InitAppList();
@@ -236,6 +237,108 @@
 		url = addQueryParams(url,params);
 		app_edit.oTable.fnSettings().sAjaxSource=url;
 		app_edit.oTable.fnDraw(); //重新加载数据
+	}
+	function app_add(t){
+		var txtName="";
+		var id="";
+		/* if(t==1)
+		{
+			if($("#ul_group .active").size()>0)
+			{
+				txtName=$("#ul_group .active").find("a").text();
+				id=$("#ul_group .active").find("a").attr("site_id");
+			}else
+			{
+				art.dialog.tips('请选择至少一个任务编辑!',1);
+				return;
+			}
+		} */
+		var d=art.dialog({
+			title:t==-1?"新增":"编辑",
+		    content: '<div id="divAddGroup"><form id="frmGroup" class="smart-form">'+
+		    	'<section><label class="label">名称：</label><label class="input">'+
+		    	'<input type="text" id="txtName" name="name"/></label>'+
+		    	'<input type="hidden" name="id" id="txtId" value="'+id+'">'+
+		    	
+		    	'<section><label class="label">类型：</label><label class="input">'+
+		    	'<input type="text" id="txtName" name="type"/></label>'+
+		    	'<section><label class="label">描述：</label><label class="input">'+
+		    	'<input type="text" id="txtName" name="desc"/></label>'+
+		    	'</section></form></div>',
+	    	lock:true,
+		    button:[{
+		    	name:"保存",
+		    	callback:function(){
+		    		if($("#txtName").val()!="")
+		    		{
+		    			var requestUrl="/beiYiSanYuan/section/save.htm";
+			    		$.ajax({
+							type: "post",
+						    url: requestUrl,
+						    data: $("#frmGroup").serialize(),
+						    success: function(data){
+						    	d.close();
+						    	if(data.success){
+						    		art.dialog.tips('保存成功!');
+						    	}else{
+						    		art.dialog.tips('保存失败!');
+						    	}
+						    	//getAllGroupList();
+				        	}
+						});
+		    		}else
+		    		{
+		    			art.dialog.tips('名称不能为空!');
+		    		}
+					return false;
+		    	}
+		    },{
+		    	name:"取消",
+		    	callback:function(){
+		    	}
+		    }],
+		    init: function () {
+		    	changeArtdialogButtonCss();
+		    }
+		});
+	}
+	function loadEditRuleDialog(){
+		var left = 541/2+"px";
+		var top = 570/2+"px";
+		var screen_width = $(document).width();
+		$(".fatch_processing").css({"position":"absolute","top":top,"left":left});
+		var dialog = art.dialog({
+			id:"rule_dialog",
+		    title: '欢迎',
+		    width: screen_width,    // 内容宽度
+			height: 'auto',     // 内容高度
+		    content: $("#rule_dialog_div").html(),
+		    follow: document.getElementById('btn2'),
+		    padding: '0px 0px',
+		    lock:true,
+		    button:[{
+		    	name:"<i class='fa  fa-play'></i>&nbsp; 保存",
+		    	callback:function(){
+		    		//saveFatchListToDBRightNow();
+		    		//art.dialog.tips('入库成功!');
+		    		return false;
+		    	}
+		    },{
+		    	name:'取消',
+		    	callback:function(){
+					/* var rId = saveNewRule();
+					$(".aui_buttons button:eq(2)").show();
+					if(rId){
+						art.dialog.tips('保存成功!');
+					} */
+					return false;
+		    	}
+		    }],
+		    init: function () {
+		    	changeArtdialogButtonCss();
+		    }
+		});
+		$(".aui_content").css("width","100%");
 	}
 	var prescription_drugs_detail_dialog_table = null;
 	var prescription_result_dialog_table = null;

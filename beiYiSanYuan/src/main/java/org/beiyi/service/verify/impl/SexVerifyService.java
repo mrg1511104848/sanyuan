@@ -51,14 +51,14 @@ public class SexVerifyService implements IDrugVeryfy {
 				errMsgBuffer.append(String.format("药品 “%s” 性别未审核，处方中该药品性别为空；", drugCombinationName));
 				
 				VerifyUtil.addErrorDrugToVerifyResult(verifyResult,
-						chuFangDrug, VerifyTypeEnums.SEX_INVALID);
+						chuFangDrug, VerifyTypeEnums.SEX_INVALID,"性别未审核，处方中该药品性别为空；");
 				continue;
 			}
 			if(!canUsedForSex){
 				errMsgBuffer.append(String.format("药品 “%s” 不适用于患者的性别；", drugCombinationName));
 				
 				VerifyUtil.addErrorDrugToVerifyResult(verifyResult,
-						chuFangDrug, VerifyTypeEnums.SEX_INVALID);
+						chuFangDrug, VerifyTypeEnums.SEX_INVALID,"不适用于患者的性别；");
 				continue;
 			}
 		}

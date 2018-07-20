@@ -125,7 +125,7 @@ public class DosageVerifyService implements IDrugVeryfy {
 			if(dosageErrors.size()>0){
 				String errorMsg = appendDosageErrors(chuFangDrug,dosageErrors);
 				errMsgBuffer.append(errorMsg);
-				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSAGE);
+				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSAGE,errorMsg);
 			}else{
 				VerifyUtil.addSuccessDrugToVerifyResult(verifyResult, chuFangDrug);
 			}

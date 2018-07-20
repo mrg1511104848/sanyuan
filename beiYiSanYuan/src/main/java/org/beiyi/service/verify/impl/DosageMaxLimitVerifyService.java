@@ -113,11 +113,12 @@ public class DosageMaxLimitVerifyService implements IDrugVeryfy {
 						.getDosage();
 				String insDosageUnit = chuFangCheckRecord.getInstructionUse()
 						.getDosageUnit();
-				errMsgBuffer.append(String.format(
+				String errorMsg = String.format(
 						"药品 “%s” 剂量为 “%s%s” ，超出【%s】 “%s%s”",
 						cfDrugCombinationName, cfDosage, cfDosageUnit,
-						doseSelection, insDosage, insDosageUnit));
-				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT);
+						doseSelection, insDosage, insDosageUnit);
+				errMsgBuffer.append(errorMsg);
+				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSAGE_GT_DAY_LIMIT,errorMsg);
 			} else {
 				VerifyUtil.addSuccessDrugToVerifyResult(verifyResult,
 						chuFangDrug);

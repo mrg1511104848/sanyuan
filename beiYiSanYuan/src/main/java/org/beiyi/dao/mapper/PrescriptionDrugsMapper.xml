@@ -26,7 +26,7 @@
   <select id="getPagedList" parameterType="org.beiyi.entity.db.PrescriptionDrugs"  resultMap="BaseResultMap">
     select 
    	*
-    from prescription_drugs
+    from prescription_drugs where prescription_verify_record_id = #{prescriptionVerifyRecordId,jdbcType=VARCHAR}
   </select>
   <insert id="insert" parameterType="org.beiyi.entity.db.PrescriptionDrugs">
     <!--

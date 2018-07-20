@@ -9,6 +9,10 @@ public class DrugVerifyInfo{
 	 * 药品校验结果的类型
 	 */
 	private int verifyResultType;
+	/**
+	 * 错误的消息
+	 */
+	private String errMessage;
 
 	
 	public DrugVerifyInfo() {
@@ -42,11 +46,22 @@ public class DrugVerifyInfo{
 		this.drug = drug;
 	}
 
+	public String getErrMessage() {
+		return errMessage;
+	}
+
+	public void setErrMessage(String errMessage) {
+		this.errMessage = errMessage;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((drug == null) ? 0 : drug.hashCode());
+		result = prime * result
+				+ ((errMessage == null) ? 0 : errMessage.hashCode());
+		result = prime * result + verifyResultType;
 		return result;
 	}
 
@@ -64,7 +79,13 @@ public class DrugVerifyInfo{
 				return false;
 		} else if (!drug.equals(other.drug))
 			return false;
+		if (errMessage == null) {
+			if (other.errMessage != null)
+				return false;
+		} else if (!errMessage.equals(other.errMessage))
+			return false;
+		if (verifyResultType != other.verifyResultType)
+			return false;
 		return true;
 	}
-	
 }

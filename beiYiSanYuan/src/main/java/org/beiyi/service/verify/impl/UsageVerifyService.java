@@ -36,9 +36,9 @@ public class UsageVerifyService implements IDrugVeryfy {
 		VerifyResult verifyResult = new VerifyResult();
 		StringBuffer errMsgBuffer = new StringBuffer();
 		List<Drug> chuFangDrugVerifingList = chuFang.getDrugs();// 需要遍历处方中的药品，挨个进行用法审核
-		Set<String> suggestUseageSet = new HashSet<String>(); //建议的药品用法，从说明书中提取。
 		
 		for (Drug chuFangDrug : chuFangDrugVerifingList) {
+			Set<String> suggestUseageSet = new HashSet<String>(); //建议的药品用法，从说明书中提取。
 			boolean chuFangDrugRouteOfMedicationIsValid = false;
 			
 			String chuFangRouteOfMedication = chuFangDrug.getRouteOfMedication();
@@ -47,6 +47,7 @@ public class UsageVerifyService implements IDrugVeryfy {
 				errMsgBuffer.append(String.format("%s【药品】 %s 用法不适宜，具体原因为 ： %s",ExcelUtil.NEW_LINE, chuFangDrug.getDrugCombinationName(),errorMsg));
 				
 				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,VerifyTypeEnums.INVALID_USAGE);
+				drugVerifyInfo.setErrMessage("用法不适宜,药品在处方中缺失用法项。");
 				verifyResult.getErrorDrugs().add(drugVerifyInfo);
 				
 				continue;
@@ -57,7 +58,9 @@ public class UsageVerifyService implements IDrugVeryfy {
 			/*// 获取整理好的说明书的药品
 			Instruction instruction = InstructionsReadUtil.get(chuFangDrug.getDrugCombinationName());
 			List<InstructionUse> instructionUses = instruction.getInstructionUses();*/
-			
+			if(chuFangDrug.getDrugCombinationName().contains("海捷亚")){
+				System.out.println();
+			}
 			List<IndicationTherapeuticRegimen> instructionUses = commonSearchService.getIndicationTherapeuticRegimens(chuFangDrug.getDrugCombinationName(), chuFang.getDiagnosises());
 			// 遍历 整理好的说明书 - 药品使用相关信息
 			for (IndicationTherapeuticRegimen instructionUse : instructionUses) {
@@ -77,11 +80,20 @@ public class UsageVerifyService implements IDrugVeryfy {
 			if(containsInVerifyResultErrorDrugs){
 				continue;
 			}
-			if(!chuFangDrugRouteOfMedicationIsValid){
+			if(instructionUses == null || instructionUses.size() == 0){
+				String errorMsg = " 用法未审核";
+				errMsgBuffer.append(String.format("%s【药品】 %s ",ExcelUtil.NEW_LINE, chuFangDrug.getDrugCombinationName(),errorMsg));
+				
+				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,VerifyTypeEnums.INVALID_USAGE);
+				drugVerifyInfo.setErrMessage(errorMsg);
+				verifyResult.getErrorDrugs().add(drugVerifyInfo);
+			}else if(!chuFangDrugRouteOfMedicationIsValid){
+				
 				String errorMsg = String.format(" 用法不适宜 处方中用法 “%s” ，推荐用法“%s”！", chuFangRouteOfMedication,suggestUseageSet);
 				errMsgBuffer.append(String.format("%s【药品】 %s 用法不适宜，具体原因为 ： %s",ExcelUtil.NEW_LINE, chuFangDrug.getDrugCombinationName(),errorMsg));
 				
 				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,VerifyTypeEnums.INVALID_USAGE);
+				drugVerifyInfo.setErrMessage(errorMsg);
 				verifyResult.getErrorDrugs().add(drugVerifyInfo);
 			}else{
 				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,VerifyTypeEnums.SUCCESS);

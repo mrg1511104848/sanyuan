@@ -110,9 +110,11 @@ public class ShiYingZhengVerifyService implements IDrugVeryfy{
 			//药品不匹配某些适应症
 			if (!drugMatchShiYingZheng) {
 				chuFangIsValid = false;
+				
 				errorSb.append(String.format("药品不包含此适应症 > [药品名] %s [适应症列表] %s ，", drugCombinationName,shiYingZhengs));
 				
 				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(drug,VerifyTypeEnums.INVALID_INDICATION);
+				drugVerifyInfo.setErrMessage(String.format("不包含此适应症 %s",shiYingZhengs));
 				verifyResult.getErrorDrugs().add(drugVerifyInfo);
 			}else{
 				DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(drug,VerifyTypeEnums.SUCCESS);

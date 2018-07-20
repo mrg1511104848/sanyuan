@@ -108,29 +108,29 @@ public class ContraindicationVerifyService implements IDrugVeryfy {
 			}
 			if (contraindicationEntirelyEqResult != null
 					&& contraindicationEntirelyEqResult.size() > 0) {
-				errMsgBuffer.append("药品 "
-						+ chuFangDrug.getDrugCombinationName() + " ");
+				String errorMsg = "药品 "+ chuFangDrug.getDrugCombinationName() + " ";
 				for (String entirelyEq : contraindicationEntirelyEqResult) {
-					errMsgBuffer.append(String.format("禁用于 “%s” 疾病/特殊人群 ；",
-							entirelyEq));
+					errorMsg += String.format("禁用于 “%s” 疾病/特殊人群 ；",
+							entirelyEq);
 				}
+				errMsgBuffer.append(errorMsg);
 				VerifyUtil.addErrorDrugToVerifyResult(verifyResult,
-						chuFangDrug, VerifyTypeEnums.CONTRAINDICATIONS);
+						chuFangDrug, VerifyTypeEnums.CONTRAINDICATIONS,errorMsg);
 			} else {
 				Set<ContraindicationICD10VerifyResult> contraindicationICD10MatchResult = compareContraindicationICD10Match(
 						instructionContraindications, chuFangAlldiagnosises);
 				if (contraindicationICD10MatchResult != null
 						&& contraindicationICD10MatchResult.size() > 0) {
-					errMsgBuffer.append("药品 "
-							+ chuFangDrug.getDrugCombinationName() + " ");
+					String errorMsg = "药品 "+ chuFangDrug.getDrugCombinationName() + " ";
 					for (ContraindicationICD10VerifyResult iCD10Match : contraindicationICD10MatchResult) {
-						errMsgBuffer.append(String.format(
+						errorMsg += String.format(
 								"禁用于 “%s(ICD10:%s)” 疾病/特殊人群 ；",
 								iCD10Match.getDiseaseName(),
-								iCD10Match.getIcd10Code()));
+								iCD10Match.getIcd10Code());
 					}
+					errMsgBuffer.append(errorMsg);
 					VerifyUtil.addErrorDrugToVerifyResult(verifyResult,
-							chuFangDrug, VerifyTypeEnums.CONTRAINDICATIONS);
+							chuFangDrug, VerifyTypeEnums.CONTRAINDICATIONS,errorMsg);
 				}
 			}
 		}

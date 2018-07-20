@@ -77,7 +77,7 @@ public class DDDSVerifyService implements IDrugVeryfy {
 			if(dddsErrors!=null&&dddsErrors.size()>0){
 				String errorMsg = appendDDDSErrors(chuFangDrug,dddsErrors);
 				errMsgBuffer.append(errorMsg);
-				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSING_FREQUENCY);
+				VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, VerifyTypeEnums.INVALID_DOSING_FREQUENCY,errorMsg);
 			}else{
 				VerifyUtil.addSuccessDrugToVerifyResult(verifyResult, chuFangDrug);
 			}

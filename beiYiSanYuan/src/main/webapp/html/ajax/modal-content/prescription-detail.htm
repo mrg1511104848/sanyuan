@@ -7,7 +7,7 @@
 </style>
 
 <!-- widget grid -->
-<section id="widget-grid-444444" class="">
+<section class="widget-grid-444444">
 
 	<!-- row -->
 	<div class="row">
@@ -30,21 +30,21 @@
 					<!-- widget content -->
 					<div class="widget-body no-padding">
 
-						<table id="pushed_article_list" class="table table-striped table-bordered table-hover" width="100%">
+						<table id="pushed_article_list" class="pushed_article_list table table-striped table-bordered table-hover" width="100%">
 							<thead>
 								<tr>
-     								<th> 标题</th>
-     								<th> 作者</th>
-     								<th> 来源</th>
-     								<th> 发布时间</th>
+     								<th> 药品名</th>
+     								<th> 剂型</th>
+     								<th> 规格</th>
+     								<th> 包装</th>
 									<th> 操作</th>
 								</tr>
 							</thead>
 						</table>
 
 					</div>
-					<div id="dialog_edit" title="编辑文章" style=""></div>
-					<div id="dialog_delete"  title="删除文章" style="text-align:center;"></div>
+					<!-- <div id="dialog_edit" title="编辑文章" style=""></div>
+					<div id="dialog_delete"  title="删除文章" style="text-align:center;"></div> -->
 					<!-- end widget content -->
 
 				</div>
@@ -65,34 +65,48 @@
 
 </section>
 <!-- end widget grid -->
-<script type="text/javascript" src="/resources/js/app-common.js"></script>
+<script type="text/javascript" src="/beiYiSanYuan/resources/js/app-common.js"></script>
 <script type="text/javascript">
-	var pushed_articles_data_table ;
+	var pushed_articles_data_table 
 	// pagefunction	
-	var pagefunction = function() {
+	 var pagefunction = function() {
 		loadDataTable();
-	};
+	}; 
+	/* $(document).ready(function () {
+		 
+	    oTable = initTable();
+	}); */
 	function loadDataTable(){
 		/* BASIC ;*/
-		if(pushed_articles_data_table!=null){
-	        pushed_articles_data_table.fnDestroy();
+		 var $searchResult = $("#pushed_article_list");
+		console.log(pushed_articles_data_table);
+		if(pushed_articles_data_table){
+			//pushed_articles_data_table.fnClearTable(); //清空一下table
+			//pushed_articles_data_table.fnDestroy(); //还原初始化了的datatable
+			//pushed_articles_data_table.fnClearTable();    //清空数据
+			$("#pushed_article_list").dataTable().fnDestroy();         //销毁datatable
+			//pushed_articles_data_table = null;
+			//datatable.fnDraw(true);
 		}
+		console.log(pushed_articles_data_table); 
 		pushed_articles_data_table = $("#pushed_article_list").dataTable({
 			"bProcessing" : true,//加载数据时候是否显示进度条
 			"bServerSide" : true,//是否从服务加载数据 
 			"bSort":false,
-			"sAjaxSource" : "/distribution-record/getPushedArticleAll?eq_id=${distributionRecordId}",//如果从服务器端加载数据,这个属性用于指定加载的路径
+			"iDisplayLength" : 10,// 每页显示行数
+			"sAjaxSource" : "/beiYiSanYuan/prescription/getPrescriptionDrugsList.htm?id=${prescriptionVerifyRecordId}",
 			"columns": [//数据列
 	            {"sWidth":'40%',"data": function ( row, type, set ){
-	            	var s_title = cut_str(row.title, 30,"...");
-		            return "<a href='"+row.url+"' target=_blank title='"+row.title+"'>"+s_title+"</a>";
+	            	/* var s_title = cut_str(row.drugName, 30,"...");
+		            return s_title; */
+		            return '';
 	            }},
 	            {"sWidth":'10%',"data": function ( row, type, set ){
-		            return row.author;
+		            return row.form;
 	            }},{"sWidth":'15%',"data": function ( row, type, set ){
-		            return row.source;
+		            return row.standard;
 	            }},{"sWidth":'50px',"data": function ( row, type, set ){
-		            return row.time;
+		            return row.pack;
 	            }},
 	             {
 	             	"sWidth":'10px',
@@ -100,13 +114,36 @@
 		            "sClass": "center",
 		             "bSortable": false,
 		            "data": function ( row, type, set ){
-		            	var delBtn ="<button  onclick=\"confirm('操作确认','<div style=padding:10px><font color=red>确定要删除吗(一旦删除，数据将无法恢复!)</font></div>',deleteRecord,'','"+row.id+"');\" title=\"删除\" class=\"btn btn-xs btn-default\"><i class=\"fa fa-times\"></i></button>"; 
-				        return delBtn; 
+		            	/* var delBtn ="<button  onclick=\"confirm('操作确认','<div style=padding:10px><font color=red>确定要删除吗(一旦删除，数据将无法恢复!)</font></div>',deleteRecord,'','"+row.id+"');\" title=\"删除\" class=\"btn btn-xs btn-default\"><i class=\"fa fa-times\"></i></button>"; 
+				        return delBtn;  */
+				        return '';
 			        } 
 	        	}
 			],
-			"oLanguage" : common_data_table_config.oLanguage,
+			//"oLanguage" : common_data_table_config.oLanguage,
+			 "oLanguage" : {//语言设置 
+                "sProcessing" : "处理中...", 
+                "sLengthMenu" : "显示 _MENU_ 项结果", 
+                "sZeroRecords" : "没有匹配结果", 
+                "sInfo" : "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项", 
+                "sInfoEmpty" : "显示第 0 至 0 项结果，共 0 项", 
+                "sInfoFiltered" : "(由 _MAX_ 项结果过滤)", 
+                "sInfoPostFix" : "", 
+                "sSearch" : "搜索:", 
+                "sUrl" : "", 
+                "sEmptyTable" : "表中数据为空", 
+                "sLoadingRecords" : "载入中...", 
+                "sInfoThousands" : ",", 
+                "oPaginate" : { 
+                  "sFirst" : "首页", 
+                  "sPrevious" : "上页", 
+                  "sNext" : "下页", 
+                  "sLast" : "末页"
+            	}
+			}, 
 			"fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
+				console.log(1111);
+				console.log(iTotal);
    	 			return  "总共<span class='text-primary'>"+iTotal+"</span>条 ,"+
    	 				"当前"+(iTotal==0?"无记录":"(<span class='txt-color-darken'>"+iStart+" </span>到 <span class='txt-color-darken'>"+iEnd+"</span>)&nbsp;&nbsp;");
   			},
@@ -115,6 +152,10 @@
 		    },
 		    "sDom": "<'dt-toolbar'<'col-xs-12 tools-bar'><'col-xs-4'C>r>"+"t"+"<'dt-toolbar-footer'<'col-xs-6'il><'col-xs-6'p>>",
 			"fnInitComplete": function(oSettings, json) {
+				//pushed_articles_data_table.fnDraw(); //重新加载数据
+				console.log('fnInitComplete');
+				//console.log(json);
+				
 				$("#pushed_article_list_wrapper .dt-toolbar").remove();
 		     }
 	    });
@@ -141,17 +182,17 @@
 	}
 	// load related plugins
 	loadScript(
-		"/resources/js/plugin/datatables/jquery.dataTables.min.js",
+		"/beiYiSanYuan/resources/js/plugin/datatables/jquery.dataTables.min.js",
 		function() {
 			loadScript(
-					"/resources/js/plugin/datatables/dataTables.colVis.min.js",
+					"/beiYiSanYuan/resources/js/plugin/datatables/dataTables.colVis.min.js",
 					function() {
 						loadScript(
-								"/resources/js/plugin/datatables/dataTables.tableTools.min.js",
+								"/beiYiSanYuan/resources/js/plugin/datatables/dataTables.tableTools.min.js",
 								function() {
 									loadScript(
-											"/resources/js/plugin/datatables/dataTables.bootstrap.min.js",
-											function(){loadScript("/resources/js/plugin/superbox/superbox.js",pagefunction);}
+											"/beiYiSanYuan/resources/js/plugin/datatables/dataTables.bootstrap.min.js",
+											function(){loadScript("/beiYiSanYuan/resources/js/plugin/superbox/superbox.js",pagefunction);}
 											);
 								});
 					});

@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.beiyi.entity.ChuFang;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.PrescriptionVerifyRecordDetail;
+import org.beiyi.entity.verify.DrugVerifyInfo;
 import org.beiyi.service.db.itr.IPrescriptionService;
 import org.beiyi.service.verify.DrugVerifyService;
 import org.beiyi.service.verify.impl.ContraindicationVerifyService;
@@ -25,14 +27,12 @@ import org.beiyi.service.verify.impl.CourseOfTreatmentVerifyService;
 import org.beiyi.service.verify.impl.DDDSVerifyService;
 import org.beiyi.service.verify.impl.DosageMaxLimitVerifyService;
 import org.beiyi.service.verify.impl.DosageVerifyService;
-import org.beiyi.service.verify.impl.DrugEffectVerifyService;
 import org.beiyi.service.verify.impl.DrugNotExistsVerifyService;
 import org.beiyi.service.verify.impl.RepeatedPrescriptionsService;
 import org.beiyi.service.verify.impl.SexVerifyService;
 import org.beiyi.service.verify.impl.ShiYingZhengVerifyService;
 import org.beiyi.service.verify.impl.UsageVerifyService;
 import org.beiyi.service.verify.itr.IDrugVeryfy;
-import org.beiyi.util.PrescriptionReadUtil;
 import org.beiyi.util.VerifyUtil;
 import org.beiyi.util.ZipUtils;
 import org.skynet.frame.util.excel.ExcelBean;
@@ -200,6 +200,14 @@ public class ChuFangController {
 		for (org.beiyi.entity.verify.ChuFang chuFang : chuFangList) {
 			VerifyResult result = drugVerifyService.notifyObserver(chuFang);
 			String text = result.getResultMsg();
+			List<DrugVerifyInfo> errorDrugs = result.getErrorDrugs();
+			for (DrugVerifyInfo errDrug : errorDrugs) {
+				PrescriptionVerifyRecordDetail prescriptionVerifyRecordDetail = new PrescriptionVerifyRecordDetail();
+				prescriptionVerifyRecordDetail.setPrescriptionNo(chuFang.getChuFangNo());
+				prescriptionVerifyRecordDetail.setErrorDesc(errDrug.getErrMessage());
+				prescriptionVerifyRecordDetail.setDrugName(errDrug.getDrug().getDrugCombinationName());
+				prescriptionService.savePrescriptionVerifyRecordDetail(prescriptionVerifyRecordDetail);
+			}
 			prescriptionService.updateResult(result, chuFang);
 			
 			for (List<String> list : chuFang.getChuFangOldRows()) {

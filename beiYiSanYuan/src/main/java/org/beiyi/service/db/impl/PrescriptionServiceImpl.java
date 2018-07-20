@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.beiyi.dao.PrescriptionDrugsMapper;
+import org.beiyi.dao.PrescriptionVerifyRecordDetailMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordMapper;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.db.PrescriptionDrugs;
 import org.beiyi.entity.db.PrescriptionVerifyRecord;
+import org.beiyi.entity.db.PrescriptionVerifyRecordDetail;
 import org.beiyi.entity.db.pageBean.Prescription;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.Drug;
@@ -23,6 +25,8 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 	PrescriptionVerifyRecordMapper prescriptionVerifyRecordMapper;
 	@Autowired
 	PrescriptionDrugsMapper prescriptionDrugsMapper;
+	@Autowired
+	PrescriptionVerifyRecordDetailMapper prescriptionVerifyRecordDetailMapper;
 	@Override
 	public void save(ChuFang chuFang) {
 		List<String> diagnosises = chuFang.getDiagnosises();
@@ -94,7 +98,24 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 	@Override
 	public List<PrescriptionDrugs> getPrescriptionDrugsList(
 			Map<String, Object> params) {
-		return prescriptionDrugsMapper.getPagedList(null);
+		PrescriptionDrugs condition = new PrescriptionDrugs();
+		String id = params.get("id").toString();
+		condition.setPrescriptionVerifyRecordId(id);
+		return prescriptionDrugsMapper.getPagedList(condition);
+	}
+	@Override
+	public PrescriptionVerifyRecord getById(String prescriptionVerifyRecordId) {
+		return prescriptionVerifyRecordMapper.selectByPrimaryKey(prescriptionVerifyRecordId);
+	}
+	@Override
+	public void savePrescriptionVerifyRecordDetail(
+			PrescriptionVerifyRecordDetail prescriptionVerifyRecordDetail) {
+		prescriptionVerifyRecordDetailMapper.insert(prescriptionVerifyRecordDetail);
+	}
+	@Override
+	public List<PrescriptionVerifyRecordDetail> getPrescriptionVerifyRecordDetailPagedList(
+			Map<String, Object> params) {
+		return prescriptionVerifyRecordDetailMapper.getPagedList(params.get("prescriptionNo").toString());
 	}
 
 }

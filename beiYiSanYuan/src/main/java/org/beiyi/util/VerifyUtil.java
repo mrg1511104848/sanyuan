@@ -55,10 +55,10 @@ public class VerifyUtil {
 		}
 		return false;
 	}
-	public static void addErrorDrugToVerifyResult(VerifyResult verifyResult,Drug chuFangDrug,int errType){
+	public static void addErrorDrugToVerifyResult(VerifyResult verifyResult,Drug chuFangDrug,int errType,String errorMsg){
 		DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug,errType);
+		drugVerifyInfo.setErrMessage(errorMsg);
 		verifyResult.getErrorDrugs().add(drugVerifyInfo);
-		
 	}
 	public static void addSuccessDrugToVerifyResult(VerifyResult verifyResult,Drug chuFangDrug){
 		DrugVerifyInfo drugVerifyInfo = new DrugVerifyInfo(chuFangDrug);
@@ -544,7 +544,7 @@ public class VerifyUtil {
 		if(errors.size()>0){
 			String errorMsg = verify.appendErrors(chuFangDrug,errors);
 			errMsgBuffer.append(errorMsg);
-			VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, errType);
+			VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrug, errType,errorMsg);
 		}else{
 			VerifyUtil.addSuccessDrugToVerifyResult(verifyResult, chuFangDrug);
 		}

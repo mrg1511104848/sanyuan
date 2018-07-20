@@ -64,14 +64,13 @@ public class RepeatedPrescriptionsService implements IDrugVeryfy {
 //					continue;
 //				}
 				if(chuFangDrugI.getDrugCombinationName().equals(chuFangDrugJ.getDrugCombinationName())){
-					VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugI, VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
-					VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugJ, VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
-					errMsgBuffer.append(String.format(
+					String errorMsg = String.format(
 							"药品“%s”与 药品 “%s” 存在重复用药，原因：药品相同",
 							chuFangDrugI
 									.getDrugCombinationName(),
 									chuFangDrugJ
-									.getDrugCombinationName()));
+									.getDrugCombinationName());
+					appendResult(verifyResult, chuFangDrugI, chuFangDrugJ, errMsgBuffer, errorMsg);
 				}else if (instructionsAtcI==null || instructionsAtcJ == null || StringUtils.isBlank(instructionsAtcI.getAtcNo()) 
 						|| StringUtils.isBlank(instructionsAtcJ.getAtcNo())) {
 					List<InstructionsCategory> chuFangDrugICatagories = InstructionsCategoryMapper.selectByCombinationStandardName(drugCombinationNameI.getCombinationStandardName());
@@ -81,41 +80,25 @@ public class RepeatedPrescriptionsService implements IDrugVeryfy {
 							chuFangDrugJCatagories);
 					if (category != null) {
 						// 属于同一分类，
-						DrugVerifyInfo drugVerifyInfoI = new DrugVerifyInfo(
-								chuFangDrugI,
-								VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
-						DrugVerifyInfo drugVerifyInfoJ = new DrugVerifyInfo(
-								chuFangDrugJ,
-								VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
-						verifyResult.getErrorDrugs().add(drugVerifyInfoI);
-						verifyResult.getErrorDrugs().add(drugVerifyInfoJ);
-						errMsgBuffer.append(String.format(
+						String errorMsg = String.format(
 								"药品“%s”与 药品 “%s” 存在重复用药，原因：他们存在同一类别“%s”下",
-								drugVerifyInfoI.getDrug()
+								chuFangDrugI
 										.getDrugCombinationName(),
-								drugVerifyInfoJ.getDrug()
-										.getDrugCombinationName(), category));
+										chuFangDrugJ
+										.getDrugCombinationName(), category);
+						appendResult(verifyResult, chuFangDrugI, chuFangDrugJ, errMsgBuffer, errorMsg);
 					}
 				} else {
 					ATCCode atcCode = getSameAtcCode(instructionsAtcI, instructionsAtcJ);
 					if (atcCode != null) {
 						// 属于同一分类，
-						DrugVerifyInfo drugVerifyInfoI = new DrugVerifyInfo(
-								chuFangDrugI,
-								VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
-						DrugVerifyInfo drugVerifyInfoJ = new DrugVerifyInfo(
-								chuFangDrugJ,
-								VerifyTypeEnums.REPEATED_PRESCRIPTIONS);
-
-						verifyResult.getErrorDrugs().add(drugVerifyInfoI);
-						verifyResult.getErrorDrugs().add(drugVerifyInfoJ);
-						errMsgBuffer.append(String.format(
+						String errorMsg = String.format(
 								"药品“%s”与 药品 “%s” 存在重复用药，原因：他们存在同一ATC编码“%s”下",
-								drugVerifyInfoI.getDrug()
+								chuFangDrugI
 										.getDrugCombinationName(),
-								drugVerifyInfoJ.getDrug()
-										.getDrugCombinationName(), atcCode
-										.getAtcNo()));
+										chuFangDrugJ
+										.getDrugCombinationName(), atcCode.getAtcNo());
+						appendResult(verifyResult, chuFangDrugI, chuFangDrugJ, errMsgBuffer, errorMsg);
 					}
 				}
 			}
@@ -138,7 +121,11 @@ public class RepeatedPrescriptionsService implements IDrugVeryfy {
 		return verifyResult;
 	}
 
-	
+	private void appendResult(VerifyResult verifyResult,Drug chuFangDrugI,Drug chuFangDrugJ,StringBuffer errMsgBuffer,String errorMsg){
+		VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugI, VerifyTypeEnums.REPEATED_PRESCRIPTIONS,errorMsg);
+		VerifyUtil.addErrorDrugToVerifyResult(verifyResult, chuFangDrugJ, VerifyTypeEnums.REPEATED_PRESCRIPTIONS,errorMsg);
+		errMsgBuffer.append(errorMsg);
+	}
 	private String isSameCategory(List<InstructionsCategory> chuFangDrugICatagories,
 			List<InstructionsCategory> chuFangDrugJCatagories) {
 		if(chuFangDrugICatagories == null || chuFangDrugJCatagories == null){
