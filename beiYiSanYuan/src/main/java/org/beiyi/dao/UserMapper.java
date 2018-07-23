@@ -1,5 +1,7 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.beiyi.entity.db.User;
 
@@ -53,4 +55,6 @@ public interface UserMapper {
     int updateByPrimaryKey(User record);
 
 	User findUser(@Param(value="username")String username, @Param(value="password")String password);
+
+	List<User> getPagedList(User user);
 }

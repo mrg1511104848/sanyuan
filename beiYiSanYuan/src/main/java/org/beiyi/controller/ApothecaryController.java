@@ -7,9 +7,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.beiyi.entity.db.PrescriptionVerifyRecord;
 import org.beiyi.entity.db.Section;
-import org.beiyi.service.db.itr.ISectionService;
+import org.beiyi.entity.db.User;
+import org.beiyi.entity.db.UserSection;
+import org.beiyi.service.db.itr.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,30 +22,19 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 
 @Controller
-@RequestMapping("/section")
-public class SectionController {
+@RequestMapping("/apothecary")
+public class ApothecaryController {
 	@Autowired
-	ISectionService sectionService;
-	@RequestMapping("/toSectionList.htm")
-	public ModelAndView toSectionList(String prescriptionVerifyRecordId) {
-		ModelAndView modelAndView = new ModelAndView("html/ajax/section-list");
-		return modelAndView;
-	}
+	IUserService userService;
 	
-	@RequestMapping("/sectionList.htm")
-	public ModelAndView sectionList(String prescriptionVerifyRecordId) {
+	@RequestMapping("/toApothecaryList.htm")
+	public ModelAndView toApothecaryList() {
 		ModelAndView modelAndView = new ModelAndView("html/ajax/section-list");
 		return modelAndView;
 	}
-	
-	@RequestMapping("/toSectionDialog.htm")
-	public ModelAndView toSectionDialog() {
-		ModelAndView modelAndView = new ModelAndView("html/ajax/section-list");
-		return modelAndView;
-	}
-	@RequestMapping(value="/getSectionPageList.htm")
+	@RequestMapping(value="/getApothecaryPageList.htm")
 	@ResponseBody
-    public Map<Object, Object> getSectionPageList(HttpServletResponse response, HttpServletRequest request,@RequestParam Map<String, Object> params){
+    public Map<Object, Object> getApothecaryPageList(HttpServletResponse response, HttpServletRequest request,@RequestParam Map<String, Object> params){
         try {
 //            User currentUser = (User)request.getSession().getAttribute("currentUser");''
 //            if(currentUser.getIsAdmin()==null||currentUser.getIsAdmin()!=1){
@@ -53,7 +43,7 @@ public class SectionController {
         	int length = Integer.parseInt(params.get("iDisplayLength").toString());
         	int start = Integer.parseInt(params.get("iDisplayStart").toString())/length+1;
         	Page page = PageHelper.startPage(start, length, true);
-        	List<Section> list = sectionService.getPagedList(params);
+        	List<UserSection> list = userService.getPagedList(params);
         	Map<Object, Object> object = new HashMap<Object, Object>();
             object.put("iTotalRecords", page.getTotal());
             object.put("iTotalDisplayRecords", page.getTotal());
@@ -64,19 +54,21 @@ public class SectionController {
         }
         return null;
     }
+	
+	
 	@RequestMapping("/edit.htm")
 	public ModelAndView edit(String id) {
-		ModelAndView modelAndView = new ModelAndView("html/ajax/modal-content/section-edit");
-		Section section = sectionService.get(id);
-		modelAndView.addObject("section", section);
+		ModelAndView modelAndView = new ModelAndView("html/ajax/modal-content/apothecary-edit");
+		User user = userService.get(id);
+		modelAndView.addObject("user", user);
 		return modelAndView;
 	}
 	@RequestMapping(value="/save.htm")
 	@ResponseBody
-    public Map<Object, Object> save(HttpServletResponse response, HttpServletRequest request,Section section){
+    public Map<Object, Object> save(HttpServletResponse response, HttpServletRequest request,User user){
 		boolean success = true;
     	try {
-			sectionService.save(section);
+    		userService.save(user);
 		} catch (Exception e) {
 			e.printStackTrace();
 			success = false;
@@ -98,7 +90,7 @@ public class SectionController {
     public Map<Object, Object> delete(HttpServletResponse response, HttpServletRequest request,String id){
 		boolean success = true;
     	try {
-			sectionService.delete(id);
+    		userService.delete(id);
 		} catch (Exception e) {
 			e.printStackTrace();
 			success = false;

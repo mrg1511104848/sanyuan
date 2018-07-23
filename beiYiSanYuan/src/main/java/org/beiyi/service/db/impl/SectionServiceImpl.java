@@ -32,4 +32,9 @@ public class SectionServiceImpl implements ISectionService{
 		return sectionMapper.getPagedList(null);
 	}
 
+	@Override
+	public Section get(String id) {
+		return sectionMapper.selectByPrimaryKey(id);
+	}
+
 }

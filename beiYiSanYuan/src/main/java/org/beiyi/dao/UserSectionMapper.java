@@ -1,5 +1,7 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
 import org.beiyi.entity.db.UserSection;
 
 public interface UserSectionMapper {
@@ -50,4 +52,6 @@ public interface UserSectionMapper {
      * @mbggenerated Fri Jul 20 14:25:17 CST 2018
      */
     int updateByPrimaryKey(UserSection record);
+
+	List<UserSection> getPagedList(UserSection userSection);
 }

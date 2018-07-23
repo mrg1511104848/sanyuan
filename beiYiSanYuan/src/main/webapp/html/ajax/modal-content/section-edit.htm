@@ -1,0 +1,54 @@
+<head>
+	<meta charset="utf-8">
+</head>
+<div style="max-height:500px;overflow-y:scroll;">
+	<div class="modal-header">
+		<h4 class="modal-title" id="myModalLabel">
+			科室编辑
+		</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<form id="frmApp" name="frmApp" class="smart-form">
+					<input type="hidden" name="id" id="txt_id"
+						value="${section.id}" />
+					<section>
+						<label class="label">
+							名称
+						</label>
+						<label class="input">
+							<input class="form-control" placeholder="" type="text" name="name"
+								id="txt_name" value="${section.name }">
+						</label>
+					</section>
+					<section>
+						<label class="label">
+							类型
+						</label>
+						<label class="input">
+							<input class="form-control" placeholder="" type="text" name="type"
+								id="txt_type" value="${section.type }">
+						</label>
+					</section>
+					<section>
+						<label class="label">
+							描述
+						</label>
+						<label class="input">
+							<input class="form-control" placeholder="" type="text" name="desc"
+								id="txt_desc" value="${section.desc }">
+						</label>
+					</section>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+	pageSetUp();
+	$(function() {	
+	});
+	
+	
+</script>

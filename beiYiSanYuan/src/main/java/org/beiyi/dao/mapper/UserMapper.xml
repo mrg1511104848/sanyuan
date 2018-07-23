@@ -35,6 +35,11 @@
     from bysy_user
     where id = #{id,jdbcType=VARCHAR}
   </select>
+  <select id="getPagedList" resultMap="BaseResultMap" parameterType="org.beiyi.entity.db.User" >
+    select 
+    <include refid="User_Column_List" />
+    from bysy_user
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     <!--
       WARNING - @mbggenerated
