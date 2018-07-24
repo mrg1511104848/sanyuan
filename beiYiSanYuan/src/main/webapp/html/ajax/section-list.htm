@@ -37,122 +37,6 @@
 </div>
 </section>
 
-<!-- widget grid -->
-<section class="widget-grid-444444" style="display:none;">
-
-	<!-- row -->
-	<div class="row">
-
-		<!-- NEW WIDGET START -->
-		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-
-			<!-- Widget ID (each widget will need unique ID)-->
-			<div class="jarviswidget jarviswidget-color-darken" style="margin:0px;" data-widget-editbutton="false" data-widget-colorbutton="false">
-
-				<!-- widget div-->
-				<div style="padding-top:10px;">
-					<!-- widget edit box -->
-					<div class="jarviswidget-editbox">
-						<!-- This area used as dropdown edit box -->
-
-					</div>
-					<!-- end widget edit box -->
-
-					<!-- widget content -->
-					<div class="widget-body no-padding">
-
-						<table id="prescription_drugs_detail_dialog_table" class="prescription_drugs_detail_dialog_table table table-striped table-bordered table-hover" width="100%">
-							<thead>
-								<tr>
-									<th> 操作</th>
-     								<th> 名称</th>
-     								<th> 类型</th>
-     								<th> 描述</th>
-									
-								</tr>
-							</thead>
-						</table>
-
-					</div>
-					<div id="dialog_delete"  title="删除文章" style="text-align:center;"></div>
-					<div id="dialog_edit" title="编辑文章" style=""></div>
-					<!-- end widget content -->
-
-				</div>
-				<!-- end widget div -->
-
-			</div>
-			<!-- end widget -->
-
-
-		</article>
-		<!-- WIDGET END -->
-
-	</div>
-
-	<!-- end row -->
-
-	<!-- end row -->
-
-</section>
-<section class="verify-result-section" style="display:none;">
-</section>
-<!-- widget grid -->
-<section class="verify-result-section2" style="display:none;">
-
-	<!-- row -->
-	<div class="row">
-
-		<!-- NEW WIDGET START -->
-		<article class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-
-			<!-- Widget ID (each widget will need unique ID)-->
-			<div class="jarviswidget jarviswidget-color-darken" style="margin:0px;" data-widget-editbutton="false" data-widget-colorbutton="false">
-
-				<!-- widget div-->
-				<div style="padding-top:10px;">
-					<!-- widget edit box -->
-					<div class="jarviswidget-editbox">
-						<!-- This area used as dropdown edit box -->
-
-					</div>
-					<!-- end widget edit box -->
-
-					<!-- widget content -->
-					<div class="widget-body no-padding">
-
-						<table id="prescription_result_dialog_table" class="prescription_drugs_detail_dialog_table table table-striped table-bordered table-hover" width="100%">
-							<thead>
-								<tr>
-     								<th> 药品名</th>
-     								<th> 结果</th>
-								</tr>
-							</thead>
-						</table>
-
-					</div>
-					<!-- <div id="dialog_edit" title="编辑文章" style=""></div>
-					<div id="dialog_delete"  title="删除文章" style="text-align:center;"></div> -->
-					<!-- end widget content -->
-
-				</div>
-				<!-- end widget div -->
-
-			</div>
-			<!-- end widget -->
-
-
-		</article>
-		<!-- WIDGET END -->
-
-	</div>
-
-	<!-- end row -->
-
-	<!-- end row -->
-
-</section>
-
 <div id="remoteModal" style="display: none;"></div>
 <div id="mechine_list_proccessed_edit_" title="编辑文章"  style="display: none;"></div>
 <div id="divDialog"></div>
@@ -222,10 +106,10 @@
 	function initAppListTableButton(){
 		$("#tbAppTable_filter label").remove();
 		$("#tbAppTable_wrapper .dt-toolbar").addClass("padding_B5");
-		var s_appname_btn = '<input type="text" name="l_name" class="form-control ng-valid ng-dirty margin_R5" placeholder="应用名">';
+		var s_sectionName_ipt = '<input type="text" name="sectionName" class="form-control ng-valid ng-dirty margin_R5" placeholder="科室名">';
 		var s_submit_btn = '<a class="btn btn-default" id="app_search" onclick="app_search()" >查询 </a>';
 		var s_add_btn = '<a class="btn btn-default" id="app_add" onclick="app_add(-1)" >新增 </a>';
-		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_appname_btn)).append($(s_submit_btn)).append('&nbsp;').append($(s_add_btn));
+		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_sectionName_ipt)).append($(s_submit_btn)).append('&nbsp;').append($(s_add_btn));
 	}
 	var pagefunction=function(){
 		InitAppList();
@@ -268,9 +152,9 @@
 		})
 	}
 	function app_search(){
-		var url = "/alreadyRecipe/getPagedList.html";
-		var l_name = $("input[name='l_name']").val();
-		var params = {"l_name":l_name}
+		var url = "/beiYiSanYuan/section/getSectionPageList.htm";
+		var sectionName = $("input[name='sectionName']").val();
+		var params = {"sectionName":sectionName}
 		url = addQueryParams(url,params);
 		app_edit.oTable.fnSettings().sAjaxSource=url;
 		app_edit.oTable.fnDraw(); //重新加载数据

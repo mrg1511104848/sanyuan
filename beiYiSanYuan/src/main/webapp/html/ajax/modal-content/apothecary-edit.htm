@@ -1,0 +1,72 @@
+<head>
+	<meta charset="utf-8">
+</head>
+<div style="max-height:500px;overflow-y:scroll;">
+	<div class="modal-header">
+		<h4 class="modal-title" id="myModalLabel">
+			药师编辑
+		</h4>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+			<div class="col-md-12">
+				<form id="frmApp" name="frmApp" class="smart-form">
+					<input type="hidden" name="userSectionId" id="txt_id"
+						value="${userSection.userSectionId}" />
+					<input type="hidden" name="userId" id="txt_id"
+						value="${userSection.userId}" />
+					<section>
+						<label class="label">
+							用户名
+						</label>
+						<label class="input">
+							<input class="form-control" placeholder="" type="text" name="username"
+								id="txt_name" value="${userSection.username }">
+						</label>
+					</section>
+					<section>
+						<label class="label">
+							密码
+						</label>
+						<label class="input">
+							<input class="form-control" placeholder="" type="text" name="password"
+								id="txt_type" value="${userSection.password }">
+						</label>
+					</section>
+					<section>
+						<label class="label">
+							真实姓名
+						</label>
+						<label class="input">
+							<input class="form-control" placeholder="" type="text" name="userRealName"
+								id="txt_desc" value="${userSection.userRealName }">
+						</label>
+					</section>
+					<section>
+						<label class="label">
+							科室
+						</label>
+						<label >
+							<select  class="" name="sectionId">
+								<#list sectionList as section>
+									<#if section.id == userSection.sectionId>
+										<option value="${section.id}" selected = "selected">${section.name}</option>
+									<#else>
+										<option value="${section.id}" >${section.name}</option>
+									</#if>
+								</#list>
+							</select>
+						</label>
+					</section>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+<script>
+	pageSetUp();
+	$(function() {	
+	});
+	
+	
+</script>

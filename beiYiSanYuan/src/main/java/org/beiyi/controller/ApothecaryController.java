@@ -8,8 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.beiyi.entity.db.Section;
-import org.beiyi.entity.db.User;
-import org.beiyi.entity.db.UserSection;
+import org.beiyi.service.db.itr.ISectionService;
 import org.beiyi.service.db.itr.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,10 +25,12 @@ import com.github.pagehelper.PageHelper;
 public class ApothecaryController {
 	@Autowired
 	IUserService userService;
+	@Autowired
+	ISectionService sectionService;
 	
 	@RequestMapping("/toApothecaryList.htm")
 	public ModelAndView toApothecaryList() {
-		ModelAndView modelAndView = new ModelAndView("html/ajax/section-list");
+		ModelAndView modelAndView = new ModelAndView("html/ajax/apothecary-list");
 		return modelAndView;
 	}
 	@RequestMapping(value="/getApothecaryPageList.htm")
@@ -43,7 +44,7 @@ public class ApothecaryController {
         	int length = Integer.parseInt(params.get("iDisplayLength").toString());
         	int start = Integer.parseInt(params.get("iDisplayStart").toString())/length+1;
         	Page page = PageHelper.startPage(start, length, true);
-        	List<UserSection> list = userService.getPagedList(params);
+        	List<org.beiyi.entity.db.pageBean.UserSection> list = userService.getPagedList(params);
         	Map<Object, Object> object = new HashMap<Object, Object>();
             object.put("iTotalRecords", page.getTotal());
             object.put("iTotalDisplayRecords", page.getTotal());
@@ -59,16 +60,34 @@ public class ApothecaryController {
 	@RequestMapping("/edit.htm")
 	public ModelAndView edit(String id) {
 		ModelAndView modelAndView = new ModelAndView("html/ajax/modal-content/apothecary-edit");
-		User user = userService.get(id);
-		modelAndView.addObject("user", user);
+		
+		org.beiyi.entity.db.pageBean.UserSection userSection = userService.getUserSection(id);
+		modelAndView.addObject("userSection", userSection);
+		
+		List<Section> sectionList = sectionService.getPagedList(null);
+		modelAndView.addObject("sectionList", sectionList);
 		return modelAndView;
 	}
-	@RequestMapping(value="/save.htm")
+	@RequestMapping(value="/saveUserSection.htm")
 	@ResponseBody
-    public Map<Object, Object> save(HttpServletResponse response, HttpServletRequest request,User user){
+    public Map<Object, Object> saveUserSection(HttpServletResponse response, HttpServletRequest request,org.beiyi.entity.db.pageBean.UserSection userSection){
 		boolean success = true;
     	try {
-    		userService.save(user);
+    		userService.save(userSection);
+		} catch (Exception e) {
+			e.printStackTrace();
+			success = false;
+		}
+    	Map<Object, Object> object = new HashMap<Object, Object>();
+        object.put("success", success);
+        return object;
+    }
+	@RequestMapping(value="/save.htm")
+	@ResponseBody
+    public Map<Object, Object> save(HttpServletResponse response, HttpServletRequest request,org.beiyi.entity.db.pageBean.UserSection userSection){
+		boolean success = true;
+    	try {
+    		userService.save(userSection);
 		} catch (Exception e) {
 			e.printStackTrace();
 			success = false;
@@ -82,7 +101,7 @@ public class ApothecaryController {
 		String id = params.get("id").toString();
 		ModelAndView modelAndView = new ModelAndView();
         modelAndView.addObject("id", id);
-        modelAndView.setViewName("html/ajax/modal-content/section-delete-confirm");
+        modelAndView.setViewName("html/ajax/modal-content/apothecary-delete-confirm");
 		return modelAndView;
 	}
 	@RequestMapping(value="/delete.htm")
@@ -90,7 +109,7 @@ public class ApothecaryController {
     public Map<Object, Object> delete(HttpServletResponse response, HttpServletRequest request,String id){
 		boolean success = true;
     	try {
-    		userService.delete(id);
+    		userService.deleteUserSection(id);
 		} catch (Exception e) {
 			e.printStackTrace();
 			success = false;

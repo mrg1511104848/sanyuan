@@ -34,7 +34,10 @@
   <select id="getPagedList" resultMap="BaseResultMap" parameterType="org.beiyi.entity.db.Section" >
     select 
     <include refid="Base_Column_List" />
-    from section
+    from section s where 1=1
+    <if test="name != null">
+        and s.name_ like  "%"#{name,jdbcType=VARCHAR}"%" 
+    </if>
   </select>
   
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >

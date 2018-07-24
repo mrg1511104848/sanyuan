@@ -130,9 +130,6 @@
 						</table>
 
 					</div>
-					<!-- <div id="dialog_edit" title="编辑文章" style=""></div>
-					<div id="dialog_delete"  title="删除文章" style="text-align:center;"></div> -->
-					<!-- end widget content -->
 
 				</div>
 				<!-- end widget div -->
@@ -175,7 +172,7 @@
 			"bPaginate" : true,
 			"bProcessing" : false,
 			"bServerSide" : true,
-			"sAjaxSource" : "/beiYiSanYuan/section/getSectionPageList.htm",
+			"sAjaxSource" : "/beiYiSanYuan/apothecary/getApothecaryPageList.htm",
 			"fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
 					oSettings.jqXHR = $.ajax( {
 						"dataType" : 'json',
@@ -194,22 +191,22 @@
 			
 			"aoColumns" : [ {
                 "sTitle": "操作", "sClass": "center", "data" : function (row,type,set) {
-                    var deleteBtn = "<button  onclick=\"deleteRow('"+row.id+"');\" title=\"删除\" class=\"btn btn-xs btn-default\">删除</button>&nbsp;";
-                    var editBtn = "<button  onclick=\"openDialog(this,'"+row.id+"');\" title=\"编辑\" class=\"btn btn-xs btn-default\">编辑</button>&nbsp;";
+                    var deleteBtn = "<button  onclick=\"deleteRow('"+row.userSectionId+"');\" title=\"删除\" class=\"btn btn-xs btn-default\">删除</button>&nbsp;";
+                    var editBtn = "<button  onclick=\"openDialog(this,'"+row.userSectionId+"');\" title=\"编辑\" class=\"btn btn-xs btn-default\">编辑</button>&nbsp;";
                     return editBtn+deleteBtn;
                 }
             },{
-                "sTitle": "名称", "sClass": "center", "data" : function(row,type,set){
-                    var nameBtn = row.name;
+                "sTitle": "科室名", "sClass": "center", "data" : function(row,type,set){
+                    var nameBtn = row.sectionName;
                     return nameBtn;
                 }
             },{
-                "sTitle": "类型", "sClass": "center", "data" : function(row,type,set){
-                    return genHtmlByObject(row.type);
+                "sTitle": "科室类型", "sClass": "center", "data" : function(row,type,set){
+                    return genHtmlByObject(row.sectionType);
                 }
             },{
-                "sTitle": "描述", "sClass": "center", "data" : function(row,type,set){
-                    return genHtmlByObject(row.desc);
+                "sTitle": "姓名", "sClass": "center", "data" : function(row,type,set){
+                    return genHtmlByObject(row.userRealName);
                 }
             }
             ],
@@ -221,10 +218,11 @@
 	function initAppListTableButton(){
 		$("#tbAppTable_filter label").remove();
 		$("#tbAppTable_wrapper .dt-toolbar").addClass("padding_B5");
-		var s_appname_btn = '<input type="text" name="l_name" class="form-control ng-valid ng-dirty margin_R5" placeholder="应用名">';
+		var s_username_ipt = '<input type="text" name="username" class="form-control ng-valid ng-dirty margin_R5" placeholder="姓名">';
+		var s_sectionName_ipt = '<input type="text" name="sectionName" class="form-control ng-valid ng-dirty margin_R5" placeholder="科室名">';
 		var s_submit_btn = '<a class="btn btn-default" id="app_search" onclick="app_search()" >查询 </a>';
 		var s_add_btn = '<a class="btn btn-default" id="app_add" onclick="app_add(-1)" >新增 </a>';
-		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_appname_btn)).append($(s_submit_btn)).append('&nbsp;').append($(s_add_btn));
+		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_username_ipt)).append($(s_sectionName_ipt)).append($(s_submit_btn)).append('&nbsp;').append($(s_add_btn));
 	}
 	var pagefunction=function(){
 		InitAppList();
@@ -240,7 +238,7 @@
 				"class" : "btn btn-danger",
 				click : function() {
 					var this_ = $(this);
-					var url = "/beiYiSanYuan/section/delete.htm";
+					var url = "/beiYiSanYuan/apothecary/delete.htm";
 					var id = $('#dialog_delete').find("input[name='del_id']").val();
 					var data= {"id":id};
 					$.ajax({
@@ -267,80 +265,101 @@
 		})
 	}
 	function app_search(){
-		var url = "/alreadyRecipe/getPagedList.html";
-		var l_name = $("input[name='l_name']").val();
-		var params = {"l_name":l_name}
+		var url = "/beiYiSanYuan/apothecary/getApothecaryPageList.htm";
+		var username = $("input[name='username']").val();
+		var sectionName = $("input[name='sectionName']").val();
+		
+		var params = {"username":username,"sectionName":sectionName}
 		url = addQueryParams(url,params);
 		app_edit.oTable.fnSettings().sAjaxSource=url;
-		app_edit.oTable.fnDraw(); //重新加载数据
+		app_edit.oTable.fnDraw(false); //重新加载数据
 	}
 	function app_add(t){
 		var txtName="";
 		var id="";
-		/* if(t==1)
-		{
-			if($("#ul_group .active").size()>0)
-			{
-				txtName=$("#ul_group .active").find("a").text();
-				id=$("#ul_group .active").find("a").attr("site_id");
-			}else
-			{
-				art.dialog.tips('请选择至少一个任务编辑!',1);
-				return;
+		var options_htm = '';
+		$.ajax({
+			url:"/beiYiSanYuan/section/getAllSectionList.htm",
+			dataType:'json',
+			success:function(r){
+				if(r.aaData){
+					for(var i = 0 ; i < r.aaData.length ; i++){
+						var aaDataEach = r.aaData[i];
+						console.log(aaDataEach);
+						var sectionId = aaDataEach['id'];
+						var sectionName = aaDataEach['name'];
+						options_htm+='	<option value="'+sectionId+'" >'+sectionName+'</option>';
+					}
+					
+					
+					var d=art.dialog({
+						title:t==-1?"新增":"编辑",
+					    content: '<div id="divAddGroup"><form id="frmGroup" class="smart-form">'+
+					    	'<section><label class="label">用户名：</label><label class="input">'+
+					    	'<input type="text" id="txtName" name="username"/></label>'+
+					    	'<input type="hidden" name="id" id="txtId" value="'+id+'">'+
+					    	'</section>'+
+					    	'<section><label class="label">密码：</label><label class="input">'+
+					    	'<input type="text" id="txtName" name="password"/></label>'+
+					    	'</section>'+
+					    	'<section><label class="label">真实姓名：</label><label class="input">'+
+					    	'<input type="text" id="txtName" name="userRealName"/></label>'+
+					    	'</section>'+
+					    	'<section><label class="label">科室：</label>'+
+					    	'<label class="input">'+
+					    	'<select  multiple class="select2 form-control" name="sectionId">'+
+					    	options_htm+
+							'</select>'+
+					    	'</section>'+
+					    	'</form></div>',
+				    	lock:true,
+					    button:[{
+					    	name:"保存",
+					    	callback:function(){
+					    		if($("#txtName").val()!="")
+					    		{
+					    			var requestUrl="/beiYiSanYuan/apothecary/saveUserSection.htm";
+						    		$.ajax({
+										type: "post",
+									    url: requestUrl,
+									    data: $("#frmGroup").serialize(),
+									    success: function(data){
+									    	d.close();
+									    	if(data.success = 'true'){
+									    		$("#tbAppTable").dataTable().fnDraw(false);
+									    		art.dialog.tips('保存成功!');
+									    	}else{
+									    		art.dialog.tips('保存失败!');
+									    	}
+									    	//getAllGroupList();
+							        	}
+									});
+					    		}else
+					    		{
+					    			art.dialog.tips('名称不能为空!');
+					    		}
+								return false;
+					    	}
+					    },{
+					    	name:"取消",
+					    	callback:function(){
+					    	}
+					    }],
+					    init: function () {
+					    	changeArtdialogButtonCss();
+					    }
+					});
+				}else{
+				}
+			},
+			error:function(){
 			}
-		} */
-		var d=art.dialog({
-			title:t==-1?"新增":"编辑",
-		    content: '<div id="divAddGroup"><form id="frmGroup" class="smart-form">'+
-		    	'<section><label class="label">名称：</label><label class="input">'+
-		    	'<input type="text" id="txtName" name="name"/></label>'+
-		    	'<input type="hidden" name="id" id="txtId" value="'+id+'">'+
-		    	
-		    	'<section><label class="label">类型：</label><label class="input">'+
-		    	'<input type="text" id="txtName" name="type"/></label>'+
-		    	'<section><label class="label">描述：</label><label class="input">'+
-		    	'<input type="text" id="txtName" name="desc"/></label>'+
-		    	'</section></form></div>',
-	    	lock:true,
-		    button:[{
-		    	name:"保存",
-		    	callback:function(){
-		    		if($("#txtName").val()!="")
-		    		{
-		    			var requestUrl="/beiYiSanYuan/section/save.htm";
-			    		$.ajax({
-							type: "post",
-						    url: requestUrl,
-						    data: $("#frmGroup").serialize(),
-						    success: function(data){
-						    	d.close();
-						    	if(data.success = 'true'){
-						    		$("#tbAppTable").dataTable().fnDraw(false);
-						    		art.dialog.tips('保存成功!');
-						    	}else{
-						    		art.dialog.tips('保存失败!');
-						    	}
-						    	//getAllGroupList();
-				        	}
-						});
-		    		}else
-		    		{
-		    			art.dialog.tips('名称不能为空!');
-		    		}
-					return false;
-		    	}
-		    },{
-		    	name:"取消",
-		    	callback:function(){
-		    	}
-		    }],
-		    init: function () {
-		    	changeArtdialogButtonCss();
-		    }
-		});
+		})
+		
+		
 	}
 	function deleteRow(id){
-		$("#dialog_delete").load("/beiYiSanYuan/section/toDelete.htm?id="+id);
+		$("#dialog_delete").load("/beiYiSanYuan/apothecary/toDelete.htm?id="+id);
 		$('#dialog_delete').dialog("open");
 		return false;
 	}
@@ -472,57 +491,6 @@
 		
 		
 		
-		/* if(prescription_result_dialog_table){
-			prescription_result_dialog_table.fnDestroy();  //还原初始化了的datatable
-		}
-		prescription_result_dialog_table = $("#prescription_result_dialog_table").dataTable({
-				"bProcessing" : true,//加载数据时候是否显示进度条
-				"bServerSide" : false,//是否从服务加载数据 
-				"bSort":false,
-				"iDisplayLength" : 10,// 每页显示行数
-				"sAjaxSource" : "/beiYiSanYuan/prescription/getPrescriptionDrugsList.htm?id="+id,
-				"columns": [//数据列
-		            {"sWidth":'50%',"data": function ( row, type, set ){
-		            	//var s_title = cut_str(row.drugName, 30,"...");
-			            return drugName;
-		            }}
-				    ,
-		            {"sWidth":'50%',"data": function ( row, type, set ){
-			            return verifyResult;
-		            }}
-		            ,
-		            {"sWidth":'50%',"data": function ( row, type, set ){
-			            return verifyTime;
-		            }}
-		             /*
-		             ,{"sWidth":'15%',"data": function ( row, type, set ){
-			            return row.standard;
-		            }},{"sWidth":'50px',"data": function ( row, type, set ){
-			            return row.pack;
-		            }}{
-		             	"sWidth":'10px',
-			            "sTitle": "操作",
-			            "sClass": "center",
-			             "bSortable": false,
-			            "data": function ( row, type, set ){
-			            	//var delBtn ="<button  onclick=\"confirm('操作确认','<div style=padding:10px><font color=red>确定要删除吗(一旦删除，数据将无法恢复!)</font></div>',deleteRecord,'','"+row.id+"');\" title=\"删除\" class=\"btn btn-xs btn-default\"><i class=\"fa fa-times\"></i></button>"; 
-					        //return delBtn;
-				        } 
-		        	} 
-				],
-				"oLanguage" : common_data_table_config.oLanguage,
-				"fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-	   	 			return  "总共<span class='text-primary'>"+iTotal+"</span>条 ,"+
-	   	 				"当前"+(iTotal==0?"无记录":"(<span class='txt-color-darken'>"+iStart+" </span>到 <span class='txt-color-darken'>"+iEnd+"</span>)&nbsp;&nbsp;");
-	  			},
-	  			"fnDrawCallback": function( oSettings ) {
-			      $("[rel=tooltip]").tooltip();
-			    },
-			    "sDom": "<'dt-toolbar'<'col-xs-12 tools-bar'><'col-xs-4'C>r>"+"t"+"<'dt-toolbar-footer'<'col-xs-6'il><'col-xs-6'p>>",
-				"fnInitComplete": function(oSettings, json) {
-					$("#prescription_result_dialog_table_wrapper .dt-toolbar").remove();
-			     }
-		    }); */
 		return false;
 	}
 	function showResult2(prescriptionNo)
@@ -606,7 +574,7 @@
 	}
 	function openDialog(obj,id)
 	{
-		$("#dialog_edit").load("/beiYiSanYuan/section/edit.htm?id="+id,function(){
+		$("#dialog_edit").load("/beiYiSanYuan/apothecary/edit.htm?id="+id,function(){
 			var dialog = window.top.art.dialog({
 					title: "详情",
 					content: $("#dialog_edit").html(),
@@ -617,7 +585,7 @@
 				    	name : "确定",
 				    	callback:function(){
 				    		var this_ = $(this);
-							var url = "/beiYiSanYuan/section/save.htm";
+							var url = "/beiYiSanYuan/apothecary/saveUserSection.htm";
 							var data= $("#frmApp").serialize();
 							$.ajax({
 								url:url,

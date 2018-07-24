@@ -29,7 +29,13 @@ public class SectionServiceImpl implements ISectionService{
 
 	@Override
 	public List<Section> getPagedList(Map<String, Object> params) {
-		return sectionMapper.getPagedList(null);
+		Section section = new Section();
+		if(params!=null){
+			if(params.containsKey("sectionName")){
+				section.setName(params.get("sectionName").toString());
+			}
+		}
+		return sectionMapper.getPagedList(section);
 	}
 
 	@Override
