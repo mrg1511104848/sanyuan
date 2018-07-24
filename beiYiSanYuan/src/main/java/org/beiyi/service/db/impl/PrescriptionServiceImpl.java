@@ -7,11 +7,13 @@ import java.util.Map;
 
 import org.beiyi.dao.PrescriptionDrugsMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordDetailMapper;
+import org.beiyi.dao.PrescriptionVerifyRecordHistoryMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordMapper;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.db.PrescriptionDrugs;
 import org.beiyi.entity.db.PrescriptionVerifyRecord;
 import org.beiyi.entity.db.PrescriptionVerifyRecordDetail;
+import org.beiyi.entity.db.PrescriptionVerifyRecordHistory;
 import org.beiyi.entity.db.pageBean.Prescription;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.Drug;
@@ -27,8 +29,10 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 	PrescriptionDrugsMapper prescriptionDrugsMapper;
 	@Autowired
 	PrescriptionVerifyRecordDetailMapper prescriptionVerifyRecordDetailMapper;
+	@Autowired
+	PrescriptionVerifyRecordHistoryMapper prescriptionVerifyRecordHistoryMapper;
 	@Override
-	public void save(ChuFang chuFang) {
+	public void save(ChuFang chuFang) throws Exception{
 		List<String> diagnosises = chuFang.getDiagnosises();
 		StringBuffer diagnosisesBuffer = new StringBuffer();
 		for (String diagnosis : diagnosises) {
@@ -69,16 +73,27 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 	}
 	@Override
 	public void updateResult(VerifyResult verifyResult,ChuFang chuFang) {
+		String verifyTime =new SimpleDateFormat(DateUtil.DATE_FORMAT_01).format(new Date());
 		PrescriptionVerifyRecord prescriptionVerifyRecord = new PrescriptionVerifyRecord();
 		prescriptionVerifyRecord.setPrescriptionNo(chuFang.getChuFangNo());
-		prescriptionVerifyRecord.setVerifyTime(new SimpleDateFormat(DateUtil.DATE_FORMAT_01).format(new Date()));
+		prescriptionVerifyRecord.setVerifyTime(verifyTime);
 		prescriptionVerifyRecord.setVerifyResult(verifyResult.getResultMsg());
+		prescriptionVerifyRecord.setVerifyProgress(1);//
+		prescriptionVerifyRecord.setVerifyPerson("机器人");
 		prescriptionVerifyRecordMapper.updateByPrescriptionNo(prescriptionVerifyRecord);
 		
-		PrescriptionVerifyRecord record = new PrescriptionVerifyRecord();
-		record.setPrescriptionNo(chuFang.getChuFangNo());
-		record.setVerifyProgress(1);//
-		this.updateVerifyProgressByPrescriptionNo(record);
+//		PrescriptionVerifyRecord record = new PrescriptionVerifyRecord();
+//		record.setPrescriptionNo(chuFang.getChuFangNo());
+//		record.setVerifyProgress(1);//
+//		record.setVerifyPerson("机器人");
+//		this.updateVerifyProgressByPrescriptionNo(record);
+		
+		PrescriptionVerifyRecordHistory verifyHistory = new PrescriptionVerifyRecordHistory();
+		verifyHistory.setPrescriptionNo(chuFang.getChuFangNo());
+		verifyHistory.setVerifyPerson("机器人");
+		verifyHistory.setVerifyTime(verifyTime);
+		verifyHistory.setVerifyProgress(1);
+		this.savePrescriptionVerifyRecordHistory(verifyHistory);
 	}
 	@Override
 	public void updateVerifyProgressByPrescriptionNo(
@@ -117,5 +132,27 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 			Map<String, Object> params) {
 		return prescriptionVerifyRecordDetailMapper.getPagedList(params.get("prescriptionNo").toString());
 	}
-
+	@Override
+	public void savePrescriptionVerifyRecordHistory(
+			PrescriptionVerifyRecordHistory record) {
+		prescriptionVerifyRecordHistoryMapper.insertSelective(record);
+	}
+	@Override
+	public void insistSubmit(PrescriptionVerifyRecordHistory record) {
+		record.setVerifyTime(new SimpleDateFormat(DateUtil.DATE_FORMAT_01).format(new Date()));
+		
+		savePrescriptionVerifyRecordHistory(record);
+		
+		PrescriptionVerifyRecord verifyRecord = new PrescriptionVerifyRecord();
+		verifyRecord.setPrescriptionNo(record.getPrescriptionNo());
+		verifyRecord.setVerifyTime(record.getVerifyTime());
+		verifyRecord.setVerifyPerson(record.getVerifyPerson());
+		verifyRecord.setVerifyPersonUniqueNo(record.getVerifyPersonUniqueNo());
+		verifyRecord.setVerifyProgress(record.getVerifyProgress());
+		updateVerifyProgressByPrescriptionNo(verifyRecord);
+	}
+	@Override
+	public int getCountByPrescriptionNo(String prescriptionNo){
+		return prescriptionVerifyRecordMapper.getCountByPrescriptionNo(prescriptionNo);
+	}
 }

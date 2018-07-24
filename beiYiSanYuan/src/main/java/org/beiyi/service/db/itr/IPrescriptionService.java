@@ -8,6 +8,7 @@ import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.db.PrescriptionDrugs;
 import org.beiyi.entity.db.PrescriptionVerifyRecord;
 import org.beiyi.entity.db.PrescriptionVerifyRecordDetail;
+import org.beiyi.entity.db.PrescriptionVerifyRecordHistory;
 import org.beiyi.entity.db.pageBean.Prescription;
 import org.beiyi.entity.verify.ChuFang;
 
@@ -17,7 +18,7 @@ import org.beiyi.entity.verify.ChuFang;
  *
  */
 public interface IPrescriptionService {
-	public void save(ChuFang chuFang);
+	public void save(ChuFang chuFang) throws Exception;
 	public void updateResult(VerifyResult verifyResult,ChuFang chuFang);
 	public void updateVerifyProgressByPrescriptionNo(PrescriptionVerifyRecord record);
 	public List<PrescriptionVerifyRecord> getPagedList(
@@ -30,4 +31,10 @@ public interface IPrescriptionService {
 	public void savePrescriptionVerifyRecordDetail(PrescriptionVerifyRecordDetail prescriptionVerifyRecordDetail);
 	
 	public List<PrescriptionVerifyRecordDetail> getPrescriptionVerifyRecordDetailPagedList(Map<String, Object> params);
+	void savePrescriptionVerifyRecordHistory(
+			PrescriptionVerifyRecordHistory record);
+	
+	void insistSubmit(
+			PrescriptionVerifyRecordHistory record);
+	int getCountByPrescriptionNo(String prescriptionNo);
 }

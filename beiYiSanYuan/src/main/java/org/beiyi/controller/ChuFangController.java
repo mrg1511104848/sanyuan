@@ -10,15 +10,25 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.lang3.StringUtils;
+import org.beiyi.changliang.VerifyProgressEnum;
+import org.beiyi.controller.base.ResponseEnum;
+import org.beiyi.controller.base.WebUtils;
 import org.beiyi.entity.ChuFang;
 import org.beiyi.entity.VerifyResult;
 import org.beiyi.entity.db.PrescriptionVerifyRecordDetail;
+import org.beiyi.entity.db.PrescriptionVerifyRecordHistory;
+import org.beiyi.entity.db.Section;
 import org.beiyi.entity.verify.DrugVerifyInfo;
 import org.beiyi.service.db.itr.IPrescriptionService;
 import org.beiyi.service.verify.DrugVerifyService;
@@ -42,8 +52,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 
 @Controller
 @RequestMapping("/chufang")
@@ -149,6 +163,36 @@ public class ChuFangController {
         } else {
         }
 	}
+	
+	@RequestMapping(value = "/insistSubmit.htm")
+	@ResponseBody
+	public JSONObject insistSubmit(HttpServletResponse response,
+			HttpServletRequest request, PrescriptionVerifyRecordHistory record) {
+		try {
+			// User currentUser =
+			// (User)request.getSession().getAttribute("currentUser");''
+			// if(currentUser.getIsAdmin()==null||currentUser.getIsAdmin()!=1){
+			// params.put("eq_userId", currentUser.getId());
+			// }
+			int prescriptionCount = prescriptionService.getCountByPrescriptionNo(record.getPrescriptionNo());
+			if(prescriptionCount == 0){
+				return WebUtils.createErrorResult(ResponseEnum.INVALID_PARAMS, "该处方不存在");
+			}
+			if(StringUtils.isBlank(record.getVerifyPerson())){
+				return WebUtils.createErrorResult(ResponseEnum.INVALID_PARAMS, "药师姓名不能为空");
+			}
+			if(StringUtils.isBlank(record.getVerifyPersonUniqueNo())){
+				return WebUtils.createErrorResult(ResponseEnum.INVALID_PARAMS, "药师唯一编码不能为空");
+			}
+			record.setVerifyProgress(VerifyProgressEnum.INSISTSUBMIT_UN_AUDITED);
+			prescriptionService.insistSubmit(record);
+			return WebUtils.createSuccResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return WebUtils.createErrorResult();
+		}
+	}
+	
 	public void downloadFile(File file,HttpServletResponse response,boolean isDelete) {
         try {
             // 以流的形式下载文件。

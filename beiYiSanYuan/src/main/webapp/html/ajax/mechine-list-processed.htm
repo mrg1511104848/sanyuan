@@ -4,7 +4,7 @@
 <div class="row">
 	<div class="col-xs-12 col-sm-7 col-md-7 col-lg-4">
 		<h1 class="page-title  txt-color-blueDark">
-			<i class="fa fa-table fa-fw "></i> 审单系统
+			<i class="fa fa-table fa-fw "></i> 审方系统
 			<span>> 已审处方</span>
 		</h1>
 	</div>
@@ -197,7 +197,7 @@
                     var showResultBtn = "<button  onclick=\"showResult('"+row.id+"');\" title=\"查看结果\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
                     var showResultBtn2 = "<button  onclick=\"showResult2('"+row.prescriptionNo+"');\" title=\"查看结果2\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
                     var showDetailBtn = "<button  onclick=\"showDetail('"+row.id+"');\" title=\"查看处方详细\" class=\"btn btn-xs btn-default\">查看处方详细</button>&nbsp;";
-                    return showResultBtn+showResultBtn2+showDetailBtn;
+                    return showResultBtn2+showDetailBtn;
                 }
             },{
                 "sTitle": "姓名", "sClass": "center", "data" : function(row,type,set){

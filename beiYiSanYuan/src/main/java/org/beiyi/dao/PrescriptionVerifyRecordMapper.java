@@ -2,6 +2,7 @@ package org.beiyi.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.beiyi.entity.db.PrescriptionVerifyRecord;
 import org.beiyi.entity.db.pageBean.Prescription;
 
@@ -61,4 +62,6 @@ public interface PrescriptionVerifyRecordMapper {
     List<PrescriptionVerifyRecord> getPagedList(PrescriptionVerifyRecord record);
     
     List<Prescription> getPrescriptionPagedList();
+    
+    int getCountByPrescriptionNo(@Param(value="prescriptionNo")String prescriptionNo);
 }
