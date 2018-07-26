@@ -1,6 +1,8 @@
 package org.beiyi.service.db.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +105,20 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 	@Override
 	public List<PrescriptionVerifyRecord> getPagedList(
 			Map<String, Object> params) {
-		return prescriptionVerifyRecordMapper.getPagedList(null);
+		org.beiyi.entity.db.pageBean.PrescriptionVerifyRecord prescriptionVerifyRecord = new org.beiyi.entity.db.pageBean.PrescriptionVerifyRecord();
+		if(params != null){
+			if(params.get("verifyProgressStr")!=null){
+				String[] verifyProgressArr = params.get("verifyProgressStr").toString().split(",");
+				List<String> verifyProgressList = Arrays.asList(verifyProgressArr);
+				List<Integer> verifyProgressListFinal = new ArrayList<Integer>();
+				for (String vp : verifyProgressList) {
+					verifyProgressListFinal.add(Integer.parseInt(vp));
+				}
+				prescriptionVerifyRecord.setVerifyProgressList(verifyProgressListFinal);
+			}
+		}
+		
+		return prescriptionVerifyRecordMapper.getPagedList(prescriptionVerifyRecord);
 	}
 	@Override
 	public List<Prescription> getPrescriptionPagedList(

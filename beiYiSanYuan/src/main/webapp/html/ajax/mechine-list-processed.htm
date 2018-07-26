@@ -175,7 +175,7 @@
 			"bPaginate" : true,
 			"bProcessing" : false,
 			"bServerSide" : true,
-			"sAjaxSource" : "/beiYiSanYuan/prescription/getPrescriptionPagedList.htm",
+			"sAjaxSource" : "/beiYiSanYuan/prescription/getPrescriptionPagedList.htm?verifyProgressStr=${verifyProgressStr}",
 			"fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
 					oSettings.jqXHR = $.ajax( {
 						"dataType" : 'json',

@@ -59,7 +59,7 @@ public interface PrescriptionVerifyRecordMapper {
     
     int updateVerifyProgressByPrescriptionNo(PrescriptionVerifyRecord record);
     
-    List<PrescriptionVerifyRecord> getPagedList(PrescriptionVerifyRecord record);
+    List<PrescriptionVerifyRecord> getPagedList(org.beiyi.entity.db.pageBean.PrescriptionVerifyRecord record);
     
     List<Prescription> getPrescriptionPagedList();
     

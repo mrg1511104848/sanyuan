@@ -409,10 +409,16 @@
     <result column="money" jdbcType="VARCHAR" property="money" />
     <result column="reimbursement_money" jdbcType="VARCHAR" property="reimbursementMoney" />
   </resultMap>
-  <select id="getPagedList" parameterType="org.beiyi.entity.db.PrescriptionVerifyRecord" resultMap="BaseResultMap">
+  <select id="getPagedList" parameterType="org.beiyi.entity.db.pageBean.PrescriptionVerifyRecord" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from prescription_verify_record
+    from prescription_verify_record where 1=1 
+    <if test="verifyProgressList != null">
+      and
+      <foreach collection="verifyProgressList" item="vpItem"  open="(" close=")"  separator="or">  
+ 		verify_progress = #{vpItem}
+ 	  </foreach>
+    </if>
   </select>
   <select id="getPrescriptionPagedList" resultMap="PrescriptionResultMap">
     select 
