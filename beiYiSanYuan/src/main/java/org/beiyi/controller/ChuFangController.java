@@ -185,7 +185,7 @@ public class ChuFangController {
 				return WebUtils.createErrorResult(ResponseEnum.INVALID_PARAMS, "药师唯一编码不能为空");
 			}
 			record.setVerifyProgress(VerifyProgressEnum.INSISTSUBMIT_UN_AUDITED);
-			prescriptionService.insistSubmit(record);
+			prescriptionService.changeVerifyHistory(record);
 			return WebUtils.createSuccResult();
 		} catch (Exception e) {
 			e.printStackTrace();

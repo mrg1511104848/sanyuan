@@ -7,9 +7,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+
+import org.beiyi.controller.base.WebUtils;
 import org.beiyi.entity.db.PrescriptionDrugs;
 import org.beiyi.entity.db.PrescriptionVerifyRecord;
 import org.beiyi.entity.db.PrescriptionVerifyRecordDetail;
+import org.beiyi.entity.db.PrescriptionVerifyRecordHistory;
 import org.beiyi.service.db.itr.IPrescriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -151,4 +155,17 @@ public class PrescriptionController {
 		}
 		return null;
 	}
+	@RequestMapping("/verify.htm")
+	@ResponseBody
+	public JSONObject verify(
+			PrescriptionVerifyRecordHistory record) {
+		try {
+			prescriptionService.changeVerifyHistory(record);
+			return WebUtils.createSuccResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return WebUtils.createErrorResult();
+		}
+	}
+	
 }

@@ -194,10 +194,12 @@
 			
 			"aoColumns" : [ {
                 "sTitle": "操作", "sClass": "center", "data" : function (row,type,set) {
-                    var showResultBtn = "<button  onclick=\"showResult('"+row.id+"');\" title=\"查看结果\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
+                    //var showResultBtn = "<button  onclick=\"showResult('"+row.id+"');\" title=\"查看结果\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
+                    var passVerifyBtn = "<button  onclick=\"verify('"+row.prescriptionNo+"',5);\" title=\"通过审核\" class=\"btn btn-xs btn-default\">通过</button>&nbsp;";
+                    var unpassVerifyBtn = "<button  onclick=\"verify('"+row.prescriptionNo+"',4);\" title=\"否决审核\" class=\"btn btn-xs btn-default\">否决</button>&nbsp;";
                     var showResultBtn2 = "<button  onclick=\"showResult2('"+row.prescriptionNo+"');\" title=\"查看结果2\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
                     var showDetailBtn = "<button  onclick=\"showDetail('"+row.id+"');\" title=\"查看处方详细\" class=\"btn btn-xs btn-default\">查看处方详细</button>&nbsp;";
-                    return showResultBtn2+showDetailBtn;
+                    return passVerifyBtn+unpassVerifyBtn+showResultBtn2+showDetailBtn;
                 }
             },{
                 "sTitle": "姓名", "sClass": "center", "data" : function(row,type,set){
@@ -212,6 +214,33 @@
                 "sTitle": "科别", "sClass": "center", "data" : function(row,type,set){
                     return genHtmlByObject(row.category);
                 }
+            },{
+                "sTitle": "审核进度", "sClass": "center", "data" : function(row,type,set){
+                	switch(row.verifyProgress)
+                	{
+	                	case 0:
+	                		return '机器未审核' 
+	                		break;
+	                	case 1:
+	                		return '机器已审核-未通过' 
+	                		break;
+	                	case 2: 
+	                		return '机器已审核 - 已通过' 
+	                		break;
+	                	case 3: 
+	                		return '医师强制提交 - 药师未审核' 
+	                		break;
+	                	case 4: 
+	                		return '医师强制提交 - 药师已审核 - 未通过' 
+	                		break;
+	                	case 5: 
+	                		return '医师强制提交 - 药师已审核 - 已通过' 
+	                		break;
+	                	default: 
+	                		return '机器未审核' 
+	                		break;
+                	}
+                }
             }
             ],
 	        "fnInitComplete": function(oSettings, json) {
@@ -222,17 +251,17 @@
 	function initAppListTableButton(){
 		$("#tbAppTable_filter label").remove();
 		$("#tbAppTable_wrapper .dt-toolbar").addClass("padding_B5");
-		var s_appname_btn = '<input type="text" name="l_name" class="form-control ng-valid ng-dirty margin_R5" placeholder="应用名">';
+		var s_prescriptionNo_btn = '<input type="text" name="prescriptionNo" class="form-control ng-valid ng-dirty margin_R5" placeholder="处方号">';
 		var s_submit_btn = '<a class="btn btn-default" id="app_search" onclick="app_search()" >查询 </a>';
-		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_appname_btn)).append($(s_submit_btn));
+		$("#tbAppTable_wrapper .dt-toolbar div:eq(0)").append($(s_prescriptionNo_btn)).append($(s_submit_btn));
 	}
 	var pagefunction=function(){
 		InitAppList();
 	}
 	function app_search(){
-		var url = "/alreadyRecipe/getPagedList.html";
-		var l_name = $("input[name='l_name']").val();
-		var params = {"l_name":l_name}
+		var url = "/beiYiSanYuan/prescription/getPrescriptionPagedList.htm?verifyProgressStr=${verifyProgressStr}";
+		var prescriptionNo = $("input[name='prescriptionNo']").val();
+		var params = {"prescriptionNo":prescriptionNo}
 		url = addQueryParams(url,params);
 		app_edit.oTable.fnSettings().sAjaxSource=url;
 		app_edit.oTable.fnDraw(); //重新加载数据
@@ -296,6 +325,35 @@
 			     }
 		    });
 	}
+	function verify(prescriptionNo,verify_flag){
+		if(verify_flag == 4){
+			asdf
+		}
+		$.ajax({
+			url:"/beiYiSanYuan/prescription/verify.htm?prescriptionNo="+prescriptionNo+"&verifyProgress="+verify_flag,
+			dataType:'json',
+			success:function(r){
+				if(r.code==0){
+					/* $(".verify-result-section").html(r.resultBean.verifyResult);
+					var dialog = window.top.art.dialog({
+							title: "详情",
+							content: $(".verify-result-section").html(),
+							width:"850px",
+							padding: '0px 0px',
+							lock:true
+					});
+					$(".aui_content").css("width","100%"); */
+					app_edit.oTable.fnDraw(false); 
+					MessageBoxShow('操作成功!',true);
+				}else{
+					MessageBoxShow('保存失败!');
+				}
+			},
+			error:function(){
+				MessageBoxShow('保存失败!');
+			}
+		})
+	}
 	function showResult(id)
 	{
 		$.ajax({
@@ -322,62 +380,6 @@
 				MessageBoxShow('保存失败!');
 			}
 		})
-		
-		
-		
-		
-		
-		/* if(prescription_result_dialog_table){
-			prescription_result_dialog_table.fnDestroy();  //还原初始化了的datatable
-		}
-		prescription_result_dialog_table = $("#prescription_result_dialog_table").dataTable({
-				"bProcessing" : true,//加载数据时候是否显示进度条
-				"bServerSide" : false,//是否从服务加载数据 
-				"bSort":false,
-				"iDisplayLength" : 10,// 每页显示行数
-				"sAjaxSource" : "/beiYiSanYuan/prescription/getPrescriptionDrugsList.htm?id="+id,
-				"columns": [//数据列
-		            {"sWidth":'50%',"data": function ( row, type, set ){
-		            	//var s_title = cut_str(row.drugName, 30,"...");
-			            return drugName;
-		            }}
-				    ,
-		            {"sWidth":'50%',"data": function ( row, type, set ){
-			            return verifyResult;
-		            }}
-		            ,
-		            {"sWidth":'50%',"data": function ( row, type, set ){
-			            return verifyTime;
-		            }}
-		             /*
-		             ,{"sWidth":'15%',"data": function ( row, type, set ){
-			            return row.standard;
-		            }},{"sWidth":'50px',"data": function ( row, type, set ){
-			            return row.pack;
-		            }}{
-		             	"sWidth":'10px',
-			            "sTitle": "操作",
-			            "sClass": "center",
-			             "bSortable": false,
-			            "data": function ( row, type, set ){
-			            	//var delBtn ="<button  onclick=\"confirm('操作确认','<div style=padding:10px><font color=red>确定要删除吗(一旦删除，数据将无法恢复!)</font></div>',deleteRecord,'','"+row.id+"');\" title=\"删除\" class=\"btn btn-xs btn-default\"><i class=\"fa fa-times\"></i></button>"; 
-					        //return delBtn;
-				        } 
-		        	} 
-				],
-				"oLanguage" : common_data_table_config.oLanguage,
-				"fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-	   	 			return  "总共<span class='text-primary'>"+iTotal+"</span>条 ,"+
-	   	 				"当前"+(iTotal==0?"无记录":"(<span class='txt-color-darken'>"+iStart+" </span>到 <span class='txt-color-darken'>"+iEnd+"</span>)&nbsp;&nbsp;");
-	  			},
-	  			"fnDrawCallback": function( oSettings ) {
-			      $("[rel=tooltip]").tooltip();
-			    },
-			    "sDom": "<'dt-toolbar'<'col-xs-12 tools-bar'><'col-xs-4'C>r>"+"t"+"<'dt-toolbar-footer'<'col-xs-6'il><'col-xs-6'p>>",
-				"fnInitComplete": function(oSettings, json) {
-					$("#prescription_result_dialog_table_wrapper .dt-toolbar").remove();
-			     }
-		    }); */
 		return false;
 	}
 	function showResult2(prescriptionNo)
@@ -433,7 +435,7 @@
 			     }
 		    });
 	}
-	function changeAppState(ele,id,state){
+	/* function changeAppState(ele,id,state){
 		$.ajax({
 			url:"/app/changeState?id="+id+"&state="+state,
 			dataType:'json',
@@ -458,7 +460,7 @@
 				MessageBoxShow('保存失败!');
 			}
 		})
-	}
+	} */
 	
 	function checkFrmIpt(){
 		var result = true;

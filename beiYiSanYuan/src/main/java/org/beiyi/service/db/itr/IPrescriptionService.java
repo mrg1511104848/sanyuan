@@ -34,7 +34,7 @@ public interface IPrescriptionService {
 	void savePrescriptionVerifyRecordHistory(
 			PrescriptionVerifyRecordHistory record);
 	
-	void insistSubmit(
+	void changeVerifyHistory(
 			PrescriptionVerifyRecordHistory record);
 	int getCountByPrescriptionNo(String prescriptionNo);
 }

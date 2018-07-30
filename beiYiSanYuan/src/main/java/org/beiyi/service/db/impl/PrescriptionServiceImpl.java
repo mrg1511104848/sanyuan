@@ -1,5 +1,6 @@
 package org.beiyi.service.db.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.beiyi.dao.PrescriptionDrugsMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordDetailMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordHistoryMapper;
@@ -21,6 +24,7 @@ import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.Drug;
 import org.beiyi.service.db.itr.IPrescriptionService;
 import org.skynet.frame.util.date.DateUtil;
+import org.skynet.frame.util.map.MapUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 @Service
@@ -116,6 +120,13 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 				}
 				prescriptionVerifyRecord.setVerifyProgressList(verifyProgressListFinal);
 			}
+			if(params.get("prescriptionNo")!=null){
+				try {
+					BeanUtils.populate(prescriptionVerifyRecord, params);
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return prescriptionVerifyRecordMapper.getPagedList(prescriptionVerifyRecord);
@@ -153,7 +164,7 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 		prescriptionVerifyRecordHistoryMapper.insertSelective(record);
 	}
 	@Override
-	public void insistSubmit(PrescriptionVerifyRecordHistory record) {
+	public void changeVerifyHistory(PrescriptionVerifyRecordHistory record) {
 		record.setVerifyTime(new SimpleDateFormat(DateUtil.DATE_FORMAT_01).format(new Date()));
 		
 		savePrescriptionVerifyRecordHistory(record);
@@ -164,6 +175,7 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 		verifyRecord.setVerifyPerson(record.getVerifyPerson());
 		verifyRecord.setVerifyPersonUniqueNo(record.getVerifyPersonUniqueNo());
 		verifyRecord.setVerifyProgress(record.getVerifyProgress());
+		verifyRecord.setDisposeSuggest(record.getDisposeSuggest());
 		updateVerifyProgressByPrescriptionNo(verifyRecord);
 	}
 	@Override
