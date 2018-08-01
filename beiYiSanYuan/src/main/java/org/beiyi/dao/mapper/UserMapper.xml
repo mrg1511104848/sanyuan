@@ -178,4 +178,11 @@
     from bysy_user
     where username = #{username,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR}
   </select>
+  <select id="findUserByCondition" parameterType="org.beiyi.entity.db.User" resultMap="BaseResultMap">
+    select 
+    <include refid="User_Column_List" />
+    from bysy_user
+    where 1=1
+  </select>
+  
 </mapper>

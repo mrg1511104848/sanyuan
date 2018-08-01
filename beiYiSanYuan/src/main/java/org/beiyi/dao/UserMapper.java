@@ -57,4 +57,6 @@ public interface UserMapper {
 	User findUser(@Param(value="username")String username, @Param(value="password")String password);
 
 	List<User> getPagedList(User user);
+	
+	List<User> findUserByCondition(User user);
 }

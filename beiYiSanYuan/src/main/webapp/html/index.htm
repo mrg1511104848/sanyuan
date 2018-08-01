@@ -128,7 +128,7 @@
 
 				<!-- logout button -->
 				<div id="logout" class="btn-header transparent pull-right">
-					<span> <a href="login.html" title="退出" data-action="userLogout" data-logout-msg="这种方式可以安全退出系统"><i class="fa fa-sign-out"></i></a> </span>
+					<span> <a href="/beiYiSanYuan/user/loginOut.htm" title="退出" data-action="userLogout" data-logout-msg="这种方式可以安全退出系统"><i class="fa fa-sign-out"></i></a> </span>
 				</div>
 				<!-- end logout button -->
 
@@ -170,7 +170,11 @@
 						&nbsp;
 						<i class="fa fa-user fa-lg"></i>
 						<span class="font-lg">
-							&nbsp;${currentUser.userName }
+						<#if (currentUser.username)??>
+						   ${currentUser.username}
+						<#else>
+						   ${currentUser.userRealName}
+						</#if>
 						</span>
 					</a> 
 					

@@ -10,11 +10,13 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.beiyi.dao.PrescriptionDistributionRecordMapper;
 import org.beiyi.dao.PrescriptionDrugsMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordDetailMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordHistoryMapper;
 import org.beiyi.dao.PrescriptionVerifyRecordMapper;
 import org.beiyi.entity.VerifyResult;
+import org.beiyi.entity.db.PrescriptionDistributionRecord;
 import org.beiyi.entity.db.PrescriptionDrugs;
 import org.beiyi.entity.db.PrescriptionVerifyRecord;
 import org.beiyi.entity.db.PrescriptionVerifyRecordDetail;
@@ -22,6 +24,7 @@ import org.beiyi.entity.db.PrescriptionVerifyRecordHistory;
 import org.beiyi.entity.db.pageBean.Prescription;
 import org.beiyi.entity.verify.ChuFang;
 import org.beiyi.entity.verify.Drug;
+import org.beiyi.service.db.itr.IPrescriptionDistributionRecordService;
 import org.beiyi.service.db.itr.IPrescriptionService;
 import org.skynet.frame.util.date.DateUtil;
 import org.skynet.frame.util.map.MapUtil;
@@ -37,6 +40,8 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 	PrescriptionVerifyRecordDetailMapper prescriptionVerifyRecordDetailMapper;
 	@Autowired
 	PrescriptionVerifyRecordHistoryMapper prescriptionVerifyRecordHistoryMapper;
+	@Autowired
+	IPrescriptionDistributionRecordService prescriptionDistributionRecordService;
 	@Override
 	public void save(ChuFang chuFang) throws Exception{
 		List<String> diagnosises = chuFang.getDiagnosises();
@@ -177,6 +182,8 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 		verifyRecord.setVerifyProgress(record.getVerifyProgress());
 		verifyRecord.setDisposeSuggest(record.getDisposeSuggest());
 		updateVerifyProgressByPrescriptionNo(verifyRecord);
+		
+		prescriptionDistributionRecordService.savePrescriptionDistributionRecord(record.getPrescriptionNo());
 	}
 	@Override
 	public int getCountByPrescriptionNo(String prescriptionNo){

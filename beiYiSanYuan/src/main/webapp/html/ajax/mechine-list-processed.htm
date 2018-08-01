@@ -155,7 +155,7 @@
 
 <div id="remoteModal" style="display: none;"></div>
 <div id="mechine_list_proccessed_edit_" title="编辑文章"  style="display: none;"></div>
-<div id="divDialog"></div>
+<div id="verifyTipDialog" style="display:none;">确定要否决此处方吗？</div>
 <script type="text/javascript" src="/beiYiSanYuan/resources/js/pending-recipe-common.js"></script>
 <script type="text/javascript">
 	pageSetUp();
@@ -199,7 +199,13 @@
                     var unpassVerifyBtn = "<button  onclick=\"verify('"+row.prescriptionNo+"',4);\" title=\"否决审核\" class=\"btn btn-xs btn-default\">否决</button>&nbsp;";
                     var showResultBtn2 = "<button  onclick=\"showResult2('"+row.prescriptionNo+"');\" title=\"查看结果2\" class=\"btn btn-xs btn-default\">查看结果</button>&nbsp;";
                     var showDetailBtn = "<button  onclick=\"showDetail('"+row.id+"');\" title=\"查看处方详细\" class=\"btn btn-xs btn-default\">查看处方详细</button>&nbsp;";
-                    return passVerifyBtn+unpassVerifyBtn+showResultBtn2+showDetailBtn;
+                    
+                    var btnGroups = '';
+                    if(!(row.verifyProgress == 0 || row.verifyProgress == 1 || row.verifyProgress == 2 )){
+                    	btnGroups+=passVerifyBtn+unpassVerifyBtn;
+                    }
+                    btnGroups+=showResultBtn2+showDetailBtn;
+                    return btnGroups;
                 }
             },{
                 "sTitle": "姓名", "sClass": "center", "data" : function(row,type,set){
@@ -327,22 +333,36 @@
 	}
 	function verify(prescriptionNo,verify_flag){
 		if(verify_flag == 4){
-			asdf
+			var dialog = window.top.art.dialog({
+				title : "需求列表",
+				content : $("#verifyTipDialog")[0],
+				width : "850px",
+				lock : true,
+				button:[{
+			    	name:"确定",
+			    	callback:function(){
+			    		ajaxVerify(prescriptionNo, verify_flag);
+			    	}
+			    },{
+			    	name:'取消',
+			    	callback:function(){
+			    	}
+			    }],
+			    init: function () {
+			    	changeArtdialogButtonCss();
+			    }
+			});
+			$(".aui_content").css("width", "100%");
+		}else{
+			ajaxVerify(prescriptionNo, verify_flag);
 		}
+	}
+	function ajaxVerify(prescriptionNo,verify_flag){
 		$.ajax({
 			url:"/beiYiSanYuan/prescription/verify.htm?prescriptionNo="+prescriptionNo+"&verifyProgress="+verify_flag,
 			dataType:'json',
 			success:function(r){
 				if(r.code==0){
-					/* $(".verify-result-section").html(r.resultBean.verifyResult);
-					var dialog = window.top.art.dialog({
-							title: "详情",
-							content: $(".verify-result-section").html(),
-							width:"850px",
-							padding: '0px 0px',
-							lock:true
-					});
-					$(".aui_content").css("width","100%"); */
 					app_edit.oTable.fnDraw(false); 
 					MessageBoxShow('操作成功!',true);
 				}else{
@@ -352,7 +372,7 @@
 			error:function(){
 				MessageBoxShow('保存失败!');
 			}
-		})
+		}) 
 	}
 	function showResult(id)
 	{

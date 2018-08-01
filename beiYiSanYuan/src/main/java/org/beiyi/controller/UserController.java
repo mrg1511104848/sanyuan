@@ -43,6 +43,18 @@ public class UserController {
 			return WebUtils.createErrorResult();
 		}
 	}
+	/**
+	 * 去登陆
+	 * 
+	 * @return
+	 */
+	@RequestMapping("/loginOut.htm")
+	public ModelAndView loginOut(HttpSession httpSession) {
+		ModelAndView modelAndView = new ModelAndView("html/login");
+		httpSession.removeAttribute(SessionData.USER);
+		return modelAndView;
+	}
+	
 	@RequestMapping(value = "/data-statistics.htm")
 	public String dataStatistics(@RequestParam Map<String, Object> params) {
 		return "html/ajax/data-statistics";
