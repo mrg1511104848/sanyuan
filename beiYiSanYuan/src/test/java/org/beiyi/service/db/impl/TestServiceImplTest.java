@@ -15,6 +15,10 @@ public class TestServiceImplTest extends BaseJunit4Test{
 		record.setAge(22);
 		record.setCreatetime(new Date());
 		record.setName("name");
-		testServiceImpl.insertSelective(record);
+		try {
+			testServiceImpl.insertSelective(record);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
