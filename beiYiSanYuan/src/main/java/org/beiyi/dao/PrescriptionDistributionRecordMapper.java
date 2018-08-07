@@ -1,5 +1,7 @@
 package org.beiyi.dao;
 
+import java.util.List;
+
 import org.beiyi.entity.db.PrescriptionDistributionRecord;
 
 public interface PrescriptionDistributionRecordMapper {
@@ -50,4 +52,6 @@ public interface PrescriptionDistributionRecordMapper {
      * @mbggenerated Tue Jul 31 16:47:18 CST 2018
      */
     int updateByPrimaryKey(PrescriptionDistributionRecord record);
+
+	List<Integer> getDistributionStatistics(String distributionPersonId);
 }

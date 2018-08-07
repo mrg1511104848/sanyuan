@@ -59,4 +59,6 @@ public interface UserMapper {
 	List<User> getPagedList(User user);
 	
 	List<User> findUserByCondition(User user);
+	
+	User getRandomUser(User user);
 }

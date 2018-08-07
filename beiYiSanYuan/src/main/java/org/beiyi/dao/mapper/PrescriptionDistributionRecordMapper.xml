@@ -32,6 +32,12 @@
     from prescription_distribution_record
     where id = #{id,jdbcType=VARCHAR}
   </select>
+  <select id="getDistributionStatistics" parameterType="java.lang.String" resultType="Integer">
+    select 
+    <include refid="Base_Column_List" />
+    from prescription_distribution_record
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     <!--
       WARNING - @mbggenerated

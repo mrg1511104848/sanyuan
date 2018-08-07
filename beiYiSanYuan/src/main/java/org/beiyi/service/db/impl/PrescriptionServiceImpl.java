@@ -183,10 +183,15 @@ public class PrescriptionServiceImpl implements IPrescriptionService {
 		verifyRecord.setDisposeSuggest(record.getDisposeSuggest());
 		updateVerifyProgressByPrescriptionNo(verifyRecord);
 		
-		prescriptionDistributionRecordService.savePrescriptionDistributionRecord(record.getPrescriptionNo());
+		
 	}
 	@Override
 	public int getCountByPrescriptionNo(String prescriptionNo){
 		return prescriptionVerifyRecordMapper.getCountByPrescriptionNo(prescriptionNo);
+	}
+	@Override
+	public void insistSubmit(PrescriptionVerifyRecordHistory record) {
+		changeVerifyHistory(record);
+		prescriptionDistributionRecordService.savePrescriptionDistributionRecord(record.getPrescriptionNo());
 	}
 }

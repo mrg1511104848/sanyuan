@@ -9,7 +9,7 @@ import org.beiyi.entity.db.pageBean.PrescriptionVerifyRecord;
 
 public class Test {
 	public static void main(String[] args) {
-		Integer a = 1;
+		/*Integer a = 1;
 		Integer b = 1;
 		System.out.println(a==b);
 		a = 200;
@@ -25,6 +25,11 @@ public class Test {
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
-		System.out.println();
+		System.out.println();*/
+		int i = 5;
+		int temp = 0;
+		i=i++;
+		System.out.println(temp);
+		System.out.println(i);
 	}
 }

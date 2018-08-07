@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.beiyi.dao.UserMapper">
+  <cache></cache>
   <resultMap id="BaseResultMap" type="org.beiyi.entity.db.User">
     <!--
       WARNING - @mbggenerated
@@ -184,5 +185,11 @@
     from bysy_user
     where 1=1
   </select>
-  
+  <select id="getRandomUser" resultMap="BaseResultMap">
+    select 
+    <include refid="User_Column_List" />
+    FROM bysy_user
+	WHERE id >= (SELECT floor(RAND() * (SELECT MAX(id) FROM bysy_user)))
+	ORDER BY id LIMIT 1;
+  </select>
 </mapper>
